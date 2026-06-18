@@ -19,16 +19,10 @@ export const useTheme = () => {
 };
 
 export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
-  const [theme, setTheme] = useState<Theme>("system");
+  const [theme, setTheme] = useState<Theme>("light");
 
-  const getEffectiveTheme = (): "light" | "dark" => {
-    if (theme === "system") {
-      return window.matchMedia("(prefers-color-scheme: dark)").matches
-        ? "dark"
-        : "light";
-    }
-    return theme as "light" | "dark";
-  };
+  // Bondable is light-only: a real light theme via :root tokens (no dark, no invert hack).
+  const getEffectiveTheme = (): "light" | "dark" => "light";
 
   const [effectiveTheme, setEffectiveTheme] = useState<"light" | "dark">(
     getEffectiveTheme()
@@ -50,14 +44,10 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
   }, [theme]);
 
   useEffect(() => {
+    // Force a real light theme. No "dark", no "invert" filter hack.
     const root = document.documentElement;
     root.classList.remove("light", "dark", "invert");
-    root.classList.add(effectiveTheme);
-
-    // only add the "invert" class in light mode
-    if (effectiveTheme === "light") {
-      root.classList.add("invert");
-    }
+    root.classList.add("light");
   }, [effectiveTheme]);
 
   return (

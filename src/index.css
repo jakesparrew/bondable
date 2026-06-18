@@ -4,49 +4,50 @@
 
 @layer base {
   :root {
-    /* Bondable brand — deep-teal primary; mint (--mint) reserved for AI surfaces */
-    --background: 170 22% 98%;
-    --foreground: 185 35% 13%;
+    /* Bondable brand — LIGHT theme matched to the design mockup.
+       Deep-teal ink + sidebar, soft off-white-green canvas, mint reserved for AI. */
+    --background: 165 24% 96%;          /* #f4f8f7 soft canvas */
+    --foreground: 174 62% 16%;          /* #0f403c deep-teal ink */
 
-    --card: 0 0% 100%;
-    --card-foreground: 185 35% 13%;
+    --card: 0 0% 100%;                  /* white cards */
+    --card-foreground: 174 62% 16%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 185 35% 13%;
+    --popover-foreground: 174 62% 16%;
 
-    --primary: 174 72% 21%;
-    --primary-foreground: 160 40% 98%;
+    --primary: 174 62% 16%;             /* #0f403c deep teal */
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 168 30% 94%;
-    --secondary-foreground: 185 35% 18%;
+    --secondary: 165 28% 94%;
+    --secondary-foreground: 174 55% 18%;
 
-    --muted: 170 18% 95%;
-    --muted-foreground: 185 12% 42%;
+    --muted: 165 22% 95%;
+    --muted-foreground: 176 13% 40%;    /* #5a7674 */
 
-    --accent: 168 34% 92%;
-    --accent-foreground: 174 72% 18%;
+    --accent: 162 38% 92%;              /* soft mint tint for hovers */
+    --accent-foreground: 174 62% 16%;
 
-    --destructive: 0 75% 52%;
+    --destructive: 0 72% 52%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 174 18% 88%;
-    --input: 174 18% 88%;
-    --ring: 162 70% 38%;
+    --border: 165 24% 89%;              /* #dbe8e6 */
+    --input: 165 24% 89%;
+    --ring: 162 72% 42%;
 
-    --radius: 0.75rem;
+    --radius: 1rem;
 
     /* Mint — AI surfaces ONLY (badges, agent UI) */
-    --mint: 162 72% 42%;
-    --mint-foreground: 185 45% 12%;
+    --mint: 162 73% 44%;                /* #1ec291 */
+    --mint-foreground: 174 64% 12%;
 
-    --sidebar-background: 185 45% 11%;
-    --sidebar-foreground: 168 22% 88%;
-    --sidebar-primary: 162 72% 42%;
-    --sidebar-primary-foreground: 185 45% 11%;
-    --sidebar-accent: 185 33% 18%;
-    --sidebar-accent-foreground: 168 22% 92%;
-    --sidebar-border: 185 30% 20%;
-    --sidebar-ring: 162 70% 42%;
+    --sidebar-background: 187 53% 9%;   /* #0a1f22 deep teal */
+    --sidebar-foreground: 168 18% 80%;  /* #d6e2e0 */
+    --sidebar-primary: 162 73% 44%;     /* mint */
+    --sidebar-primary-foreground: 187 53% 9%;
+    --sidebar-accent: 184 36% 14%;      /* #152e2f active nav */
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 185 34% 16%;      /* #1a3134 */
+    --sidebar-ring: 162 72% 44%;
   }
 
   .dark {
