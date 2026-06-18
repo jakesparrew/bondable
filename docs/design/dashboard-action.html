@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bondable Therapist Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+
+    :root {
+      --background: #f4f8f7;
+      --foreground: #152427;
+      --primary: #0f403c;
+      --mint: #1ec291;
+      --secondary: #eef7f5;
+      --sidebar: #0a1f22;
+      --card: #ffffff;
+      --border: #dbe8e6;
+    }
+
+    body {
+      font-family: 'Plus+Jakarta+Sans', sans-serif;
+      background-color: var(--background);
+      color: var(--foreground);
+    }
+
+    .custom-shadow {
+      box-shadow: 0 4px 20px -4px rgba(15, 64, 60, 0.05);
+    }
+
+    .ai-badge {
+      background-color: rgba(30, 194, 145, 0.15);
+      color: var(--mint);
+      border: 1px solid rgba(30, 194, 145, 0.2);
+    }
+
+    .action-card:hover {
+      transform: translateY(-2px);
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    @view-transition {
+      navigation: auto;
+    }
+  </style>
+  <meta name="view-transition" content="same-origin">
+</head>
+<body>
+  <div class="flex min-h-screen">
+    <!-- Sidebar -->
+    <aside class="w-64 flex flex-col fixed inset-y-0 left-0 bg-[#0a1f22] text-[#d6e2e0] z-50">
+      <div class="p-8">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-lg bg-[#1ec291] flex items-center justify-center">
+            <iconify-icon icon="lucide:leaf" class="text-white text-xl"></iconify-icon>
+          </div>
+          <span class="text-xl font-bold tracking-tight text-white">Bondable</span>
+        </div>
+      </div>
+
+      <nav class="flex-1 px-4 space-y-1">
+        <a href="#" id="nav-dashboard" class="flex items-center gap-3 px-4 py-3 rounded-lg text-white bg-[#152e2f] transition-colors">
+          <iconify-icon icon="lucide:layout-dashboard" class="text-lg"></iconify-icon>
+          <span class="font-medium">Dashboard</span>
+        </a>
+        <a href="#" id="nav-clients" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-[#152e2f] hover:text-white transition-colors">
+          <iconify-icon icon="lucide:users" class="text-lg"></iconify-icon>
+          <span class="font-medium">Clients</span>
+        </a>
+        <a href="#" id="nav-sessions" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-[#152e2f] hover:text-white transition-colors">
+          <iconify-icon icon="lucide:calendar-range" class="text-lg"></iconify-icon>
+          <span class="font-medium">Sessions</span>
+        </a>
+        <a href="#" id="nav-tasks" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-[#152e2f] hover:text-white transition-colors">
+          <iconify-icon icon="lucide:check-circle-2" class="text-lg"></iconify-icon>
+          <span class="font-medium">Tasks</span>
+        </a>
+        <a href="#" id="nav-messages" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-[#152e2f] hover:text-white transition-colors">
+          <iconify-icon icon="lucide:message-circle" class="text-lg"></iconify-icon>
+          <span class="font-medium text-sm">Messages</span>
+        </a>
+      </nav>
+
+      <div class="p-4 mb-4">
+        <div class="bg-[#152e2f] rounded-xl p-4">
+          <div class="flex items-center justify-between mb-2">
+            <span class="ai-badge px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">AI · Supervised</span>
+          </div>
+          <p class="text-[11px] leading-relaxed text-[#a3b8b6] mb-3">Bondable Assistant ready to summarize your morning sessions.</p>
+          <button id="cta-review-drafts" class="w-full py-2 bg-[#1ec291] text-[#0a1f22] rounded-lg text-xs font-semibold hover:bg-[#17a87e] transition-colors">
+            Review Drafts
+          </button>
+        </div>
+      </div>
+
+      <div class="p-4 border-t border-[#1a3134]">
+        <a href="#" id="nav-settings" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-[#152e2f] hover:text-white transition-colors">
+          <iconify-icon icon="lucide:settings" class="text-lg"></iconify-icon>
+          <span class="font-medium">Settings</span>
+        </a>
+        <div class="flex items-center gap-3 px-4 py-4 mt-2">
+          <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=DrElena" alt="Avatar" class="w-10 h-10 rounded-full border-2 border-[#1ec291]">
+          <div class="overflow-hidden">
+            <p class="text-sm font-semibold text-white truncate">Dr. Elena Thorne</p>
+            <p class="text-xs text-[#a3b8b6] truncate">LCSW</p>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 ml-64 min-w-0 bg-[#f4f8f7]">
+      <header class="sticky top-0 z-40 bg-white border-b border-[#dbe8e6] px-8 py-4 flex items-center justify-between">
+        <div>
+          <h1 class="text-lg font-bold text-[#0f403c] tracking-tight">Dashboard Overview</h1>
+          <p class="text-xs text-[#5a7674]">Tuesday, Nov 24, 2024</p>
+        </div>
+        <div class="flex items-center gap-3">
+          <div class="relative">
+            <iconify-icon icon="lucide:search" class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></iconify-icon>
+            <input type="text" placeholder="Search clients, notes..." class="pl-10 pr-4 py-2 bg-gray-50 border border-[#dbe8e6] rounded-full text-xs w-64 focus:outline-none focus:border-[#1ec291]">
+          </div>
+          <button id="header-notifs" class="p-2 rounded-full border border-[#dbe8e6] text-[#0f403c] hover:bg-gray-50 relative">
+            <iconify-icon icon="lucide:bell" class="text-lg"></iconify-icon>
+            <span class="absolute top-2 right-2 w-1.5 h-1.5 bg-[#1ec291] rounded-full"></span>
+          </button>
+        </div>
+      </header>
+
+      <div class="p-8">
+        <!-- Action-First: Prominent Quick Actions -->
+        <section class="mb-10">
+          <h2 class="text-xs font-bold text-[#5a7674] uppercase tracking-widest mb-4">Quick Actions</h2>
+          <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            <button id="action-new-client" class="action-card flex flex-col items-center justify-center p-4 bg-white border border-[#dbe8e6] rounded-2xl custom-shadow hover:border-[#0f403c] transition-all">
+              <div class="w-10 h-10 rounded-full bg-emerald-50 text-[#0f403c] flex items-center justify-center mb-2">
+                <iconify-icon icon="lucide:user-plus" class="text-xl"></iconify-icon>
+              </div>
+              <span class="text-xs font-bold text-[#0f403c]">New Client</span>
+            </button>
+            <button id="action-schedule" class="action-card flex flex-col items-center justify-center p-4 bg-white border border-[#dbe8e6] rounded-2xl custom-shadow hover:border-[#0f403c] transition-all">
+              <div class="w-10 h-10 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center mb-2">
+                <iconify-icon icon="lucide:calendar" class="text-xl"></iconify-icon>
+              </div>
+              <span class="text-xs font-bold text-[#0f403c]">Schedule</span>
+            </button>
+            <button id="action-clinical-note" class="action-card flex flex-col items-center justify-center p-4 bg-white border border-[#dbe8e6] rounded-2xl custom-shadow hover:border-[#0f403c] transition-all">
+              <div class="w-10 h-10 rounded-full bg-purple-50 text-purple-600 flex items-center justify-center mb-2">
+                <iconify-icon icon="lucide:file-edit" class="text-xl"></iconify-icon>
+              </div>
+              <span class="text-xs font-bold text-[#0f403c]">Clinical Note</span>
+            </button>
+            <button id="action-invoice" class="action-card flex flex-col items-center justify-center p-4 bg-white border border-[#dbe8e6] rounded-2xl custom-shadow hover:border-[#0f403c] transition-all">
+              <div class="w-10 h-10 rounded-full bg-orange-50 text-orange-600 flex items-center justify-center mb-2">
+                <iconify-icon icon="lucide:credit-card" class="text-xl"></iconify-icon>
+              </div>
+              <span class="text-xs font-bold text-[#0f403c]">Invoice</span>
+            </button>
+            <button id="action-telehealth" class="action-card flex flex-col items-center justify-center p-4 bg-[#0f403c] border border-[#0f403c] rounded-2xl custom-shadow transition-all group">
+              <div class="w-10 h-10 rounded-full bg-white/10 text-white flex items-center justify-center mb-2">
+                <iconify-icon icon="lucide:video" class="text-xl"></iconify-icon>
+              </div>
+              <span class="text-xs font-bold text-white">Join Room</span>
+            </button>
+          </div>
+        </section>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          <!-- Client Management: Slightly Denser Table -->
+          <div class="lg:col-span-8">
+            <div class="bg-white rounded-3xl border border-[#dbe8e6] custom-shadow overflow-hidden">
+              <div class="px-6 py-5 border-b border-[#dbe8e6] flex items-center justify-between">
+                <div>
+                  <h2 class="text-sm font-bold text-[#0f403c]">Active Clients & Tasks</h2>
+                  <p class="text-[11px] text-[#5a7674]">Manage your current clinical queue</p>
+                </div>
+                <div class="flex gap-2">
+                  <button class="px-3 py-1.5 text-[11px] font-bold bg-[#f4f8f7] text-[#0f403c] rounded-lg">All</button>
+                  <button class="px-3 py-1.5 text-[11px] font-bold text-[#5a7674] hover:bg-[#f4f8f7] rounded-lg">Urgent</button>
+                </div>
+              </div>
+              
+              <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                  <thead>
+                    <tr class="bg-gray-50/50 text-[10px] font-bold text-[#5a7674] uppercase tracking-wider">
+                      <th class="px-6 py-3 border-b border-[#dbe8e6]">Client</th>
+                      <th class="px-6 py-3 border-b border-[#dbe8e6]">Status</th>
+                      <th class="px-6 py-3 border-b border-[#dbe8e6]">Last Session</th>
+                      <th class="px-6 py-3 border-b border-[#dbe8e6]">Outcome</th>
+                      <th class="px-6 py-3 border-b border-[#dbe8e6] text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-[#dbe8e6]/50">
+                    <tr class="hover:bg-[#f4f8f7]/40 transition-colors">
+                      <td class="px-6 py-3">
+                        <div class="flex items-center gap-3">
+                          <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah" class="w-8 h-8 rounded-full bg-[#eef7f5]">
+                          <div>
+                            <p class="text-xs font-bold text-[#0f403c]">Sarah Jenkins</p>
+                            <p class="text-[10px] text-[#5a7674]">Individual · DBT</p>
+                          </div>
+                        </div>
+                      </td>
+                      <td class="px-6 py-3">
+                        <span class="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-600 text-[9px] font-bold border border-emerald-100 uppercase">Stabilizing</span>
+                      </td>
+                      <td class="px-6 py-3 text-[11px] text-[#5a7674]">Today, 10:30 AM</td>
+                      <td class="px-6 py-3">
+                        <div class="flex gap-0.5 text-xs text-emerald-500">
+                           <iconify-icon icon="lucide:trending-up"></iconify-icon>
+                        </div>
+                      </td>
+                      <td class="px-6 py-3 text-right">
+                        <button id="client-action-1" class="p-1.5 text-[#5a7674] hover:text-[#0f403c]">
+                          <iconify-icon icon="lucide:more-horizontal"></iconify-icon>
+                        </button>
+                      </td>
+                    </tr>
+                    <tr class="hover:bg-[#f4f8f7]/40 transition-colors">
+                      <td class="px-6 py-3">
+                        <div class="flex items-center gap-3">
+                          <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Michael" class="w-8 h-8 rounded-full bg-[#eef7f5]">
+                          <div>
+                            <p class="text-xs font-bold text-[#0f403c]">Michael Chen</p>
+                            <p class="text-[10px] text-[#5a7674]">Family · Crisis</p>
+                          </div>
+                        </div>
+                      </td>
+                      <td class="px-6 py-3">
+                        <span class="px-2 py-0.5 rounded-full bg-amber-50 text-amber-600 text-[9px] font-bold border border-amber-100 uppercase">Action Required</span>
+                      </td>
+                      <td class="px-6 py-3 text-[11px] text-[#5a7674]">Nov 22, 02:00 PM</td>
+                      <td class="px-6 py-3">
+                        <div class="flex gap-0.5 text-xs text-amber-500">
+                           <iconify-icon icon="lucide:alert-circle"></iconify-icon>
+                        </div>
+                      </td>
+                      <td class="px-6 py-3 text-right">
+                        <button id="client-action-2" class="p-1.5 text-[#5a7674] hover:text-[#0f403c]">
+                          <iconify-icon icon="lucide:more-horizontal"></iconify-icon>
+                        </button>
+                      </td>
+                    </tr>
+                    <tr class="hover:bg-[#f4f8f7]/40 transition-colors">
+                      <td class="px-6 py-3">
+                        <div class="flex items-center gap-3">
+                          <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Emily" class="w-8 h-8 rounded-full bg-[#eef7f5]">
+                          <div>
+                            <p class="text-xs font-bold text-[#0f403c]">Emily Rogers</p>
+                            <p class="text-[10px] text-[#5a7674]">Individual · GAD</p>
+                          </div>
+                        </div>
+                      </td>
+                      <td class="px-6 py-3">
+                        <span class="px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 text-[9px] font-bold border border-blue-100 uppercase">Maintenance</span>
+                      </td>
+                      <td class="px-6 py-3 text-[11px] text-[#5a7674]">Nov 21, 09:15 AM</td>
+                      <td class="px-6 py-3">
+                        <div class="flex gap-0.5 text-xs text-blue-500">
+                           <iconify-icon icon="lucide:minus"></iconify-icon>
+                        </div>
+                      </td>
+                      <td class="px-6 py-3 text-right">
+                        <button id="client-action-3" class="p-1.5 text-[#5a7674] hover:text-[#0f403c]">
+                          <iconify-icon icon="lucide:more-horizontal"></iconify-icon>
+                        </button>
+                      </td>
+                    </tr>
+                    <tr class="hover:bg-[#f4f8f7]/40 transition-colors">
+                      <td class="px-6 py-3">
+                        <div class="flex items-center gap-3">
+                          <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Marcus" class="w-8 h-8 rounded-full bg-[#eef7f5]">
+                          <div>
+                            <p class="text-xs font-bold text-[#0f403c]">Marcus Thorne</p>
+                            <p class="text-[10px] text-[#5a7674]">Couples · Gottman</p>
+                          </div>
+                        </div>
+                      </td>
+                      <td class="px-6 py-3">
+                        <span class="px-2 py-0.5 rounded-full bg-gray-100 text-gray-500 text-[9px] font-bold uppercase">Post-Intake</span>
+                      </td>
+                      <td class="px-6 py-3 text-[11px] text-[#5a7674]">Nov 19, 04:00 PM</td>
+                      <td class="px-6 py-3">
+                        <div class="flex gap-0.5 text-xs text-gray-400">
+                           <iconify-icon icon="lucide:help-circle"></iconify-icon>
+                        </div>
+                      </td>
+                      <td class="px-6 py-3 text-right">
+                        <button id="client-action-4" class="p-1.5 text-[#5a7674] hover:text-[#0f403c]">
+                          <iconify-icon icon="lucide:more-horizontal"></iconify-icon>
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="p-4 border-t border-[#dbe8e6] flex justify-center">
+                <button id="btn-view-all-clients" class="text-[11px] font-bold text-[#0f403c] hover:underline flex items-center gap-1">
+                  View Full Client List <iconify-icon icon="lucide:chevron-right"></iconify-icon>
+                </button>
+              </div>
+            </div>
+
+            <!-- Today's Stats KPIs (Condensed) -->
+            <div class="grid grid-cols-3 gap-4 mt-8">
+              <div class="bg-white p-4 rounded-2xl border border-[#dbe8e6] custom-shadow">
+                <p class="text-[10px] font-bold text-[#5a7674] uppercase mb-1">Total Billings</p>
+                <p class="text-xl font-bold text-[#0f403c]">$1,240</p>
+                <p class="text-[9px] text-emerald-600 font-bold mt-1">+4% from last week</p>
+              </div>
+              <div class="bg-white p-4 rounded-2xl border border-[#dbe8e6] custom-shadow">
+                <p class="text-[10px] font-bold text-[#5a7674] uppercase mb-1">Hours Logged</p>
+                <p class="text-xl font-bold text-[#0f403c]">28.5 <span class="text-xs font-medium text-[#5a7674]">/ 40</span></p>
+                <div class="w-full bg-gray-100 h-1 rounded-full mt-2">
+                  <div class="bg-[#1ec291] h-1 rounded-full w-[70%]"></div>
+                </div>
+              </div>
+              <div class="bg-white p-4 rounded-2xl border border-[#dbe8e6] custom-shadow">
+                <p class="text-[10px] font-bold text-[#5a7674] uppercase mb-1">Pending Tasks</p>
+                <p class="text-xl font-bold text-[#0f403c]">12</p>
+                <p class="text-[9px] text-orange-500 font-bold mt-1">3 Urgent tasks</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Today's Schedule Sidebar -->
+          <div class="lg:col-span-4 space-y-6">
+            <div class="bg-white rounded-3xl border border-[#dbe8e6] custom-shadow p-6">
+              <div class="flex items-center justify-between mb-4">
+                <h2 class="text-sm font-bold text-[#0f403c]">Clinical Queue</h2>
+                <span class="text-[10px] font-bold text-[#5a7674] bg-[#f4f8f7] px-2 py-1 rounded-md">Today</span>
+              </div>
+
+              <div class="space-y-3">
+                <div class="p-3 rounded-2xl bg-emerald-50/50 border border-emerald-100 relative">
+                  <div class="flex items-center gap-3">
+                    <div class="text-center">
+                      <p class="text-xs font-bold text-[#0f403c]">10:30</p>
+                    </div>
+                    <div class="h-6 w-px bg-emerald-100"></div>
+                    <div>
+                      <p class="text-xs font-bold text-[#0f403c]">Sarah Jenkins</p>
+                      <p class="text-[9px] text-emerald-700">DBT · Telehealth</p>
+                    </div>
+                  </div>
+                  <div class="absolute top-3 right-3">
+                    <span class="flex h-2 w-2">
+                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                      <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                    </span>
+                  </div>
+                </div>
+
+                <div class="p-3 rounded-2xl bg-white border border-[#dbe8e6]">
+                  <div class="flex items-center gap-3">
+                    <div class="text-center">
+                      <p class="text-xs font-bold text-[#5a7674]">12:00</p>
+                    </div>
+                    <div class="h-6 w-px bg-[#dbe8e6]"></div>
+                    <div>
+                      <p class="text-xs font-bold text-[#5a7674]">Documentation</p>
+                      <p class="text-[9px] text-[#a3b8b6]">Review AI Drafts</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="p-3 rounded-2xl bg-white border border-[#dbe8e6]">
+                  <div class="flex items-center gap-3">
+                    <div class="text-center">
+                      <p class="text-xs font-bold text-[#0f403c]">02:15</p>
+                    </div>
+                    <div class="h-6 w-px bg-[#dbe8e6]"></div>
+                    <div>
+                      <p class="text-xs font-bold text-[#0f403c]">Michael Chen</p>
+                      <p class="text-[9px] text-[#5a7674]">Crisis Intervention</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <button id="agenda-add" class="w-full mt-4 py-3 border-2 border-dashed border-[#dbe8e6] rounded-2xl text-[11px] font-bold text-[#5a7674] hover:bg-[#f4f8f7] transition-colors">
+                + Quick Slot
+              </button>
+
+              <div class="mt-8 pt-6 border-t border-[#dbe8e6]">
+                <h3 class="text-[10px] font-bold text-[#0f403c] uppercase tracking-wider mb-4">System Alerts</h3>
+                <div class="space-y-3">
+                  <div class="flex items-center gap-3 p-3 bg-orange-50 rounded-xl border border-orange-100">
+                    <iconify-icon icon="lucide:alert-triangle" class="text-orange-500 text-lg"></iconify-icon>
+                    <div class="flex-1">
+                      <p class="text-[11px] font-bold text-orange-800">3 Invoices Unsent</p>
+                      <p class="text-[9px] text-orange-700">Due by EOD tomorrow</p>
+                    </div>
+                    <iconify-icon icon="lucide:arrow-right" class="text-orange-400"></iconify-icon>
+                  </div>
+                  <div class="flex items-center gap-3 p-3 bg-[#eef7f5] rounded-xl border border-emerald-100">
+                    <iconify-icon icon="lucide:sparkles" class="text-emerald-500 text-lg"></iconify-icon>
+                    <div class="flex-1">
+                      <p class="text-[11px] font-bold text-emerald-800">AI Summaries Ready</p>
+                      <p class="text-[9px] text-emerald-700">2 sessions processed</p>
+                    </div>
+                    <iconify-icon icon="lucide:arrow-right" class="text-emerald-400"></iconify-icon>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

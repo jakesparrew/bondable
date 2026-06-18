@@ -1,8 +1,7 @@
-import BaseDashboard from "@/components/common/BaseDashboard";
-import { therapistDashboardConfig } from "@/config/dashboardConfigs";
+import TherapistDashboardContent from "@/components/dashboard/TherapistDashboardContent";
 
 const TherapistDashboard = () => {
-  return <BaseDashboard userType="therapist" config={therapistDashboardConfig} />;
+  return <TherapistDashboardContent />;
 };
 
 export default TherapistDashboard;
