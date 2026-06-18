@@ -4,83 +4,92 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Bondable brand — deep-teal primary; mint (--mint) reserved for AI surfaces */
+    --background: 170 22% 98%;
+    --foreground: 185 35% 13%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 185 35% 13%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 185 35% 13%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 174 72% 21%;
+    --primary-foreground: 160 40% 98%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 168 30% 94%;
+    --secondary-foreground: 185 35% 18%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 170 18% 95%;
+    --muted-foreground: 185 12% 42%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 168 34% 92%;
+    --accent-foreground: 174 72% 18%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 75% 52%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --border: 174 18% 88%;
+    --input: 174 18% 88%;
+    --ring: 162 70% 38%;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
 
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    /* Mint — AI surfaces ONLY (badges, agent UI) */
+    --mint: 162 72% 42%;
+    --mint-foreground: 185 45% 12%;
+
+    --sidebar-background: 185 45% 11%;
+    --sidebar-foreground: 168 22% 88%;
+    --sidebar-primary: 162 72% 42%;
+    --sidebar-primary-foreground: 185 45% 11%;
+    --sidebar-accent: 185 33% 18%;
+    --sidebar-accent-foreground: 168 22% 92%;
+    --sidebar-border: 185 30% 20%;
+    --sidebar-ring: 162 70% 42%;
   }
 
   .dark {
-    --background: 0 0% 3.9%;
-    --foreground: 0 0% 98%;
+    /* Bondable dark — deep teal, not black */
+    --background: 185 42% 9%;
+    --foreground: 168 22% 92%;
 
-    --card: 0 0% 3.9%;
-    --card-foreground: 0 0% 98%;
+    --card: 185 40% 12%;
+    --card-foreground: 168 22% 92%;
 
-    --popover: 0 0% 3.9%;
-    --popover-foreground: 0 0% 98%;
+    --popover: 185 40% 12%;
+    --popover-foreground: 168 22% 92%;
 
-    --primary: 0 0% 98%;
-    --primary-foreground: 0 0% 9%;
+    --primary: 162 70% 45%;
+    --primary-foreground: 185 45% 10%;
 
-    --secondary: 0 0% 14.9%;
-    --secondary-foreground: 0 0% 98%;
+    --secondary: 185 30% 18%;
+    --secondary-foreground: 168 22% 92%;
 
-    --muted: 0 0% 14.9%;
-    --muted-foreground: 0 0% 63.9%;
+    --muted: 185 28% 16%;
+    --muted-foreground: 168 14% 62%;
 
-    --accent: 0 0% 14.9%;
-    --accent-foreground: 0 0% 98%;
+    --accent: 185 30% 20%;
+    --accent-foreground: 168 22% 94%;
 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
+    --destructive: 0 70% 45%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 0 0% 14.9%;
-    --input: 0 0% 14.9%;
-    --ring: 0 0% 83.1%;
+    --border: 185 28% 20%;
+    --input: 185 28% 20%;
+    --ring: 162 70% 45%;
 
-    --sidebar-background: 0 0% 3.9%;
-    --sidebar-foreground: 0 0% 98%;
-    --sidebar-primary: 0 0% 98%;
-    --sidebar-primary-foreground: 0 0% 9%;
-    --sidebar-accent: 0 0% 14.9%;
-    --sidebar-accent-foreground: 0 0% 98%;
-    --sidebar-border: 0 0% 14.9%;
-    --sidebar-ring: 0 0% 83.1%;
+    --mint: 162 72% 48%;
+    --mint-foreground: 185 45% 10%;
+
+    --sidebar-background: 185 45% 8%;
+    --sidebar-foreground: 168 22% 88%;
+    --sidebar-primary: 162 72% 45%;
+    --sidebar-primary-foreground: 185 45% 10%;
+    --sidebar-accent: 185 33% 16%;
+    --sidebar-accent-foreground: 168 22% 92%;
+    --sidebar-border: 185 30% 18%;
+    --sidebar-ring: 162 70% 45%;
   }
   
   /* Mobile file input and audio fixes */

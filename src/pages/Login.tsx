@@ -397,9 +397,9 @@ const Login = () => {
   // Show loading state while auth is initializing
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
-        <div className="text-white text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto mb-4"></div>
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-foreground text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-foreground mx-auto mb-4"></div>
           <p>{t("loading")}</p>
         </div>
       </div>
@@ -409,9 +409,9 @@ const Login = () => {
   // Show redirecting state
   if (isRedirecting) {
     return (
-      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
-        <div className="text-white text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto mb-4"></div>
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-foreground text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-foreground mx-auto mb-4"></div>
           <p>{t("redirecting")}</p>
         </div>
       </div>
@@ -421,9 +421,9 @@ const Login = () => {
   // Don't render login form for authenticated users - they will be redirected by the useEffect
   if (user && !showRoleDialog && !isRedirecting) {
     return (
-      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
-        <div className="text-white text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto mb-4"></div>
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-foreground text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-foreground mx-auto mb-4"></div>
           <p>{t("processing_login")}</p>
         </div>
       </div>
@@ -431,34 +431,34 @@ const Login = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] flex">
+    <div className="min-h-screen bg-background flex">
       <RoleSelectionDialog
         open={showRoleDialog}
         onRoleSelect={handleRoleSelection}
       />
 
       {/* Left side - welcome text */}
-      <div className="flex-1 hidden lg:flex flex-col justify-between p-10 bg-[#1a1a1a]">
+      <div className="flex-1 hidden lg:flex flex-col justify-between p-10 bg-sidebar">
         <div className="flex items-center space-x-2">
           <img src="/favicon.ico" alt="Icon" className="w-8 h-8" />
         </div>
 
         <div>
-          <blockquote className="text-white text-sm leading-relaxed max-w-lg">
+          <blockquote className="text-foreground text-sm leading-relaxed max-w-lg">
             {t('login_blockquote')}
           </blockquote>
         </div>
       </div>
 
       {/* Right side - login/register form */}
-      <div className="flex-1 flex items-center justify-center p-4 sm:p-8 bg-[#0a0a0a] min-h-screen">{/* Reduced mobile padding and ensured full height */}
+      <div className="flex-1 flex items-center justify-center p-4 sm:p-8 bg-background min-h-screen">{/* Reduced mobile padding and ensured full height */}
         <div className="w-full max-w-sm">
           <div className="space-y-6">
             <div className="text-center space-y-2">
-              <h1 className="text-white text-xl font-medium">
+              <h1 className="text-foreground text-xl font-medium">
                 {isRegister ? t('create_an_account') : t('welcome_back')}
               </h1>
-              <p className="text-gray-400 text-sm">
+              <p className="text-muted-foreground text-sm">
                 {isRegister
                   ? t('enter_details')
                   : t('enter_credentials')}
@@ -473,7 +473,7 @@ const Login = () => {
                     type="button"
                     onClick={() => quickLogin("therapist")}
                     disabled={isLoading}
-                    className="flex-1 h-9 rounded-md text-xs bg-[#1a1a1a] border border-[#2a2a2a] text-white hover:bg-[#2a2a2a]"
+                    className="flex-1 h-9 rounded-md text-xs bg-card border border-border text-foreground hover:bg-muted"
                   >
                     Care Provider
                   </Button>
@@ -481,7 +481,7 @@ const Login = () => {
                     type="button"
                     onClick={() => quickLogin("client")}
                     disabled={isLoading}
-                    className="flex-1 h-9 rounded-md text-xs bg-[#1a1a1a] border border-[#2a2a2a] text-white hover:bg-[#2a2a2a]"
+                    className="flex-1 h-9 rounded-md text-xs bg-card border border-border text-foreground hover:bg-muted"
                   >
                     Client
                   </Button>
@@ -497,7 +497,7 @@ const Login = () => {
                     placeholder={t('first_name')}
                     value={firstName}
                     onChange={(e) => setFirstName(e.target.value)}
-                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white placeholder:text-gray-500 h-10 rounded-md focus:border-gray-400 focus:ring-0"
+                    className="bg-background border-border text-foreground placeholder:text-muted-foreground h-10 rounded-md focus:border-ring focus:ring-ring"
                     required
                     disabled={isLoading}
                   />
@@ -506,7 +506,7 @@ const Login = () => {
                     placeholder={t('last_name')}
                     value={lastName}
                     onChange={(e) => setLastName(e.target.value)}
-                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white placeholder:text-gray-500 h-10 rounded-md focus:border-gray-400 focus:ring-0"
+                    className="bg-background border-border text-foreground placeholder:text-muted-foreground h-10 rounded-md focus:border-ring focus:ring-ring"
                     required
                     disabled={isLoading}
                   />
@@ -518,7 +518,7 @@ const Login = () => {
                 placeholder={t("name_example_com")}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="bg-[#1a1a1a] border-[#2a2a2a] text-white placeholder:text-gray-500 h-10 rounded-md focus:border-gray-400 focus:ring-0"
+                className="bg-background border-border text-foreground placeholder:text-muted-foreground h-10 rounded-md focus:border-ring focus:ring-ring"
                 required
                 disabled={isLoading}
               />
@@ -528,7 +528,7 @@ const Login = () => {
                 placeholder={t('enter_password')}
                 value={password}
                 onChange={setPassword}
-                className="bg-[#1a1a1a] border-[#2a2a2a] text-white placeholder:text-gray-500 h-10 rounded-md focus:border-gray-400 focus:ring-0"
+                className="bg-background border-border text-foreground placeholder:text-muted-foreground h-10 rounded-md focus:border-ring focus:ring-ring"
                 state={isRegister ? "default" : "never"}
               />
 
@@ -540,8 +540,8 @@ const Login = () => {
                     disabled={isLoading}
                     className={`flex-1 h-10 rounded-md font-medium text-sm transition-colors ${
                       selectedRole === "therapist"
-                        ? "bg-white text-black hover:bg-gray-100"
-                        : "bg-[#1a1a1a] border border-[#2a2a2a] text-white hover:bg-[#2a2a2a] hover:text-neutral-300"
+                        ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                        : "bg-card border border-border text-foreground hover:bg-muted hover:text-muted-foreground"
                     }`}
                     variant={
                       selectedRole === "therapist" ? "default" : "outline"
@@ -555,8 +555,8 @@ const Login = () => {
                     disabled={isLoading}
                     className={`flex-1 h-10 rounded-md font-medium text-sm transition-colors ${
                       selectedRole === "client"
-                        ? "bg-white text-black hover:bg-gray-100 "
-                        : "bg-[#1a1a1a] border border-[#2a2a2a] text-white hover:bg-[#2a2a2a] hover:text-neutral-300"
+                        ? "bg-primary text-primary-foreground hover:bg-primary/90 "
+                        : "bg-card border border-border text-foreground hover:bg-muted hover:text-muted-foreground"
                     }`}
                     variant={selectedRole === "client" ? "default" : "outline"}
                   >
@@ -575,7 +575,7 @@ const Login = () => {
                       !firstName.trim() ||
                       !lastName.trim()))
                 }
-                className="w-full bg-white text-black hover:bg-gray-100 disabled:opacity-50 h-10 rounded-md font-medium text-sm"
+                className="w-full bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 h-10 rounded-md font-medium text-sm"
               >
                 {isLoading ? t('loading') : isRegister ? t('register') : t('sign_in')}
               </Button>
@@ -583,10 +583,10 @@ const Login = () => {
 
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
-                <Separator className="bg-[#2a2a2a]" />
+                <Separator className="bg-border" />
               </div>
               <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-[#0a0a0a] px-2 text-gray-500 font-medium">
+                <span className="bg-background px-2 text-muted-foreground font-medium">
                   {t('continue_with')}
                 </span>
               </div>
@@ -597,7 +597,7 @@ const Login = () => {
               variant="outline"
               disabled={isLoading}
               onClick={handleGoogleSignIn}
-              className="w-full bg-[#1a1a1a] border-[#2a2a2a] text-white hover:bg-[#2a2a2a] h-10 rounded-md font-medium text-sm"
+              className="w-full bg-card border-border text-foreground hover:bg-muted h-10 rounded-md font-medium text-sm"
             >
               <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
                 <path
@@ -625,7 +625,7 @@ const Login = () => {
                 type="button"
                 onClick={() => setIsRegister(!isRegister)}
                 disabled={isLoading}
-                className="text-sm text-gray-400 hover:text-white transition-colors disabled:opacity-50"
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50"
               >
                 {isRegister
                   ? t('already_account')
@@ -633,18 +633,18 @@ const Login = () => {
               </button>
             </div>
 
-            <p className="text-xs text-gray-500 text-center leading-relaxed">
+            <p className="text-xs text-muted-foreground text-center leading-relaxed">
               {t('clicking_continue')}{" "}
               <a
                 href="#"
-                className="underline hover:text-white transition-colors"
+                className="underline hover:text-foreground transition-colors"
               >
                 {t('terms_service')}
               </a>{" "}
               {t('and')}{" "}
               <a
                 href="#"
-                className="underline hover:text-white transition-colors"
+                className="underline hover:text-foreground transition-colors"
               >
                 {t('privacy_policy')}
               </a>

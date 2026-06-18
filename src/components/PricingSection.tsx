@@ -7,11 +7,11 @@ import { Check } from "lucide-react";
 import { toast } from "@/hooks/ui/use-toast";
 
 interface Plan {
-  id: "free" | "basic" | "pro" | "premium";
+  id: "free" | "basic" | "pro";
   name: string;
   description: string;
-  monthly: number; // USD per month
-  yearly: number;  // USD per year
+  monthly: number; // EUR per month
+  yearly: number;  // EUR per year
   features: string[];
   highlight?: boolean;
 }
@@ -27,7 +27,7 @@ const plans: Plan[] = [
   },
   {
     id: "basic",
-    name: "$25",
+    name: "€25",
     description: "Essentials for small practices",
     monthly: 25,
     yearly: 250, // 2 months free
@@ -35,10 +35,10 @@ const plans: Plan[] = [
   },
   {
     id: "pro",
-    name: "$50 (Pro)",
+    name: "€55 (Pro)",
     description: "Advanced tools for growing teams",
-    monthly: 50,
-    yearly: 500, // 2 months free
+    monthly: 55,
+    yearly: 550, // 2 months free
     features: [
       "Unlimited clients",
       "Advanced analytics",
@@ -46,14 +46,6 @@ const plans: Plan[] = [
       "Integrations (Calendar, etc.)",
     ],
     highlight: true,
-  },
-  {
-    id: "premium",
-    name: "$100",
-    description: "Scale with premium features",
-    monthly: 100,
-    yearly: 1000, // 2 months free
-    features: ["All Pro features", "Dedicated onboarding", "SLA & compliance"],
   },
 ];
 
@@ -78,7 +70,7 @@ const PricingSection = () => {
       </CardHeader>
       <CardContent className="space-y-6">
         <Separator />
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
           {plans.map((plan) => {
             const isPro = plan.highlight;
             return (
@@ -104,10 +96,10 @@ const PricingSection = () => {
                 <div className="mt-4 flex items-end gap-1">
                   <span className="text-3xl font-semibold">
                     {plan.monthly === 0
-                      ? "$0"
+                      ? "€0"
                       : isYearly
-                      ? `$${plan.yearly}`
-                      : `$${plan.monthly}`}
+                      ? `€${plan.yearly}`
+                      : `€${plan.monthly}`}
                   </span>
                   <span className="text-muted-foreground">{isYearly ? "/yr" : "/mo"}</span>
                 </div>

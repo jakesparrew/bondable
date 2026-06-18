@@ -324,9 +324,9 @@ const SetupPassword = () => {
 
   if (isVerifying) {
     return (
-      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
-        <div className="text-white text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto mb-4"></div>
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-foreground text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-foreground mx-auto mb-4"></div>
           <p>Verifying invitation...</p>
         </div>
       </div>
@@ -335,21 +335,21 @@ const SetupPassword = () => {
 
   if (!clientData) {
     return (
-      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center px-4">
+      <div className="min-h-screen bg-background flex items-center justify-center px-4">
         <div className="text-center space-y-6 max-w-md mx-auto">
           {/* Icon */}
           <div className="flex justify-center">
-            <div className="p-4 rounded-full bg-[#1f1f23] border border-[#2a2a2f]">
+            <div className="p-4 rounded-full bg-card border border-border">
               <Lock className="h-12 w-12 text-red-400" />
             </div>
           </div>
 
           {/* Heading */}
           <div className="space-y-2">
-            <h1 className="text-2xl font-semibold text-white">
+            <h1 className="text-2xl font-semibold text-foreground">
               Invalid or Expired Link
             </h1>
-            <p className="text-gray-400 text-sm leading-relaxed">
+            <p className="text-muted-foreground text-sm leading-relaxed">
               This invitation link is no longer valid or may have already been
               used.
             </p>
@@ -359,7 +359,7 @@ const SetupPassword = () => {
           <div>
             <Button
               onClick={() => navigate("/")}
-              className="bg-neutral-50 hover:bg-[#d6d6d6] text-neutral-950 px-6 py-2 rounded-lg font-medium transition-colors"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-2 rounded-lg font-medium transition-colors"
             >
               <span className="inline-flex items-center space-x-2">
                 <Home className="h-4 w-4" />
@@ -369,8 +369,8 @@ const SetupPassword = () => {
           </div>
 
           {/* Optional Footer Info */}
-          <div className="pt-4 border-t border-[#1f1f23]">
-            <p className="text-xs text-gray-500">
+          <div className="pt-4 border-t border-border">
+            <p className="text-xs text-muted-foreground">
               If you believe this is a mistake, please contact your
               administrator.
             </p>
@@ -381,20 +381,20 @@ const SetupPassword = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center p-4">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="flex flex-col items-center gap-y-6">
         <div className="flex items-center justify-center space-x-3">
           <img src="/favicon.ico" alt="Icon" className="w-8 h-8" />
-          <span className="font-semibold text-xl text-white">Bondable</span>
+          <span className="font-semibold text-xl text-foreground">Bondable</span>
         </div>
-        <Card className="w-full max-w-md bg-[#111111] border-[#1f1f23]">
+        <Card className="w-full max-w-md bg-card border-border">
           <CardHeader className="text-center space-y-4">
             <div>
-              <CardTitle className="text-white text-xl">
+              <CardTitle className="text-foreground text-xl">
                 Complete Your Setup
               </CardTitle>
-              <div className="h-px w-full bg-gradient-to-r from-transparent via-[#3f3f3f] to-transparent mt-3" />
-              <p className="text-gray-400 text-sm mt-3">
+              <div className="h-px w-full bg-gradient-to-r from-transparent via-border to-transparent mt-3" />
+              <p className="text-muted-foreground text-sm mt-3">
                 Welcome, {clientData.first_name}! Create your password to access
                 your account.
               </p>
@@ -402,12 +402,12 @@ const SetupPassword = () => {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="bg-[#1a1a1a] p-4 rounded-lg border border-[#2a2a2a]">
-                <p className="text-sm text-gray-300 mb-2">Account Details:</p>
-                <p className="text-white font-medium">
+              <div className="bg-card p-4 rounded-lg border border-border">
+                <p className="text-sm text-muted-foreground mb-2">Account Details:</p>
+                <p className="text-foreground font-medium">
                   {clientData.first_name} {clientData.last_name}
                 </p>
-                <p className="text-gray-400 text-sm">{clientData.email}</p>
+                <p className="text-muted-foreground text-sm">{clientData.email}</p>
               </div>
 
               <PasswordStrengthInput
@@ -415,7 +415,7 @@ const SetupPassword = () => {
                 placeholder="Enter your password"
                 value={password}
                 onChange={setPassword}
-                className="bg-[#0a0a0a] border-[#1f1f23] text-white placeholder:text-gray-500 focus:border-gray-400"
+                className="bg-background border-border text-foreground placeholder:text-muted-foreground focus:border-ring focus:ring-ring"
                 state="default"
               />
 
@@ -424,7 +424,7 @@ const SetupPassword = () => {
                 placeholder={t("confirm_your_password")}
                 value={confirmPassword}
                 onChange={setConfirmPassword}
-                className="bg-[#0a0a0a] border-[#1f1f23] text-white placeholder:text-gray-500 focus:border-gray-400"
+                className="bg-background border-border text-foreground placeholder:text-muted-foreground focus:border-ring focus:ring-ring"
                 state="never"
               />
 
@@ -435,25 +435,25 @@ const SetupPassword = () => {
                   !isPasswordValid() ||
                   password !== confirmPassword
                 }
-                className="w-full bg-white text-black hover:bg-gray-100 disabled:opacity-50 h-10 rounded-md font-medium text-sm"
+                className="w-full bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 h-10 rounded-md font-medium text-sm"
               >
                 {isLoading ? t("creating_account") : t("complete_setup")}
               </Button>
             </form>
 
             <div className="mt-6 text-center">
-              <p className="text-xs text-gray-500 leading-relaxed">
+              <p className="text-xs text-muted-foreground leading-relaxed">
                 By completing setup, you agree to Bondable's{" "}
                 <a
                   href="#"
-                  className="underline hover:text-white transition-colors"
+                  className="underline hover:text-foreground transition-colors"
                 >
                   Terms of Service
                 </a>{" "}
                 and{" "}
                 <a
                   href="#"
-                  className="underline hover:text-white transition-colors"
+                  className="underline hover:text-foreground transition-colors"
                 >
                   Privacy Policy
                 </a>
