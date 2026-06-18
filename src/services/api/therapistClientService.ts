@@ -1,5 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import { Client } from "@/types/client";
+import { fetchLastSessionDates, formatLastSession } from "./lastSessionUtil";
 
 export interface TherapistClient {
   id: string;
@@ -57,6 +58,8 @@ export const therapistClientService = {
       console.log("Active client relationships fetched:", relationshipClients);
       console.log("Pending clients fetched:", pendingClients);
 
+      const lastSessionMap = await fetchLastSessionDates(therapistId);
+
       const processedClients: Client[] = [];
 
       // Process active clients from relationships
@@ -92,7 +95,7 @@ export const therapistClientService = {
             phone: profile.phone || 'No phone provided',
             status: "Active",
             joinDate: new Date(relationship.connected_at).toLocaleDateString(),
-            lastSession: "N/A",
+            lastSession: formatLastSession(lastSessionMap, relationship.client_id),
             image: profile.avatar_url || '',
           });
         }
@@ -110,7 +113,7 @@ export const therapistClientService = {
             phone: client.phone || 'No phone provided',
             status: "Pending",
             joinDate: new Date(client.created_at).toLocaleDateString(),
-            lastSession: "N/A",
+            lastSession: formatLastSession(lastSessionMap, client.id),
             image: client.avatar_url || '',
           });
         }

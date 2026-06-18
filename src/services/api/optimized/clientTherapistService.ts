@@ -9,6 +9,7 @@ import {
 } from '@/services/cache/clientTherapistCache';
 import { ConnectedTherapist } from '../clientTherapistService';
 import { Client } from '@/types/client';
+import { fetchLastSessionDates, formatLastSession } from '../lastSessionUtil';
 
 export interface OptimizedClientTherapistService {
   connectToTherapist(inviteCode: string, clientId: string): Promise<{ success: boolean; therapistName?: string; error?: string }>;
@@ -186,7 +187,7 @@ class OptimizedClientTherapistServiceImpl implements OptimizedClientTherapistSer
         console.log('🔍 Fetching clients for therapist:', therapistId);
         
         // Batch both queries for efficiency
-        const [relationshipResult, pendingResult] = await Promise.all([
+        const [relationshipResult, pendingResult, lastSessionMap] = await Promise.all([
           supabase
             .from("client_therapist_relationships")
             .select(`
@@ -204,12 +205,14 @@ class OptimizedClientTherapistServiceImpl implements OptimizedClientTherapistSer
             `)
             .eq("therapist_id", therapistId)
             .eq("status", "active"),
-          
+
           supabase
             .from("clients")
             .select("*")
             .eq("therapist_id", therapistId)
-            .eq("status", "Pending")
+            .eq("status", "Pending"),
+
+          fetchLastSessionDates(therapistId)
         ]);
 
         const processedClients: Client[] = [];
@@ -235,7 +238,7 @@ class OptimizedClientTherapistServiceImpl implements OptimizedClientTherapistSer
               phone: profile.phone || 'No phone provided',
               status: "Active",
               joinDate: new Date(relationship.connected_at).toLocaleDateString(),
-              lastSession: "N/A",
+              lastSession: formatLastSession(lastSessionMap, relationship.client_id),
               image: profile.avatar_url || '',
             });
           }
@@ -253,7 +256,7 @@ class OptimizedClientTherapistServiceImpl implements OptimizedClientTherapistSer
               phone: client.phone || 'No phone provided',
               status: "Pending",
               joinDate: new Date(client.created_at).toLocaleDateString(),
-              lastSession: "N/A",
+              lastSession: formatLastSession(lastSessionMap, client.id),
               image: client.avatar_url || '',
             });
           }
