@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "291268451133",
+    "project_id": "bondable-43836",
+    "storage_bucket": "bondable-43836.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:291268451133:android:af7ed3acb231ac07cc4354",
+        "android_client_info": {
+          "package_name": "com.bondable.crm"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCYiN2x0leWUMlkG2TMukiwJyF1EiTPMG4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

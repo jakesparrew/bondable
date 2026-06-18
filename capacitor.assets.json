@@ -1,0 +1,8 @@
+{
+  "icon": { "source": "assets/icon.png"},
+  "splash": {
+    "source": "assets/splash.png",
+    "resizeMode": "contain",
+    "backgroundColor": "#232323"
+  }
+}

@@ -1,0 +1,446 @@
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useOptimizedState, useOptimizedEffect } from "@/hooks/performance/useOptimizedComponents";
+import { SimpleDatePicker } from "@/components/ui/simple-date-picker";
+import { Checkbox } from "@/components/ui/checkbox";
+import type { TaskPriority } from "@/types/global";
+import { useTranslation } from "react-i18next";
+
+interface Client {
+  id: string;
+  name: string;
+  initials: string;
+}
+
+interface TaskData {
+  id?: string;
+  title: string;
+  description: string;
+  clientId: string;
+  clientName?: string;
+  priority: TaskPriority | null;
+  dueDate: string | null;
+  assignedDate?: string;
+  notes: string;
+  status?: string;
+  deniedReason?: string;
+}
+
+interface TaskDialogProps {
+  open: boolean;
+  setOpen: (open: boolean) => void;
+  task?: TaskData | null;
+  clients: Client[];
+  onSave: (task: Omit<TaskData, "id" | "assignedDate">) => void;
+  onStatusChange?: (taskId: string, status: string, reason?: string) => void;
+  mode: "add" | "edit" | "view";
+  userType?: "therapist" | "client";
+}
+
+export default function TaskDialog({
+  open,
+  setOpen,
+  task,
+  clients,
+  onSave,
+  onStatusChange,
+  mode,
+  userType = "therapist",
+}: TaskDialogProps) {
+  const { t } = useTranslation();
+  const [formData, setFormData] = useOptimizedState({
+    title: "",
+    description: "",
+    clientId: "",
+    priority: "medium" as TaskPriority,
+    dueDate: "",
+    notes: "",
+  });
+
+  const [showDeniedReason, setShowDeniedReason] = useOptimizedState(false);
+  const [deniedReason, setDeniedReason] = useOptimizedState("");
+  const [hasPriority, setHasPriority] = useOptimizedState(false);
+  const [hasDueDate, setHasDueDate] = useOptimizedState(false);
+
+  useOptimizedEffect(() => {
+    if (task && (mode === "edit" || mode === "view")) {
+      setFormData({
+        title: task.title,
+        description: task.description,
+        clientId: task.clientId,
+        priority: task.priority || "medium",
+        dueDate: task.dueDate || "",
+        notes: task.notes || "",
+      });
+      setHasPriority(!!task.priority);
+      setHasDueDate(!!task.dueDate);
+    } else if (mode === "add") {
+      setFormData({
+        title: "",
+        description: "",
+        clientId: "",
+        priority: "medium",
+        dueDate: "",
+        notes: "",
+      });
+      setHasPriority(false);
+      setHasDueDate(false);
+    }
+    setShowDeniedReason(false);
+    setDeniedReason("");
+  }, [task, mode, open]);
+
+  const handleSave = () => {
+    if (!formData.title || !formData.clientId) {
+      return;
+    }
+
+    const client = clients.find((c) => c.id === formData.clientId);
+    const taskData = {
+      ...formData,
+      clientName: client?.name || "",
+      // Only include priority and dueDate if they're enabled
+      priority: hasPriority ? formData.priority : null,
+      dueDate: hasDueDate ? formData.dueDate : null,
+    };
+
+    onSave(taskData);
+    
+    // Add small delay before closing to ensure save operation completes
+    setTimeout(() => {
+      setOpen(false);
+    }, 100);
+  };
+
+  const handleStatusChange = (newStatus: string) => {
+    if (newStatus === "denied") {
+      setShowDeniedReason(true);
+    } else {
+      setShowDeniedReason(false);
+      if (task && onStatusChange) {
+        onStatusChange(task.id!, newStatus);
+        setTimeout(() => {
+          setOpen(false);
+        }, 100);
+      }
+    }
+  };
+
+  const handleDeniedSubmit = () => {
+    if (task && onStatusChange && deniedReason.trim()) {
+      onStatusChange(task.id!, "denied", deniedReason);
+      setTimeout(() => {
+        setOpen(false);
+      }, 100);
+    }
+  };
+
+  const isReadOnly = mode === "view";
+  const title =
+    mode === "add"
+      ? t("assign_new_task")
+      : mode === "edit"
+      ? t("edit_task")
+      : t("task_details");
+
+  return (
+    <Dialog 
+      open={open} 
+      onOpenChange={setOpen}
+    >
+      <DialogContent 
+        className="bg-[#0a0a0a] border border-[#1f1f23] text-white max-w-2xl"
+        onCloseAutoFocus={(e) => {
+          // Prevent auto focus to avoid focus trapping
+          e.preventDefault();
+        }}
+      >
+        <DialogHeader>
+          <DialogTitle className="text-white">{title}</DialogTitle>
+        </DialogHeader>
+        <div className="mt-2 h-px w-full bg-gradient-to-r from-transparent via-[#3f3f3f] to-transparent " />
+        <div className="space-y-4 overflow-y-auto scrollbar-hide ">
+          {mode === "view" && task && (
+            <div className="grid grid-cols-2 gap-4 p-4 bg-[#111111] rounded-lg border border-[#1f1f23]">
+              <div>
+                <Label className="text-gray-400 text-xs">{t('task_id')}</Label>
+                <p className="font-mono text-sm">{task.id}</p>
+              </div>
+              <div>
+                <Label className="text-gray-400 text-xs">{t('assigned_date')}</Label>
+                <p className="text-sm">
+                  {task.assignedDate ? new Date(task.assignedDate).toLocaleDateString() : t("n_a")}
+                </p>
+              </div>
+            </div>
+          )}
+
+          <div>
+            <Label htmlFor="client" className="text-gray-300 ">
+              {t("client")} <span className="text-red-400">*</span>
+            </Label>
+            <Select
+              value={formData.clientId}
+              onValueChange={(value) =>
+                setFormData({ ...formData, clientId: value })
+              }
+              disabled={isReadOnly}
+              required
+            >
+              <SelectTrigger className="bg-[#111111] border-[#1f1f23] text-white mt-2 !cursor-default">
+                <SelectValue placeholder={t("select_client")} />
+              </SelectTrigger>
+              <SelectContent className="bg-[#111111] border-[#1f1f23]">
+                {clients.map((client) => (
+                  <SelectItem
+                    className="text-neutral-400 data-[state=checked]:text-neutral-50 data-[highlighted]:!text-neutral-50"
+                    key={client.id}
+                    value={client.id}
+                  >
+                    {client.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="pb-2">
+            <Label htmlFor="title" className="text-gray-300 ">
+              {t("task_title")} <span className="text-red-400">*</span>
+            </Label>
+            <Input
+              id="title"
+              value={formData.title}
+              onChange={(e) =>
+                setFormData({ ...formData, title: e.target.value })
+              }
+              placeholder={t("enter_task_title")}
+              className="bg-[#111111] border-[#1f1f23] text-white mt-2"
+              readOnly={isReadOnly}
+              required
+            />
+          </div>
+
+          <div className="flex-1 bg-neutral-800 border border-neutral-700 text-white p-4 rounded-lg pt-2 ">
+            <div>
+              <Label htmlFor="description" className="text-gray-300">
+                {t("description")}
+              </Label>
+              <Textarea
+                id="description"
+                value={formData.description}
+                onChange={(e) =>
+                  setFormData({ ...formData, description: e.target.value })
+                }
+                placeholder={t("describe_task_purpose")}
+                className="bg-[#111111] border-[#1f1f23] text-white mt-2"
+                rows={4}
+                readOnly={isReadOnly}
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4 pt-4">
+              <div>
+                {!isReadOnly ? (
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="priority-checkbox"
+                      checked={hasPriority}
+                      onCheckedChange={(checked) => {
+                        setHasPriority(!!checked);
+                        if (!checked) {
+                          setFormData({ ...formData, priority: "medium" });
+                        }
+                      }}
+                    />
+                    <Label htmlFor="priority-checkbox" className="text-gray-300">
+                      {t("set_priority")}
+                    </Label>
+                  </div>
+                ) : (
+                  <Label className="text-gray-300">{t('priority')}</Label>
+                )}
+                
+                {(hasPriority || isReadOnly) && (
+                  <div className="mt-2">
+                    <Select
+                      value={formData.priority}
+                      onValueChange={(value: TaskPriority) =>
+                        setFormData({ ...formData, priority: value })
+                      }
+                      disabled={isReadOnly}
+                    >
+                      <SelectTrigger className="bg-[#111111] border-[#1f1f23] text-white">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="bg-[#111111] border-[#1f1f23]">
+                        <SelectItem
+                          className="text-neutral-400 hover:!text-neutral-950 data-[state=checked]:text-neutral-50 data-[highlighted]:!text-neutral-950"
+                          value="low"
+                        >
+                          {t("low")}
+                        </SelectItem>
+                        <SelectItem
+                          className="text-neutral-400 hover:!text-neutral-950 data-[state=checked]:text-neutral-50 data-[highlighted]:!text-neutral-950"
+                          value="medium"
+                        >
+                          {t("medium")}
+                        </SelectItem>
+                        <SelectItem
+                          className="text-neutral-400 hover:!text-neutral-950 data-[state=checked]:text-neutral-50 data-[highlighted]:!text-neutral-950"
+                          value="high"
+                        >
+                          {t("high")}
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+              </div>
+              
+              <div>
+                {!isReadOnly ? (
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="duedate-checkbox"
+                      checked={hasDueDate}
+                      onCheckedChange={(checked) => {
+                        setHasDueDate(!!checked);
+                        if (!checked) {
+                          setFormData({ ...formData, dueDate: "" });
+                        }
+                      }}
+                    />
+                    <Label htmlFor="duedate-checkbox" className="text-gray-300">
+                      {t("set_due_date")}
+                    </Label>
+                  </div>
+                ) : (
+                  <Label className="text-gray-300">{t('due_date')}</Label>
+                )}
+                
+                {(hasDueDate || isReadOnly) && (
+                  <div className="mt-2">
+                    <SimpleDatePicker
+                      label=""
+                      defaultValue={formData.dueDate}
+                      readOnly={isReadOnly}
+                      className="w-full"
+                      onChange={(date) => setFormData({ ...formData, dueDate: date })}
+                    />
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <Label htmlFor="notes" className="text-gray-300">
+              {t("additional_notes")}
+            </Label>
+            <Textarea
+              id="notes"
+              value={formData.notes}
+              onChange={(e) =>
+                setFormData({ ...formData, notes: e.target.value })
+              }
+              placeholder={t("additional_instructions")}
+              className="bg-[#111111] border-[#1f1f23] text-white mt-2"
+              rows={3}
+              readOnly={isReadOnly}
+            />
+          </div>
+
+          {/* Client Status Update Section */}
+          {userType === "client" && mode === "view" && task && task.status === "assigned" && (
+            <div className="space-y-4 p-4 bg-[#111111] rounded-lg border border-[#1f1f23]">
+              <Label className="text-gray-300">{t('update_task_status')}</Label>
+              <div className="flex gap-2">
+                <Button
+                  onClick={() => handleStatusChange("in-progress")}
+                  className="bg-yellow-600 hover:bg-yellow-700"
+                >
+                  {t("start_task")}
+                </Button>
+                <Button
+                  onClick={() => handleStatusChange("completed")}
+                  className="bg-green-600 hover:bg-green-700"
+                >
+                  {t("mark_complete")}
+                </Button>
+                <Button
+                  onClick={() => handleStatusChange("denied")}
+                  variant="destructive"
+                >
+                  {t("decline_task")}
+                </Button>
+              </div>
+              
+              {showDeniedReason && (
+                <div className="space-y-2">
+                  <Label className="text-gray-300">{t("reason_for_declining")}</Label>
+                  <Textarea
+                    value={deniedReason}
+                    onChange={(e) => setDeniedReason(e.target.value)}
+                    placeholder={t("explain_declining_task")}
+                    className="bg-[#111111] border-[#1f1f23] text-white"
+                    rows={3}
+                  />
+                  <div className="flex gap-2">
+                    <Button
+                      onClick={handleDeniedSubmit}
+                      disabled={!deniedReason.trim()}
+                      variant="destructive"
+                    >
+                      {t("submit_decline")}
+                    </Button>
+                    <Button
+                      onClick={() => setShowDeniedReason(false)}
+                      variant="outline"
+                      className="border-[#333] bg-transparent hover:bg-[#1a1a1a] text-gray-300"
+                    >
+                      {t("cancel")}
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {!isReadOnly && userType === "therapist" && (
+            <div className="flex justify-end space-x-2">
+              <Button
+                variant="outline"
+                onClick={() => setOpen(false)}
+                className="border-[#333] bg-transparent hover:bg-[#1a1a1a] text-gray-300"
+              >
+                {t("cancel")}
+              </Button>
+              <Button
+                onClick={handleSave}
+                className="bg-white text-black hover:bg-gray-200"
+              >
+                {mode === "add" ? t("assign_task") : t("save_changes")}
+              </Button>
+            </div>
+          )}
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
