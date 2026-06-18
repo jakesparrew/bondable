@@ -771,6 +771,9 @@ class MockQueryBuilder {
   private orderSpecs: Array<{ column: string; ascending: boolean }> = [];
   // For insert/update/upsert: data to echo back instead of the seed table.
   private mutationData: any[] | null = null;
+  // Raw `select(...)` columns string, used to disambiguate embedded-join aliases
+  // (e.g. which fkey a `profiles!...` join targets on relationship rows).
+  private selectStr = '';
 
   constructor(table: string) {
     this.table = table;
@@ -812,7 +815,8 @@ class MockQueryBuilder {
 
   /* --- selection / projection --- */
 
-  select(_columns?: string) {
+  select(columns?: string) {
+    this.selectStr = columns ?? '';
     return this;
   }
 
@@ -970,16 +974,22 @@ class MockQueryBuilder {
 
     switch (this.table) {
       case 'client_therapist_relationships': {
-        if ('client_id' in row) {
-          const client = profileById(row.client_id);
-          enriched.client = client;
+        const client = 'client_id' in row ? profileById(row.client_id) : null;
+        const therapist = 'therapist_id' in row ? profileById(row.therapist_id) : null;
+        enriched.client = client;
+        enriched.client_profile = client;
+        enriched.therapist = therapist;
+        enriched.therapist_profile = therapist;
+        // Both the client side (getConnectedTherapists, joins via therapist_id_fkey)
+        // and the therapist side (getClientsForTherapist, joins via client_id_fkey)
+        // read `relationship.profiles`. The mock ignores the real join, so pick
+        // the target from the select string's fkey hint; default to the client
+        // (the therapist-side shape, which most relationship reads expect).
+        const sel = this.selectStr;
+        if (/therapist_id_fkey/.test(sel)) {
+          enriched.profiles = therapist;
+        } else {
           enriched.profiles = client;
-          enriched.client_profile = client;
-        }
-        if ('therapist_id' in row) {
-          const therapist = profileById(row.therapist_id);
-          enriched.therapist = therapist;
-          enriched.therapist_profile = therapist;
         }
         break;
       }

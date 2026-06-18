@@ -55,10 +55,17 @@ const DEV_BYPASS_ROLE: UserRole = (() => {
 })();
 
 const DevBypassAuthProvider = ({ children, role }: { children: ReactNode; role: 'therapist' | 'client' | 'admin' }) => {
+  // The client role maps to a SEEDED client ("Lotte Vermeulen") so the client
+  // dashboard populates from the mock data; therapist/admin keep the seeded
+  // therapist id. Emails stay role-scoped (dev-client@bondable.local, …).
   const mockUser = {
-    id: '00000000-0000-0000-0000-000000000001',
+    id: role === 'client'
+      ? '00000000-0000-0000-0000-000000000002'
+      : '00000000-0000-0000-0000-000000000001',
     email: `dev-${role}@bondable.local`,
-    user_metadata: { first_name: 'Dev', last_name: role.charAt(0).toUpperCase() + role.slice(1), full_name: `Dev ${role}` },
+    user_metadata: role === 'client'
+      ? { first_name: 'Lotte', last_name: 'Vermeulen', full_name: 'Lotte Vermeulen' }
+      : { first_name: 'Dev', last_name: role.charAt(0).toUpperCase() + role.slice(1), full_name: `Dev ${role}` },
     app_metadata: { provider: 'email', providers: ['email'] },
     aud: 'authenticated',
     created_at: '2026-01-01T00:00:00.000Z',

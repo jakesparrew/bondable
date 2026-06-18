@@ -1,15 +1,8 @@
-import BaseDashboard from "@/components/common/BaseDashboard";
-import { clientDashboardConfig } from "@/config/dashboardConfigs";
+import ClientDashboardContent from "@/components/dashboard/client/ClientDashboardContent";
 import { IntakePendingBanner } from "@/components/intake/IntakePendingBanner";
 
 const ClientDashboard = () => {
-  return (
-    <BaseDashboard
-      userType="client"
-      config={clientDashboardConfig}
-      headerSlot={<IntakePendingBanner />}
-    />
-  );
+  return <ClientDashboardContent headerSlot={<IntakePendingBanner />} />;
 };
 
 export default ClientDashboard;
