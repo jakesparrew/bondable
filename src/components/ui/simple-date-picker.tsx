@@ -104,7 +104,7 @@ export function SimpleDatePicker({
   return (
     <div className="space-y-2">
       {label && (
-        <Label className="text-gray-300 text-sm font-medium">
+        <Label className="text-muted-foreground text-sm font-medium">
           {label}
           {required && <span className="text-red-400 ml-1">*</span>}
         </Label>
@@ -113,7 +113,7 @@ export function SimpleDatePicker({
         <Input
           value={date ? format(date, "PPP") : ""}
           readOnly
-          className={cn("bg-[#1a1a1a] border-[#1f1f23] text-white", className)}
+          className={cn("bg-background border-border text-foreground", className)}
         />
       ) : (
         <Popover>
@@ -121,8 +121,8 @@ export function SimpleDatePicker({
             <Button
               variant="outline"
               className={cn(
-                "w-full justify-start text-left font-normal bg-[#0a0a0a] border-[#1f1f23] text-white hover:bg-[#1a1a1a] hover:text-white",
-                !date && "text-gray-500",
+                "w-full justify-start text-left font-normal bg-background border-border text-foreground hover:bg-muted hover:text-foreground",
+                !date && "text-muted-foreground",
                 className
               )}
             >
@@ -131,7 +131,7 @@ export function SimpleDatePicker({
             </Button>
           </PopoverTrigger>
           <PopoverContent
-            className="w-auto p-0 bg-[#111111] border-[#1f1f23] text-neutral-50 "
+            className="w-auto p-0 bg-popover border-border text-foreground "
             align="start"
           >
             <div className="p-3 space-y-2">
@@ -141,15 +141,15 @@ export function SimpleDatePicker({
                   value={month.getFullYear().toString()}
                   onValueChange={handleYearChange}
                 >
-                  <SelectTrigger className="w-24 bg-[#0a0a0a] border-[#1f1f23] text-white ">
+                  <SelectTrigger className="w-24 bg-background border-border text-foreground ">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="bg-[#111111] border-[#1f1f23] max-h-40">
+                  <SelectContent className="bg-popover border-border max-h-40">
                     {years.map((year) => (
                       <SelectItem
                         key={year}
                         value={year.toString()}
-                        className="text-white hover:bg-[#1f1f23] "
+                        className="text-foreground hover:bg-accent "
                       >
                         {year}
                       </SelectItem>
@@ -160,15 +160,15 @@ export function SimpleDatePicker({
                   value={month.getMonth().toString()}
                   onValueChange={handleMonthChange}
                 >
-                  <SelectTrigger className="flex-1 bg-[#0a0a0a] border-[#1f1f23] text-white">
+                  <SelectTrigger className="flex-1 bg-background border-border text-foreground">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="bg-[#111111] border-[#1f1f23]">
+                  <SelectContent className="bg-popover border-border">
                     {Array.from({ length: 12 }, (_, i) => (
                       <SelectItem
                         key={i}
                         value={i.toString()}
-                        className="text-white hover:bg-[#1f1f23]"
+                        className="text-foreground hover:bg-accent"
                       >
                         {format(new Date(2000, i, 1), "MMMM")}
                       </SelectItem>

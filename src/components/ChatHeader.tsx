@@ -99,8 +99,8 @@ const ChatHeader = ({
   return (
     <div>
       <div
-        className={`p-0 border-b border-[#1f1f23] flex items-stretch ${
-          isMobile ? "sticky top-0 z-50 bg-[#111111]" : "bg-[#111111]"
+        className={`p-0 border-b border-border flex items-stretch ${
+          isMobile ? "sticky top-0 z-50 bg-card" : "bg-card"
         }`}
       >
         {/* Back Button */}
@@ -110,7 +110,7 @@ const ChatHeader = ({
               variant="ghost"
               size="sm"
               onClick={onBackClick}
-              className="text-gray-400 hover:text-white hover:bg-neutral-800 transition-colors"
+              className="text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
             >
               <ArrowLeft className="h-4 w-4" />
             </Button>
@@ -121,22 +121,22 @@ const ChatHeader = ({
         {showDropdown && client ? (
           <DropdownMenu onOpenChange={setIsDropdownOpen}>
             <DropdownMenuTrigger asChild>
-              <div className="flex items-center px-3 flex-1 py-3 cursor-pointer hover:bg-neutral-900 transition-colors group rounded-xl sm:rounded-l-none touch-manipulation active:bg-neutral-800">
+              <div className="flex items-center px-3 flex-1 py-3 cursor-pointer hover:bg-muted transition-colors group rounded-xl sm:rounded-l-none touch-manipulation active:bg-muted">
                 <Avatar className="w-10 h-10 flex-shrink-0">
                   <AvatarImage
                     src={clientAvatar || ""}
                     key={`${client?.id}-${clientAvatar}`}
                     className="non-invertable"
                   />
-                  <AvatarFallback className="bg-[#27272a] text-white text-sm">
+                  <AvatarFallback className="bg-muted text-foreground text-sm">
                     {avatar}
                   </AvatarFallback>
                 </Avatar>
                 <div className="ml-3 min-w-0 flex-1 overflow-hidden">
-                  <h3 className="text-white font-medium truncate">{title}</h3>
+                  <h3 className="text-foreground font-medium truncate">{title}</h3>
                 </div>
                 <ChevronDown
-                  className={`h-4 w-4 text-gray-400 ml-2 flex-shrink-0 transition-all duration-200 ease-out group-hover:text-gray-300 ${
+                  className={`h-4 w-4 text-muted-foreground ml-2 flex-shrink-0 transition-all duration-200 ease-out group-hover:text-muted-foreground ${
                     isDropdownOpen ? "rotate-180" : "rotate-0"
                   }`}
                 />
@@ -144,7 +144,7 @@ const ChatHeader = ({
             </DropdownMenuTrigger>
             <DropdownMenuContent
               align="start"
-              className="w-80 !bg-[#1a1a1a]  z-[9999] animate-scale-in touch-manipulation"
+              className="w-80 !bg-card  z-[9999] animate-scale-in touch-manipulation"
               style={{ zIndex: 9999 }}
               onCloseAutoFocus={(e) => e.preventDefault()}
             >
@@ -155,33 +155,33 @@ const ChatHeader = ({
                       src={clientAvatar || ""}
                       key={`${client?.id}-${clientAvatar}`}
                     />
-                    <AvatarFallback className="bg-[#27272a] text-white">
+                    <AvatarFallback className="bg-muted text-foreground">
                       {avatar}
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-white font-medium text-base">
+                    <h3 className="text-foreground font-medium text-base">
                       {title}
                     </h3>
-                    <p className="text-gray-400 text-sm break-all">
+                    <p className="text-muted-foreground text-sm break-all">
                       {client.email}
                     </p>
                   </div>
                 </div>
                 {client.phone && client.phone !== t("no_phone_provided") && (
                   <div className="mb-2">
-                    <span className="text-gray-500 text-xs">
+                    <span className="text-muted-foreground text-xs">
                       {t("phone_label")}
                     </span>
-                    <p className="text-white text-sm">{client.phone}</p>
+                    <p className="text-foreground text-sm">{client.phone}</p>
                   </div>
                 )}
                 {client.status && (
                   <div className="mb-2">
-                    <span className="text-gray-500 text-xs">
+                    <span className="text-muted-foreground text-xs">
                       {t("status_label")}
                     </span>
-                    <p className="text-white text-sm">{client.status}</p>
+                    <p className="text-foreground text-sm">{client.status}</p>
                   </div>
                 )}
               </div>
@@ -191,7 +191,7 @@ const ChatHeader = ({
           <div className="flex items-center px-3 flex-1 py-3">
             <Avatar className="w-10 h-10 flex-shrink-0">
               {type === "ai" ? (
-                <AvatarFallback className="bg-neutral-700 text-white">
+                <AvatarFallback className="bg-muted text-foreground">
                   {avatar}
                 </AvatarFallback>
               ) : (
@@ -201,16 +201,16 @@ const ChatHeader = ({
                     key={`${client?.id}-${clientAvatar}`}
                     className="non-invertable"
                   />
-                  <AvatarFallback className="bg-[#27272a] text-white text-sm">
+                  <AvatarFallback className="bg-muted text-foreground text-sm">
                     {avatar}
                   </AvatarFallback>
                 </>
               )}
             </Avatar>
             <div className="ml-3 min-w-0">
-              <h3 className="text-white font-medium truncate">{title}</h3>
+              <h3 className="text-foreground font-medium truncate">{title}</h3>
               {subtitle && (
-                <p className="text-gray-400 text-xs break-words line-clamp-2">{subtitle}</p>
+                <p className="text-muted-foreground text-xs break-words line-clamp-2">{subtitle}</p>
               )}
             </div>
           </div>
@@ -226,8 +226,8 @@ const ChatHeader = ({
                 size="sm"
                 className={`transition-colors ${
                   currentMode === "ai"
-                    ? "text-white"
-                    : "text-gray-400 hover:text-gray-300"
+                    ? "text-foreground"
+                    : "text-muted-foreground hover:text-muted-foreground"
                 }`}
                 title={t("ask_ai")}
                 onClick={() => onModeChange?.("ai")}
@@ -243,8 +243,8 @@ const ChatHeader = ({
                 size="sm"
                 className={`transition-colors ${
                   currentMode === "ai"
-                    ? "text-white"
-                    : "text-gray-400 hover:text-gray-300"
+                    ? "text-foreground"
+                    : "text-muted-foreground hover:text-muted-foreground"
                 }`}
                 onClick={() => onModeChange?.("sms")}
                 title={t("send_sms")}
@@ -264,7 +264,7 @@ const ChatHeader = ({
                 variant="outline"
                 size="sm"
                 onClick={onShowAutomation}
-                className="bg-[#1a1a1a] text-gray-300 hover:text-white hover:bg-[#2a2a2a] border-neutral-800 transition-colors"
+                className="bg-card text-muted-foreground hover:text-foreground hover:bg-muted border-border transition-colors"
               >
                 {t("automation")}
               </Button>
@@ -285,9 +285,9 @@ const ChatHeader = ({
                  flex items-center justify-center ${pressed ? "mt-6" : "mt-6"}`}
           >
             {pressed ? (
-              <ChevronsDown className="w-5 h-5 text-neutral-300" />
+              <ChevronsDown className="w-5 h-5 text-muted-foreground" />
             ) : (
-              <ChevronsDown className="w-5 h-5 text-neutral-300" />
+              <ChevronsDown className="w-5 h-5 text-muted-foreground" />
             )}
           </button>
         </div>

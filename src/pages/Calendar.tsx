@@ -386,8 +386,8 @@ const Calendar = () => {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-semibold text-white mb-1">{t("calendar")}</h2>
-            <p className="text-gray-400 text-sm">
+            <h2 className="text-2xl font-semibold text-foreground mb-1">{t("calendar")}</h2>
+            <p className="text-muted-foreground text-sm">
               {t("manage_appointments")}
             </p>
           </div>
@@ -398,7 +398,7 @@ const Calendar = () => {
                   variant={syncButtonConfig.variant}
                   onClick={handleSyncGoogleCalendar}
                   disabled={syncButtonConfig.disabled}
-                  className="border-[#333] bg-[#1a1a1a] hover:bg-[#2a2a2a] text-gray-300 hover:text-neutral-400 px-4 py-2 rounded-lg font-medium"
+                  className="border-border bg-card hover:bg-muted text-muted-foreground hover:text-muted-foreground px-4 py-2 rounded-lg font-medium"
                 >
                   {syncButtonConfig.text}
                 </Button>
@@ -410,14 +410,14 @@ const Calendar = () => {
                     disabled={isGoogleSyncing || isManualRefreshing}
                     aria-label={t("refresh") || "Refresh"}
                     title={t("refresh") || "Refresh"}
-                    className="border-[#333] bg-[#1a1a1a] hover:bg-[#2a2a2a] text-gray-300 hover:text-neutral-400 rounded-lg"
+                    className="border-border bg-card hover:bg-muted text-muted-foreground hover:text-muted-foreground rounded-lg"
                   >
                     <RefreshCcw className={`h-4 w-4 ${isGoogleSyncing || isManualRefreshing ? "animate-spin" : ""}`} />
                   </Button>
                 )}
                 <Button
                   onClick={handleCreateEvent}
-                  className="bg-neutral-50 hover:bg-[#d6d6d6] text-neutral-950 px-4 py-2 rounded-lg font-medium transition-colors"
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2 rounded-lg font-medium transition-colors"
                 >
                   <Plus className="w-4 h-4 mr-2" />
                   {t("new_event")}
@@ -433,7 +433,7 @@ const Calendar = () => {
                 variant={syncButtonConfig.variant}
                 onClick={handleSyncGoogleCalendar}
                 disabled={syncButtonConfig.disabled}
-                className="flex-1 border-[#333] bg-[#1a1a1a] hover:bg-[#2a2a2a] text-gray-300 hover:text-neutral-400 px-4 py-2 rounded-lg font-medium"
+                className="flex-1 border-border bg-card hover:bg-muted text-muted-foreground hover:text-muted-foreground px-4 py-2 rounded-lg font-medium"
               >
                 {syncButtonConfig.text}
               </Button>
@@ -445,7 +445,7 @@ const Calendar = () => {
                   disabled={isGoogleSyncing || isManualRefreshing}
                   aria-label={t("refresh") || "Refresh"}
                   title={t("refresh") || "Refresh"}
-                  className="border-[#333] bg-[#1a1a1a] hover:bg-[#2a2a2a] text-gray-300 hover:text-neutral-400 rounded-lg"
+                  className="border-border bg-card hover:bg-muted text-muted-foreground hover:text-muted-foreground rounded-lg"
                 >
                   <RefreshCcw className={`h-4 w-4 ${isGoogleSyncing || isManualRefreshing ? "animate-spin" : ""}`} />
                 </Button>
@@ -453,7 +453,7 @@ const Calendar = () => {
             </div>
             <Button
               onClick={handleCreateEvent}
-              className="bg-neutral-50 hover:bg-[#d6d6d6] text-neutral-950 px-4 py-2 rounded-lg font-medium transition-colors"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2 rounded-lg font-medium transition-colors"
             >
               <Plus className="w-4 h-4 mr-2" />
               {t("new_event")}
@@ -462,7 +462,7 @@ const Calendar = () => {
         )}
 
         {/* Calendar View Controls */}
-        <Card className="bg-[#111111] border-[#1f1f23]">
+        <Card className="bg-card border-border">
           <CardContent className="p-4">
             <div
               className={`flex items-center ${
@@ -474,7 +474,7 @@ const Calendar = () => {
                   <Button
                     variant="ghost"
                     onClick={handleToday}
-                    className="bg-[#1a1a1a] hover:bg-[#2a2a2a] text-gray-300 hover:text-white border border-[#333] rounded-lg px-3 py-1.5 font-medium"
+                    className="bg-card hover:bg-muted text-muted-foreground hover:text-foreground border border-border rounded-lg px-3 py-1.5 font-medium"
                   >
                     {t("today")}
                   </Button>
@@ -484,18 +484,18 @@ const Calendar = () => {
                     variant="ghost"
                     size="sm"
                     onClick={handlePrevPeriod}
-                    className="text-gray-400 hover:text-white hover:bg-[#2a2a2a] h-8 w-8 p-0 rounded-lg"
+                    className="text-muted-foreground hover:text-foreground hover:bg-muted h-8 w-8 p-0 rounded-lg"
                   >
                     <ChevronLeft className="h-4 w-4" />
                   </Button>
-                  <h3 className="text-lg font-medium text-white min-w-[140px] text-center">
+                  <h3 className="text-lg font-medium text-foreground min-w-[140px] text-center">
                     {getDateRangeText()}
                   </h3>
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={handleNextPeriod}
-                    className="text-gray-400 hover:text-white hover:bg-[#2a2a2a] h-8 w-8 p-0 rounded-lg"
+                    className="text-muted-foreground hover:text-foreground hover:bg-muted h-8 w-8 p-0 rounded-lg"
                   >
                     <ChevronRight className="h-4 w-4" />
                   </Button>
@@ -522,7 +522,7 @@ const Calendar = () => {
           <Button
             variant="ghost"
             onClick={handleToday}
-            className="w-full bg-[#1a1a1a] hover:bg-[#2a2a2a] text-gray-300 hover:text-white border border-[#333] rounded-lg px-3 py-1.5 font-medium"
+            className="w-full bg-card hover:bg-muted text-muted-foreground hover:text-foreground border border-border rounded-lg px-3 py-1.5 font-medium"
             >
               {t("today")}
             </Button>

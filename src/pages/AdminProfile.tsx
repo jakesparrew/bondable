@@ -231,7 +231,7 @@ const AdminProfile = () => {
       <div className="flex items-center gap-4 mb-2">
         <Button
           variant="ghost"
-          className="text-gray-400 hover:text-white hover:bg-[#1f1f23] p-2"
+          className="text-muted-foreground hover:text-foreground hover:bg-muted p-2"
           onClick={handleGoBack}
         >
             <ArrowLeft className="w-4 h-4 mr-2" />
@@ -248,10 +248,10 @@ const AdminProfile = () => {
               size="md"
             />
             <div>
-              <h2 className="text-2xl font-semibold text-white mb-1">
+              <h2 className="text-2xl font-semibold text-foreground mb-1">
                 {t("admin_profile")}
               </h2>
-              <p className="text-gray-400 text-sm">
+              <p className="text-muted-foreground text-sm">
                 {t("manage_admin_account")}
               </p>
             </div>
@@ -268,8 +268,8 @@ const AdminProfile = () => {
               variant={isEditMode ? "outline" : "default"}
               className={` ${
                 isEditMode
-                  ? "border-[#333] bg-transparent hover:bg-[#1a1a1a] text-gray-300 hover:text-white"
-                  : " bg-neutral-50 hover:bg-[#d6d6d6] text-neutral-950 px-4 py-2 rounded-lg font-medium transition-colors"
+                  ? "border-border bg-transparent hover:bg-card text-muted-foreground hover:text-foreground"
+                  : " bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2 rounded-lg font-medium transition-colors"
               }`}
             >
               {isEditMode ? t("cancel") : t("edit_profile")}
@@ -289,8 +289,8 @@ const AdminProfile = () => {
               variant={isEditMode ? "outline" : "default"}
               className={` ${
                 isEditMode
-                  ? "w-full border-[#333] bg-transparent hover:bg-[#1a1a1a] text-gray-300 hover:text-white"
-                  : "w-full bg-neutral-50 hover:bg-[#d6d6d6] text-neutral-950 px-4 py-2 rounded-lg font-medium transition-colors"
+                  ? "w-full border-border bg-transparent hover:bg-card text-muted-foreground hover:text-foreground"
+                  : "w-full bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2 rounded-lg font-medium transition-colors"
               }`}
             >
               {isEditMode ? t("cancel") : t("edit_profile")}
@@ -299,11 +299,11 @@ const AdminProfile = () => {
         )}
 
         {/* Personal Information */}
-        <Card className="bg-[#111111] border-[#1f1f23]">
+        <Card className="bg-card border-border">
           <CardHeader>
             <div className="flex items-center space-x-2">
-              <User className="h-5 w-5 text-gray-400" />
-              <CardTitle className="text-white text-lg">
+              <User className="h-5 w-5 text-muted-foreground" />
+              <CardTitle className="text-foreground text-lg">
                 {t("personal_information")}
               </CardTitle>
             </div>
@@ -320,9 +320,9 @@ const AdminProfile = () => {
                 readOnly={!isEditMode}
                 className={`${
                   isEditMode
-                    ? "bg-[#0a0a0a] border-[#1f1f23]"
-                    : "bg-[#1a1a1a] border-[#1f1f23]"
-                } text-white placeholder:text-gray-500 focus:border-gray-400`}
+                    ? "bg-background border-border"
+                    : "bg-card border-border"
+                } text-foreground placeholder:text-muted-foreground focus:border-ring`}
               />
                <RequiredInput
                  label={t("last_name")}
@@ -332,9 +332,9 @@ const AdminProfile = () => {
                 readOnly={!isEditMode}
                 className={`${
                   isEditMode
-                    ? "bg-[#0a0a0a] border-[#1f1f23]"
-                    : "bg-[#1a1a1a] border-[#1f1f23]"
-                } text-white placeholder:text-gray-500 focus:border-gray-400`}
+                    ? "bg-background border-border"
+                    : "bg-card border-border"
+                } text-foreground placeholder:text-muted-foreground focus:border-ring`}
               />
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -347,9 +347,9 @@ const AdminProfile = () => {
                 required
                 className={`${
                   isEditMode
-                    ? "bg-[#0a0a0a] border-[#1f1f23]"
-                    : "bg-[#1a1a1a] border-[#1f1f23]"
-                } text-white placeholder:text-gray-500 focus:border-gray-400`}
+                    ? "bg-background border-border"
+                    : "bg-card border-border"
+                } text-foreground placeholder:text-muted-foreground focus:border-ring`}
               />
               <PhoneInputComponent
                 label={t("phone")}
@@ -363,21 +363,21 @@ const AdminProfile = () => {
         </Card>
 
         {/* Security Settings */}
-        <Card className="bg-[#111111] border-[#1f1f23]">
+        <Card className="bg-card border-border">
           <CardHeader>
             <div className="flex items-center space-x-2">
-              <Shield className="h-5 w-5 text-gray-400" />
-              <CardTitle className="text-white text-lg">
+              <Shield className="h-5 w-5 text-muted-foreground" />
+              <CardTitle className="text-foreground text-lg">
                 {t("security_privacy")}
               </CardTitle>
             </div>
-            <CardDescription className="text-gray-400 text-sm">
+            <CardDescription className="text-muted-foreground text-sm">
               {t("manage_account_security")}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="currentPassword" className="text-gray-300">
+              <Label htmlFor="currentPassword" className="text-muted-foreground">
                 {t("current_password")}
               </Label>
               <Input
@@ -389,9 +389,9 @@ const AdminProfile = () => {
                 readOnly={!isEditMode}
                 className={`${
                   isEditMode
-                    ? "bg-[#0a0a0a] border-[#1f1f23] text-white"
-                    : "bg-[#1a1a1a] border-[#1f1f23] text-gray-500"
-                } placeholder:text-gray-500 focus:border-gray-400`}
+                    ? "bg-background border-border text-foreground"
+                    : "bg-card border-border text-muted-foreground"
+                } placeholder:text-muted-foreground focus:border-ring`}
               />
             </div>
 
@@ -403,16 +403,16 @@ const AdminProfile = () => {
                 onChange={setNewPassword}
                 className={`${
                   isEditMode
-                    ? "bg-[#0a0a0a] border-[#1f1f23] text-white"
-                    : "bg-[#1a1a1a] border-[#1f1f23] text-gray-500"
-                } placeholder:text-gray-500 focus:border-gray-400`}
+                    ? "bg-background border-border text-foreground"
+                    : "bg-card border-border text-muted-foreground"
+                } placeholder:text-muted-foreground focus:border-ring`}
                 readOnly={!isEditMode}
                 state={isEditMode ? "default" : "always"}
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword" className="text-gray-300">
+              <Label htmlFor="confirmPassword" className="text-muted-foreground">
                 {t("confirm_new_password")}
               </Label>
               <Input
@@ -424,9 +424,9 @@ const AdminProfile = () => {
                 readOnly={!isEditMode}
                 className={`${
                   isEditMode
-                    ? "bg-[#0a0a0a] border-[#1f1f23] text-white"
-                    : "bg-[#1a1a1a] border-[#1f1f23] text-gray-500"
-                } placeholder:text-gray-500 focus:border-gray-400`}
+                    ? "bg-background border-border text-foreground"
+                    : "bg-card border-border text-muted-foreground"
+                } placeholder:text-muted-foreground focus:border-ring`}
               />
             </div>
           </CardContent>
@@ -437,7 +437,7 @@ const AdminProfile = () => {
           <div className="flex justify-end space-x-3">
             <Button
               onClick={handleSave}
-              className="bg-neutral-50 hover:bg-[#d6d6d6] text-neutral-950 px-6 py-2 rounded-lg font-medium transition-colors"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-2 rounded-lg font-medium transition-colors"
             >
               {t("save_changes")}
             </Button>

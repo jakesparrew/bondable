@@ -30,7 +30,7 @@ const TasksSkeleton = ({ userType }: TasksSkeletonProps) => {
         </div>
 
         {/* Stats Bar */}
-        <Card className="bg-[#111111] border-[#1f1f23]">
+        <Card className="bg-muted border-border">
           <CardContent className="p-3 md:p-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4 md:gap-8 w-full justify-evenly text-xs md:text-sm">
@@ -39,13 +39,13 @@ const TasksSkeleton = ({ userType }: TasksSkeletonProps) => {
                   <Skeleton className="h-4 w-20" />
                   <Skeleton className="h-4 w-6" />
                 </div>
-                <div className="w-px h-4 bg-[#1f1f23]" />
+                <div className="w-px h-4 bg-border" />
                 <div className="flex items-center gap-2">
                   <Skeleton className="h-4 w-4 rounded-full" />
                   <Skeleton className="h-4 w-24 hidden sm:block" />
                   <Skeleton className="h-4 w-12" />
                 </div>
-                <div className="w-px h-4 bg-[#1f1f23] hidden sm:block" />
+                <div className="w-px h-4 bg-border hidden sm:block" />
                 <div className="items-center gap-2 hidden sm:flex">
                   <Skeleton className="h-4 w-4 rounded-full" />
                   <Skeleton className="h-4 w-24" />
@@ -67,12 +67,12 @@ const TasksSkeleton = ({ userType }: TasksSkeletonProps) => {
         </div>
 
         {/* Tasks Table - Desktop */}
-        <Card className="bg-[#111111] border-[#1f1f23] hidden md:block">
+        <Card className="bg-muted border-border hidden md:block">
           <CardContent className="p-0">
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
-                  <TableRow className="border-[#1f1f23] hover:bg-transparent">
+                  <TableRow className="border-border hover:bg-transparent">
                     <TableHead>
                       <Skeleton className="h-4 w-10" />
                     </TableHead>
@@ -105,7 +105,7 @@ const TasksSkeleton = ({ userType }: TasksSkeletonProps) => {
                 </TableHeader>
                 <TableBody>
                   {[1, 2, 3, 4, 5, 6].map((i) => (
-                    <TableRow key={i} className="border-[#1f1f23]">
+                    <TableRow key={i} className="border-border">
                       <TableCell>
                         <Skeleton className="h-4 w-12" />
                       </TableCell>
@@ -144,7 +144,7 @@ const TasksSkeleton = ({ userType }: TasksSkeletonProps) => {
         {/* Mobile Task Cards */}
         <div className="md:hidden space-y-3">
           {[1, 2, 3, 4, 5].map((i) => (
-            <Card key={i} className="bg-[#111111] border-[#1f1f23]">
+            <Card key={i} className="bg-muted border-border">
               <CardContent className="p-4">
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
@@ -165,7 +165,7 @@ const TasksSkeleton = ({ userType }: TasksSkeletonProps) => {
                     <Skeleton className="h-4 w-10" />
                   </div>
 
-                  <div className="flex items-center justify-between pt-2 border-t border-[#1f1f23]">
+                  <div className="flex items-center justify-between pt-2 border-t border-border">
                     <Skeleton className="h-4 w-24" />
                     <Skeleton className="h-8 w-8" />
                   </div>

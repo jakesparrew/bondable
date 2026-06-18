@@ -109,7 +109,7 @@ function TaskActionDropdown({
         <Button
           variant="ghost"
           size="sm"
-          className="h-8 w-8 p-0 text-gray-400 hover:text-white hover:bg-neutral-700"
+          className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground hover:bg-muted"
           onClick={(e) => {
             e.stopPropagation();
             setIsOpen(!isOpen);
@@ -120,7 +120,7 @@ function TaskActionDropdown({
       </DropdownMenuTrigger>
       <DropdownMenuContent
         align="end"
-        className="bg-[#111111] border-[#1f1f23] z-50"
+        className="bg-card border-border z-50"
         onCloseAutoFocus={(e) => {
           // Prevent auto focus to avoid focus trapping
           e.preventDefault();
@@ -131,7 +131,7 @@ function TaskActionDropdown({
         }}
       >
         <DropdownMenuItem
-          className="text-gray-300 hover:bg-[#1a1a1a] cursor-pointer"
+          className="text-muted-foreground hover:bg-muted cursor-pointer"
           onClick={(e) => {
             e.stopPropagation();
             handleMenuAction(onViewDetails);
@@ -142,7 +142,7 @@ function TaskActionDropdown({
         
         {userType === "therapist" && onEditTask && (
           <DropdownMenuItem
-            className="text-gray-300 hover:bg-[#1a1a1a] cursor-pointer"
+            className="text-muted-foreground hover:bg-muted cursor-pointer"
             onClick={(e) => {
               e.stopPropagation();
               handleMenuAction(onEditTask);
@@ -154,9 +154,9 @@ function TaskActionDropdown({
         
         {userType === "client" && task.status === "assigned" && (
           <>
-            <DropdownMenuSeparator className="bg-[#1f1f23]" />
+            <DropdownMenuSeparator className="bg-border" />
             <DropdownMenuItem
-              className="text-yellow-400 hover:bg-[#1a1a1a] cursor-pointer"
+              className="text-yellow-400 hover:bg-muted cursor-pointer"
               onClick={(e) => {
                 e.stopPropagation();
                 handleStatusChange("in_progress");
@@ -165,7 +165,7 @@ function TaskActionDropdown({
               {t("mark_in_progress")}
             </DropdownMenuItem>
             <DropdownMenuItem
-              className="text-green-400 hover:bg-[#1a1a1a] cursor-pointer"
+              className="text-green-400 hover:bg-muted cursor-pointer"
               onClick={(e) => {
                 e.stopPropagation();
                 handleStatusChange("completed");
@@ -174,7 +174,7 @@ function TaskActionDropdown({
               {t("mark_complete")}
             </DropdownMenuItem>
             <DropdownMenuItem
-              className="text-red-400 hover:bg-[#1a1a1a] cursor-pointer"
+              className="text-red-400 hover:bg-muted cursor-pointer"
               onClick={(e) => {
                 e.stopPropagation();
                 handleStatusChange("denied");
@@ -187,9 +187,9 @@ function TaskActionDropdown({
         
         {userType === "client" && task.status === "in_progress" && (
           <>
-            <DropdownMenuSeparator className="bg-[#1f1f23]" />
+            <DropdownMenuSeparator className="bg-border" />
             <DropdownMenuItem
-              className="text-green-400 hover:bg-[#1a1a1a] cursor-pointer"
+              className="text-green-400 hover:bg-muted cursor-pointer"
               onClick={(e) => {
                 e.stopPropagation();
                 handleStatusChange("completed");
@@ -202,7 +202,7 @@ function TaskActionDropdown({
         
         {userType === "therapist" && onDeleteTask && (
           <DropdownMenuItem
-            className="text-red-400 hover:bg-[#1a1a1a] cursor-pointer"
+            className="text-red-400 hover:bg-muted cursor-pointer"
             onClick={(e) => {
               e.stopPropagation();
               handleMenuAction(onDeleteTask);

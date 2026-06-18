@@ -155,7 +155,7 @@ const SidebarProvider = React.forwardRef<
               } as React.CSSProperties
             }
             className={cn(
-              "group/sidebar-wrapper flex min-h-svh w-full has-[[data-variant=inset]]:bg-neutral-900",
+              "group/sidebar-wrapper flex min-h-svh w-full has-[[data-variant=inset]]:bg-sidebar",
               className
             )}
             ref={ref}
@@ -222,7 +222,7 @@ const Sidebar = React.forwardRef<
     {...props}
   >
     <div
-      className={`w-[--sidebar-width] -ml-2 pr-2 bg-neutral-900 text-neutral-50 overflow-y-auto border-r border-neutral-800 p-4 ${
+      className={`w-[--sidebar-width] -ml-2 pr-2 bg-sidebar text-sidebar-foreground overflow-y-auto border-r border-sidebar-border p-4 ${
         IS_NATIVE ? 'pt-14 pb-5' : ''
       }`}
       style={

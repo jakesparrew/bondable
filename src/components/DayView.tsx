@@ -60,10 +60,10 @@ const DayView = ({
   };
 
   return (
-    <div className="bg-[#111111] border border-[#1f1f23] rounded-lg overflow-hidden">
+    <div className="bg-card border border-border rounded-lg overflow-hidden">
       {/* Header */}
-      <div className="border-b border-[#1f1f23] p-4">
-        <h3 className="text-lg font-medium text-white">
+      <div className="border-b border-border p-4">
+        <h3 className="text-lg font-medium text-foreground">
           {currentDate.toLocaleDateString(i18n.language === 'fr' ? 'fr-FR' : 'en-US', {
             weekday: "long",
             year: "numeric",
@@ -74,18 +74,18 @@ const DayView = ({
       </div>
 
       {/* Time slots */}
-      <div className="divide-y divide-[#1f1f23]">
+      <div className="divide-y divide-border">
         {hours.map((hour) => {
           const hourEvents = getEventsForHour(hour);
           
           return (
             <div
               key={hour}
-              className="flex min-h-[80px] cursor-pointer hover:bg-[#1a1a1a]"
+              className="flex min-h-[80px] cursor-pointer hover:bg-muted"
               onClick={() => handleTimeSlotClick(hour)}
             >
               {/* Time label */}
-              <div className="w-20 p-4 text-sm text-gray-400 border-r border-[#1f1f23]">
+              <div className="w-20 p-4 text-sm text-muted-foreground border-r border-border">
                 {`${String(hour).padStart(2, "0")}:00`}
               </div>
               

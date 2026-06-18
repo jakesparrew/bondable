@@ -31,11 +31,11 @@ const SessionsSkeleton = ({ userType }: SessionsSkeletonProps) => {
 
         {/* Tabs */}
         <Tabs defaultValue="upcoming" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 bg-[#1a1a1a] border border-[#333]">
-            <TabsTrigger value="upcoming" className="data-[state=active]:bg-[#333] data-[state=active]:text-white">
+          <TabsList className="grid w-full grid-cols-2 bg-muted border border-border">
+            <TabsTrigger value="upcoming" className="data-[state=active]:bg-background data-[state=active]:text-foreground">
               <Skeleton className="h-4 w-20" />
             </TabsTrigger>
-            <TabsTrigger value="past" className="data-[state=active]:bg-[#333] data-[state=active]:text-white">
+            <TabsTrigger value="past" className="data-[state=active]:bg-background data-[state=active]:text-foreground">
               <Skeleton className="h-4 w-16" />
             </TabsTrigger>
           </TabsList>
@@ -43,7 +43,7 @@ const SessionsSkeleton = ({ userType }: SessionsSkeletonProps) => {
           <TabsContent value="upcoming" className="mt-6">
             <div className="space-y-4">
               {[1, 2, 3, 4, 5].map((i) => (
-                <Card key={i} className="bg-[#111111] border-[#1f1f23]">
+                <Card key={i} className="bg-muted border-border">
                   <CardContent className="p-4">
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex items-center gap-3">
@@ -85,7 +85,7 @@ const SessionsSkeleton = ({ userType }: SessionsSkeletonProps) => {
           <TabsContent value="past" className="mt-6">
             <div className="space-y-4">
               {[1, 2, 3].map((i) => (
-                <Card key={i} className="bg-[#111111] border-[#1f1f23] opacity-75">
+                <Card key={i} className="bg-muted border-border opacity-75">
                   <CardContent className="p-4">
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex items-center gap-3">

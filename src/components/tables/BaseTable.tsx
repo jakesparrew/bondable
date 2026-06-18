@@ -123,10 +123,10 @@ function BaseTable<T>({
         {/* Search and filter skeleton */}
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="relative flex-1">
-            <div className="h-10 bg-[#1a1a1a] rounded-md animate-pulse" />
+            <div className="h-10 bg-muted rounded-md animate-pulse" />
           </div>
           <div className="w-full sm:w-48">
-            <div className="h-10 bg-[#1a1a1a] rounded-md animate-pulse" />
+            <div className="h-10 bg-muted rounded-md animate-pulse" />
           </div>
         </div>
 
@@ -136,11 +136,11 @@ function BaseTable<T>({
             <TableHeader>
               <TableRow>
                 {columns.map((column) => (
-                  <TableHead key={column.key} className={`text-gray-400 ${column.className}`}>
+                  <TableHead key={column.key} className={`text-muted-foreground ${column.className}`}>
                     {column.label}
                   </TableHead>
                 ))}
-                {actions && <TableHead className="text-gray-400 w-[50px]"></TableHead>}
+                {actions && <TableHead className="text-muted-foreground w-[50px]"></TableHead>}
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -148,12 +148,12 @@ function BaseTable<T>({
                 <TableRow key={i}>
                   {columns.map((column) => (
                     <TableCell key={column.key} className={column.className}>
-                      <div className="h-4 bg-[#1a1a1a] rounded animate-pulse" />
+                      <div className="h-4 bg-muted rounded animate-pulse" />
                     </TableCell>
                   ))}
                   {actions && (
                     <TableCell>
-                      <div className="h-8 w-8 bg-[#1a1a1a] rounded animate-pulse" />
+                      <div className="h-8 w-8 bg-muted rounded animate-pulse" />
                     </TableCell>
                   )}
                 </TableRow>
@@ -170,30 +170,30 @@ function BaseTable<T>({
       {/* Search and Filter */}
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
             <Input
               placeholder={searchPlaceholder || t("search")}
               value={searchQuery}
               onChange={(e) => handleSearchChange(e.target.value)}
-              className="pl-10 bg-[#1a1a1a] border-[#2a2a2a] text-white placeholder-gray-400 focus:border-[#3a3a3a]"
+              className="pl-10 bg-background border-border text-foreground placeholder:text-muted-foreground focus:border-ring"
             />
         </div>
         
         {filterOptions && (
           <Select value={statusFilter} onValueChange={handleFilterChange}>
-            <SelectTrigger className="w-full sm:w-48 bg-[#1a1a1a] border-[#2a2a2a] text-white">
+            <SelectTrigger className="w-full sm:w-48 bg-background border-border text-foreground">
               <Filter className="h-4 w-4 mr-2" />
               <SelectValue placeholder={t("filter_by_status")} />
             </SelectTrigger>
-            <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a]">
-              <SelectItem value="all" className="text-white hover:bg-[#2a2a2a]">
+            <SelectContent className="bg-card border-border">
+              <SelectItem value="all" className="text-foreground hover:bg-muted">
                 {t("all_statuses")}
               </SelectItem>
               {filterOptions.map((option) => (
-                <SelectItem 
-                  key={option.value} 
+                <SelectItem
+                  key={option.value}
                   value={option.value}
-                  className="text-white hover:bg-[#2a2a2a]"
+                  className="text-foreground hover:bg-muted"
                 >
                   {option.label}
                 </SelectItem>
@@ -209,17 +209,17 @@ function BaseTable<T>({
           <TableHeader>
             <TableRow>
               {columns.map((column) => (
-                <TableHead key={column.key} className={`text-gray-400 ${column.className || ''}`}>
+                <TableHead key={column.key} className={`text-muted-foreground ${column.className || ''}`}>
                   {column.label}
                 </TableHead>
               ))}
-              {actions && <TableHead className="text-gray-400 w-[50px]"></TableHead>}
+              {actions && <TableHead className="text-muted-foreground w-[50px]"></TableHead>}
             </TableRow>
           </TableHeader>
           <TableBody>
             {paginatedData.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={columns.length + (actions ? 1 : 0)} className="text-center text-gray-400 py-8">
+                <TableCell colSpan={columns.length + (actions ? 1 : 0)} className="text-center text-muted-foreground py-8">
                   {emptyMessage || t("no_data_available")}
                 </TableCell>
               </TableRow>
@@ -237,20 +237,20 @@ function BaseTable<T>({
                         <DropdownMenuTrigger asChild>
                           <Button
                             variant="ghost"
-                            className="h-8 w-8 p-0 text-gray-400 hover:text-white"
+                            className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground"
                           >
                             <MoreHorizontal className="h-4 w-4" />
                           </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent 
+                        <DropdownMenuContent
                           align="end"
-                          className="bg-[#111111] border-[#1f1f23]"
+                          className="bg-card border-border"
                         >
                           {actions.map((action, index) => (
                             <DropdownMenuItem
                               key={index}
                               onClick={() => action.onClick(item)}
-                              className={action.className || "text-white hover:bg-[#2a2a2a]"}
+                              className={action.className || "text-foreground hover:bg-muted"}
                             >
                               {action.icon}
                               {action.label}
@@ -270,8 +270,8 @@ function BaseTable<T>({
       {/* Pagination */}
       {totalPages > 1 && (
         <div className="flex items-center justify-between">
-          <p className="text-sm text-gray-400">
-            {t("showing", { 
+          <p className="text-sm text-muted-foreground">
+            {t("showing", {
               start: Math.min(startIndex + 1, filteredData.length), 
               end: Math.min(startIndex + itemsPerPage, filteredData.length), 
               total: filteredData.length 
@@ -284,7 +284,7 @@ function BaseTable<T>({
               size="sm"
               onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
               disabled={currentPage === 1}
-              className="bg-[#1a1a1a] border-[#2a2a2a] text-white hover:bg-[#2a2a2a]"
+              className="bg-card border-border text-foreground hover:bg-muted"
             >
               <ChevronLeft className="h-4 w-4" />
               {t("previous")}
@@ -298,8 +298,8 @@ function BaseTable<T>({
                 onClick={() => setCurrentPage(page)}
                 className={
                   currentPage === page
-                    ? "bg-white text-black hover:bg-gray-200"
-                    : "bg-[#1a1a1a] border-[#2a2a2a] text-white hover:bg-[#2a2a2a]"
+                    ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                    : "bg-card border-border text-foreground hover:bg-muted"
                 }
               >
                 {page}
@@ -311,7 +311,7 @@ function BaseTable<T>({
               size="sm"
               onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
               disabled={currentPage === totalPages}
-              className="bg-[#1a1a1a] border-[#2a2a2a] text-white hover:bg-[#2a2a2a]"
+              className="bg-card border-border text-foreground hover:bg-muted"
             >
               {t("next")}
               <ChevronRight className="h-4 w-4" />

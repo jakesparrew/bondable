@@ -11,8 +11,8 @@ const MessagesSkeleton = ({ userType }: MessagesSkeletonProps) => {
     <DashboardLayout userType={userType} contentClassName="!p-0">
       <div className="h-screen w-full overflow-x-hidden flex flex-col md:flex-row">
         {/* Conversations List */}
-        <div className="w-full md:w-80 h-full bg-[#111111] border-b md:border-b-0 md:border-r border-[#1f1f23] flex flex-col">
-          <div className="p-3 md:p-4 border-b border-[#1f1f23]">
+        <div className="w-full md:w-80 h-full bg-muted border-b md:border-b-0 md:border-r border-border flex flex-col">
+          <div className="p-3 md:p-4 border-b border-border">
             <div className="flex items-center justify-between mb-4">
               <Skeleton className="h-5 md:h-6 w-16 md:w-20" />
               <Skeleton className="h-6 md:h-8 w-6 md:w-8" />
@@ -23,7 +23,7 @@ const MessagesSkeleton = ({ userType }: MessagesSkeletonProps) => {
             {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
               <div
                 key={i}
-                className="flex items-center space-x-2 md:space-x-3 p-2 md:p-3 rounded-lg border border-[#1f1f23] bg-[#1a1a1a] cursor-pointer"
+                className="flex items-center space-x-2 md:space-x-3 p-2 md:p-3 rounded-lg border border-border bg-background cursor-pointer"
               >
                 <Skeleton className="h-8 md:h-10 w-8 md:w-10 rounded-full" />
                 <div className="flex-1 space-y-1">
@@ -40,9 +40,9 @@ const MessagesSkeleton = ({ userType }: MessagesSkeletonProps) => {
         </div>
 
         {/* Chat Messages */}
-        <div className="hidden md:flex flex-1 bg-[#111111] flex-col">
+        <div className="hidden md:flex flex-1 bg-muted flex-col">
           {/* Chat Header */}
-          <div className="p-3 md:p-4 border-b border-[#1f1f23]">
+          <div className="p-3 md:p-4 border-b border-border">
             <div className="flex items-center space-x-3">
               <Skeleton className="h-8 md:h-10 w-8 md:w-10 rounded-full" />
               <div>
@@ -71,8 +71,8 @@ const MessagesSkeleton = ({ userType }: MessagesSkeletonProps) => {
                     <Skeleton
                       className={`h-10 md:h-12 rounded-lg ${
                         i % 2 === 0
-                          ? "w-40 md:w-48 bg-[#1a1a1a]"
-                          : "w-32 md:w-40 bg-[#2b2b2b]"
+                          ? "w-40 md:w-48 bg-muted/60"
+                          : "w-32 md:w-40 bg-muted"
                       }`}
                     />
                     <Skeleton
@@ -87,7 +87,7 @@ const MessagesSkeleton = ({ userType }: MessagesSkeletonProps) => {
           </div>
 
           {/* Message Input */}
-          <div className="p-3 md:p-4 border-t border-[#1f1f23]">
+          <div className="p-3 md:p-4 border-t border-border">
             <div className="flex items-center space-x-2">
               <Skeleton className="h-6 md:h-8 w-6 md:w-8" />
               <Skeleton className="h-9 md:h-10 flex-1" />

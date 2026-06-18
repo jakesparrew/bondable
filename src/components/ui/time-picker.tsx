@@ -91,7 +91,7 @@ export function TimePicker({
   return (
     <div className="space-y-2">
       {label && (
-        <Label className="text-sm font-medium text-gray-300">
+        <Label className="text-sm font-medium text-muted-foreground">
           {label} {required && <span className="text-red-400">*</span>}
         </Label>
       )}
@@ -102,9 +102,9 @@ export function TimePicker({
             disabled={disabled}
             className={clsx(
               "w-full justify-between text-left font-normal",
-              "bg-[#0a0a0a] border-[#1f1f23] text-white",
-              "hover:bg-[#1a1a1a] hover:text-white",
-              !value && "text-gray-500",
+              "bg-background border-border text-foreground",
+              "hover:bg-muted hover:text-foreground",
+              !value && "text-muted-foreground",
               className
             )}
           >
@@ -113,27 +113,27 @@ export function TimePicker({
           </Button>
         </PopoverTrigger>
         <PopoverContent
-          className="w-80 p-0 bg-[#111111] border-[#1f1f23]"
+          className="w-80 p-0 bg-popover border-border"
           align="start"
         >
           <div className="p-4 space-y-4">
             <div className="space-y-1">
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-2">
-                  <Label className="text-xs text-gray-400">Hour</Label>
+                  <Label className="text-xs text-muted-foreground">Hour</Label>
                   <Select
                     value={hours.toString()}
                     onValueChange={handleHourChange}
                   >
-                    <SelectTrigger className="bg-[#0a0a0a] border-[#1f1f23] text-white h-9">
+                    <SelectTrigger className="bg-background border-border text-foreground h-9">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="bg-[#111111] border-[#1f1f23] max-h-48">
+                    <SelectContent className="bg-popover border-border max-h-48">
                       {hourOptions.map((hour) => (
                         <SelectItem
                           key={hour}
                           value={hour.toString()}
-                          className="text-gray-300 hover:!text-neutral-950 data-[state=checked]:text-neutral-50 data-[highlighted]:!text-neutral-950"
+                          className="text-foreground focus:bg-accent focus:text-accent-foreground"
                         >
                           {hour.toString().padStart(2, "0")}
                         </SelectItem>
@@ -143,20 +143,20 @@ export function TimePicker({
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-xs text-gray-400">Minute</Label>
+                  <Label className="text-xs text-muted-foreground">Minute</Label>
                   <Select
                     value={minutes.toString()}
                     onValueChange={handleMinuteChange}
                   >
-                    <SelectTrigger className="bg-[#0a0a0a] border-[#1f1f23] text-white h-9">
+                    <SelectTrigger className="bg-background border-border text-foreground h-9">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="bg-[#111111] border-[#1f1f23] max-h-48">
+                    <SelectContent className="bg-popover border-border max-h-48">
                       {minuteOptions.map((minute) => (
                         <SelectItem
                           key={minute}
                           value={minute.toString()}
-                          className="text-gray-300 hover:!text-neutral-950 data-[state=checked]:text-neutral-50 data-[highlighted]:!text-neutral-950"
+                          className="text-foreground focus:bg-accent focus:text-accent-foreground"
                         >
                           {minute.toString().padStart(2, "0")}
                         </SelectItem>
@@ -166,14 +166,14 @@ export function TimePicker({
                 </div>
               </div>
               <div className="space-y-2 pt-2">
-                <Label htmlFor="custom-time" className="text-xs text-gray-400">
+                <Label htmlFor="custom-time" className="text-xs text-muted-foreground">
                   Or enter time manually
                 </Label>
                 <Input
                   id="custom-time"
                   type="text"
                   placeholder="HH:MM"
-                  className="w-full bg-[#0a0a0a] border-[#1f1f23] text-white placeholder:text-gray-500 focus:border-gray-400"
+                  className="w-full bg-background border-border text-foreground placeholder:text-muted-foreground focus:border-ring"
                   onChange={(e) => handleInputChange(e.target.value)}
                 />
               </div>
@@ -185,7 +185,7 @@ export function TimePicker({
                 variant="outline"
                 size="sm"
                 onClick={handleDone}
-                className="border-[#333] bg-[#1a1a1a] hover:bg-[#2a2a2a] text-gray-300 hover:text-neutral-300"
+                className="border-border bg-card hover:bg-muted text-muted-foreground hover:text-foreground"
               >
                 Done
               </Button>

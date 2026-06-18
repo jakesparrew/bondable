@@ -126,13 +126,13 @@ const SessionCard = ({ session, userType, onViewDetails, onConfirmSession, onCan
   const permissions = getSessionPermissions();
 
   return (
-    <Card className="bg-[#111111] border-[#1f1f23] hover:border-[#333] transition-colors">
+    <Card className="bg-card border-border hover:border-border transition-colors">
       <CardContent className="p-4">
         <div className="flex items-start justify-between mb-3">
           <div className="flex items-center gap-3">
             <Avatar className="h-10 w-10">
               <AvatarImage src={avatarUrl} alt={session.client?.full_name || session.therapist?.full_name || ''} className="non-invertable"/>
-              <AvatarFallback className="bg-[#1a1a1a] text-gray-300">
+              <AvatarFallback className="bg-muted text-muted-foreground">
                 {(session.client?.full_name || session.therapist?.full_name || 'U')
                   .split(" ")
                   .map((n) => n[0])
@@ -141,8 +141,8 @@ const SessionCard = ({ session, userType, onViewDetails, onConfirmSession, onCan
               </AvatarFallback>
             </Avatar>
             <div>
-              <h4 className="text-white font-medium">{session.client?.full_name || session.therapist?.full_name || 'Unknown'}</h4>
-              <p className="text-gray-400 text-sm">
+              <h4 className="text-foreground font-medium">{session.client?.full_name || session.therapist?.full_name || 'Unknown'}</h4>
+              <p className="text-muted-foreground text-sm">
                 {userType === "client" ? t("therapist") : t("client")} •{" "}
                 {t(session.session_type?.toLowerCase().replace(/\s+/g, '_') || 'individual_therapy')}
               </p>
@@ -154,25 +154,25 @@ const SessionCard = ({ session, userType, onViewDetails, onConfirmSession, onCan
         </div>
 
         <div className="space-y-2">
-          <div className="flex items-center gap-2 text-gray-300">
-            <Clock className="w-4 h-4 text-gray-400" />
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <Clock className="w-4 h-4 text-muted-foreground" />
             <span className="text-sm">
               {session.session_time} • {session.duration_minutes} min
             </span>
           </div>
-          <div className="flex items-center gap-2 text-gray-300">
+          <div className="flex items-center gap-2 text-muted-foreground">
             {getSessionTypeIcon(session.session_format || 'Video')}
             <span className="text-sm">{session.location}</span>
           </div>
           {session.notes && (
-            <p className="text-gray-400 text-sm mt-2">{session.notes}</p>
+            <p className="text-muted-foreground text-sm mt-2">{session.notes}</p>
           )}
         </div>
 
         <div className="flex gap-2 mt-4">
           <Button
             size="sm"
-            className="bg-neutral-50 hover:bg-[#d6d6d6] text-neutral-950"
+            className="bg-primary hover:bg-primary/90 text-primary-foreground"
             onClick={() => onViewDetails(session)}
           >
             {t("view_details")}
@@ -181,7 +181,7 @@ const SessionCard = ({ session, userType, onViewDetails, onConfirmSession, onCan
             <Button
               size="sm"
               variant="outline"
-              className="border-[#333] bg-[#1a1a1a] hover:bg-[#2a2a2a] text-gray-300 hover:text-neutral-300"
+              className="border-border bg-muted hover:bg-muted text-muted-foreground hover:text-foreground"
               onClick={() => onConfirmSession(session.id)}
             >
               {t("confirm")}
@@ -201,7 +201,7 @@ const SessionCard = ({ session, userType, onViewDetails, onConfirmSession, onCan
             <Button
               size="sm"
               variant="outline"
-              className="border-[#333] bg-[#1a1a1a] hover:bg-[#2a2a2a] text-gray-300 hover:text-neutral-300"
+              className="border-border bg-muted hover:bg-muted text-muted-foreground hover:text-foreground"
               onClick={() => onCancelSession(session.id)}
             >
               {t("cancel")}
@@ -211,7 +211,7 @@ const SessionCard = ({ session, userType, onViewDetails, onConfirmSession, onCan
             <Button
               size="sm"
               variant="outline"
-              className="border-[#333] bg-[#1a1a1a] hover:bg-[#2a2a2a] text-gray-300 hover:text-neutral-300"
+              className="border-border bg-muted hover:bg-muted text-muted-foreground hover:text-foreground"
               onClick={() => onRequestUpdate(session.id)}
             >
               {t("request_update")}
@@ -502,9 +502,9 @@ const Sessions = () => {
   const renderSessionGroup = (dateLabel: string, sessions: Session[]) => (
     <div key={dateLabel} className="space-y-3">
       <div className="flex items-center gap-2">
-        <h3 className="text-lg font-semibold text-white">{dateLabel}</h3>
-        <div className="h-px flex-1 bg-[#1f1f23]"></div>
-        <span className="text-gray-400 text-sm">
+        <h3 className="text-lg font-semibold text-foreground">{dateLabel}</h3>
+        <div className="h-px flex-1 bg-border"></div>
+        <span className="text-muted-foreground text-sm">
           {sessions.length} {sessions.length === 1 ? t("session") : t("sessions")}
         </span>
       </div>
@@ -541,8 +541,8 @@ const Sessions = () => {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-semibold text-white mb-1">{t('sessions')}</h2>
-            <p className="text-gray-400 text-sm">
+            <h2 className="text-2xl font-semibold text-foreground mb-1">{t('sessions')}</h2>
+            <p className="text-muted-foreground text-sm">
               {userType === "client"
                 ? t("view_manage_therapy_sessions")
                 : t("manage_client_sessions_appointments")}
@@ -551,7 +551,7 @@ const Sessions = () => {
               <div className="flex items-center gap-2 mt-2">
                 <Badge
                   variant="outline"
-                  className="text-white border-[#333] bg-[#1a1a1a]"
+                  className="text-foreground border-border bg-muted"
                 >
                   {t("filtered_by")}: {decodeURIComponent(clientNameFilter)}
                   <button
@@ -569,7 +569,7 @@ const Sessions = () => {
               <Button
                 variant="outline"
                 size="sm"
-                className="border-[#333] bg-[#1a1a1a] hover:bg-[#2a2a2a] text-gray-300 hover:text-neutral-300"
+                className="border-border bg-muted hover:bg-muted text-muted-foreground hover:text-foreground"
                 onClick={() => setShowFilterDialog(true)}
               >
                 <Filter className="w-4 h-4 mr-2" />
@@ -577,7 +577,7 @@ const Sessions = () => {
               </Button>
               <Button
                 size="sm"
-                className="bg-neutral-50 hover:bg-[#d6d6d6] text-neutral-950"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground"
                 onClick={() => setShowScheduleDialog(true)}
               >
                 <CalendarDays className="w-4 h-4 mr-2" />
@@ -592,7 +592,7 @@ const Sessions = () => {
             <Button
               variant="outline"
               size="sm"
-              className="border-[#333] bg-[#1a1a1a] hover:bg-[#2a2a2a] text-gray-300 hover:text-neutral-300 w-full"
+              className="border-border bg-muted hover:bg-muted text-muted-foreground hover:text-foreground w-full"
               onClick={() => setShowFilterDialog(true)}
             >
               <Filter className="w-4 h-4 mr-2" />
@@ -600,7 +600,7 @@ const Sessions = () => {
             </Button>
             <Button
               size="sm"
-              className="bg-neutral-50 hover:bg-[#d6d6d6] text-neutral-950 w-full"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground w-full"
               onClick={() => setShowScheduleDialog(true)}
             >
               <CalendarDays className="w-4 h-4 mr-2" />
@@ -611,16 +611,16 @@ const Sessions = () => {
 
         {/* Sessions Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-2 bg-[#1a1a1a] border border-[#333] p-0 px-1 gap-1">
+          <TabsList className="grid w-full grid-cols-2 bg-card border border-border p-0 px-1 gap-1">
             <TabsTrigger
               value="upcoming"
-              className="text-neutral-400 data-[state=active]:text-neutral-950 data-[state=active]:bg-neutral-50 hover:bg-neutral-800 hover:text-neutral-300"
+              className="text-muted-foreground data-[state=active]:text-primary-foreground data-[state=active]:bg-primary hover:bg-muted hover:text-foreground"
             >
               {t("upcoming_sessions")}
             </TabsTrigger>
             <TabsTrigger
               value="history"
-              className="text-neutral-400 data-[state=active]:text-neutral-950 data-[state=active]:bg-neutral-50 hover:bg-neutral-800 hover:text-neutral-300"
+              className="text-muted-foreground data-[state=active]:text-primary-foreground data-[state=active]:bg-primary hover:bg-muted hover:text-foreground"
             >
               {t("session_history")}
             </TabsTrigger>
@@ -629,7 +629,7 @@ const Sessions = () => {
           <TabsContent value="upcoming" className="space-y-6 mt-6">
             {Object.entries(groupSessionsByDate(upcomingSessions)).length === 0 ? (
               <div className="text-center py-8">
-                <p className="text-gray-400">{t("no_upcoming_sessions_found")}</p>
+                <p className="text-muted-foreground">{t("no_upcoming_sessions_found")}</p>
               </div>
             ) : (
               Object.entries(groupSessionsByDate(upcomingSessions)).map(
@@ -642,7 +642,7 @@ const Sessions = () => {
           <TabsContent value="history" className="space-y-6 mt-6">
             {Object.entries(groupSessionsByDate(pastSessions)).length === 0 ? (
               <div className="text-center py-8">
-                <p className="text-gray-400">{t("no_past_sessions_found")}</p>
+                <p className="text-muted-foreground">{t("no_past_sessions_found")}</p>
               </div>
             ) : (
               Object.entries(groupSessionsByDate(pastSessions)).map(

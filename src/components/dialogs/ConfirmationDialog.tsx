@@ -52,16 +52,16 @@ const ConfirmationDialog = ({
   if (open !== undefined && onOpenChange) {
     return (
       <AlertDialog open={open} onOpenChange={onOpenChange}>
-        <AlertDialogContent className="bg-[#111111] border-[#1f1f23] text-white">
+        <AlertDialogContent className="bg-card border-border text-foreground">
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-white">{title}</AlertDialogTitle>
-            <AlertDialogDescription className="text-gray-400">
+            <AlertDialogTitle className="text-foreground">{title}</AlertDialogTitle>
+            <AlertDialogDescription className="text-muted-foreground">
               {description}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel 
-              className="border-[#333] bg-[#1a1a1a] hover:bg-[#2a2a2a] text-gray-300 hover:text-white"
+              className="border-border bg-card hover:bg-muted text-muted-foreground hover:text-foreground"
             >
               {defaultCancelText}
             </AlertDialogCancel>
@@ -71,7 +71,7 @@ const ConfirmationDialog = ({
               className={
                 variant === "destructive"
                   ? "bg-red-600 hover:bg-red-700 text-white"
-                  : "bg-neutral-50 hover:bg-[#d6d6d6] text-neutral-950"
+                  : "bg-primary text-primary-foreground hover:bg-primary/90"
               }
             >
               {isLoading ? t("loading") : defaultConfirmText}
@@ -86,16 +86,16 @@ const ConfirmationDialog = ({
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>{trigger}</AlertDialogTrigger>
-      <AlertDialogContent className="bg-[#111111] border-[#1f1f23] text-white">
+      <AlertDialogContent className="bg-card border-border text-foreground">
         <AlertDialogHeader>
-          <AlertDialogTitle className="text-white">{title}</AlertDialogTitle>
-          <AlertDialogDescription className="text-gray-400">
+          <AlertDialogTitle className="text-foreground">{title}</AlertDialogTitle>
+          <AlertDialogDescription className="text-muted-foreground">
             {description}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel 
-            className="border-[#333] bg-[#1a1a1a] hover:bg-[#2a2a2a] text-gray-300 hover:text-white"
+            className="border-border bg-card hover:bg-muted text-muted-foreground hover:text-foreground"
           >
             {defaultCancelText}
           </AlertDialogCancel>
@@ -105,7 +105,7 @@ const ConfirmationDialog = ({
             className={
               variant === "destructive"
                 ? "bg-red-600 hover:bg-red-700 text-white"
-                : "bg-neutral-50 hover:bg-[#d6d6d6] text-neutral-950"
+                : "bg-primary text-primary-foreground hover:bg-primary/90"
             }
           >
             {isLoading ? t("loading") : defaultConfirmText}

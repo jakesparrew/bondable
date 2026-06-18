@@ -108,29 +108,29 @@ export default function IntakeTemplateBuilderPage() {
     return () => clearTimeout(timerRef.current);
   }, [patch, tpl?.id, tpl?.title, tpl?.description, tpl?.category, tpl?.is_published]);
 
-  if (isLoading) return <DashboardLayout><p className="p-6 text-gray-400">{t("intake:saving")}</p></DashboardLayout>;
-  if (!tpl)     return <DashboardLayout><p className="p-6 text-gray-400">Not found</p></DashboardLayout>;
+  if (isLoading) return <DashboardLayout><p className="p-6 text-muted-foreground">{t("intake:saving")}</p></DashboardLayout>;
+  if (!tpl)     return <DashboardLayout><p className="p-6 text-muted-foreground">Not found</p></DashboardLayout>;
 
   return (
     <DashboardLayout>
       <div className="p-6 space-y-6 max-w-3xl mx-auto">
         <div className="flex items-center justify-between">
           <Button variant="outline" onClick={() => navigate("/dashboard/therapist/intake-forms")}>←</Button>
-          <span className="text-xs text-gray-400">
+          <span className="text-xs text-muted-foreground">
             {saveState === "saving" && t("intake:saving")}
             {saveState === "saved"  && `✓ ${t("intake:saved")}`}
             {saveState === "error"  && t("intake:save_failed")}
           </span>
         </div>
 
-        <Card className="bg-[#111] border-[#1f1f23]">
+        <Card className="bg-card border-border">
           <CardContent className="p-5 space-y-3">
             <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder={t("intake:template_title")} />
             <Input value={category} onChange={(e) => setCategory(e.target.value)} placeholder={t("intake:template_category")} />
             <Textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder={t("intake:template_description")} />
             <div className="flex items-center gap-2">
               <Switch checked={isPublished} onCheckedChange={setIsPublished} />
-              <span className="text-sm text-gray-300">{isPublished ? t("intake:published") : t("intake:draft")}</span>
+              <span className="text-sm text-muted-foreground">{isPublished ? t("intake:published") : t("intake:draft")}</span>
             </div>
           </CardContent>
         </Card>

@@ -225,8 +225,8 @@ const SMSInterface = ({ selectedClient, onBack }: SMSInterfaceProps) => {
     if (!isCurrentUser) return null;
 
     const statusMap = {
-      sending: { text: t("message_status_sending"), color: "text-gray-400" },
-      sent: { text: t("message_status_sent"), color: "text-gray-400" },
+      sending: { text: t("message_status_sending"), color: "text-muted-foreground" },
+      sent: { text: t("message_status_sent"), color: "text-muted-foreground" },
     };
 
     const status = statusMap[message.status] || statusMap.sent;
@@ -245,10 +245,10 @@ const SMSInterface = ({ selectedClient, onBack }: SMSInterfaceProps) => {
     <div
       className={ 
         isMobile
-          ? `flex flex-col h-screen overflow-hidden bg-[#111111] ${
+          ? `flex flex-col h-screen overflow-hidden bg-card ${
               isNative ? "pt-14" : ""
             }`
-          : "flex-1 flex flex-col bg-[#111111] h-full relative rounded-br-lg"
+          : "flex-1 flex flex-col bg-card h-full relative rounded-br-lg"
       }
     >
       {/* Header */}
@@ -260,16 +260,16 @@ const SMSInterface = ({ selectedClient, onBack }: SMSInterfaceProps) => {
         />
 
         {/* SMS Controls */}
-        <div className="p-4 border-b border-[#1f1f23] flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:space-x-2 justify-end">
+        <div className="p-4 border-b border-border flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:space-x-2 justify-end">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
                 variant="outline"
                 size="sm"
-                className="bg-[#1a1a1a] text-gray-300 hover:text-white hover:bg-[#2a2a2a] border-neutral-800 transition-colors"
+                className="bg-card text-muted-foreground hover:text-foreground hover:bg-muted border-border transition-colors"
               >
                 {t("channels")}
-                <span className="text-neutral-400 -ml-1">
+                <span className="text-muted-foreground -ml-1">
                   | {activeTab === "sms" ? t("sms") : t("whatsapp")}
                 </span>
                 <ChevronDownIcon
@@ -279,13 +279,13 @@ const SMSInterface = ({ selectedClient, onBack }: SMSInterfaceProps) => {
                 />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="bg-[#1a1a1a] border-[#2a2a2a] text-sm min-w-[--radix-dropdown-menu-trigger-width] animate-scale-in">
+            <DropdownMenuContent className="bg-card border-border text-sm min-w-[--radix-dropdown-menu-trigger-width] animate-scale-in">
               <DropdownMenuItem
                 onClick={() => setActiveTab("sms")}
                 className={`flex items-center gap-2 px-2 py-1.5 rounded-md cursor-pointer transition-colors ${
                   activeTab === "sms"
-                    ? "bg-neutral-600 text-white"
-                    : "text-gray-300 hover:bg-[#2a2a2a]"
+                    ? "bg-muted text-foreground"
+                    : "text-muted-foreground hover:bg-muted"
                 }`}
               >
                 <Phone className="h-3 w-3" />
@@ -296,8 +296,8 @@ const SMSInterface = ({ selectedClient, onBack }: SMSInterfaceProps) => {
                 onClick={() => setActiveTab("whatsapp")}
                 className={`flex items-center gap-2 px-2 py-1.5 rounded-md cursor-pointer transition-colors ${
                   activeTab === "whatsapp"
-                    ? "bg-neutral-600 text-white"
-                    : "text-gray-300 hover:bg-[#2a2a2a]"
+                    ? "bg-muted text-foreground"
+                    : "text-muted-foreground hover:bg-muted"
                 }`}
               >
                 <MessageSquare className="h-3 w-3" />
@@ -314,7 +314,7 @@ const SMSInterface = ({ selectedClient, onBack }: SMSInterfaceProps) => {
               <Button
                 variant="outline"
                 size="sm"
-                className="bg-[#1a1a1a] text-gray-300 hover:text-white hover:bg-[#2a2a2a] border-neutral-800 transition-colors"
+                className="bg-card text-muted-foreground hover:text-foreground hover:bg-muted border-border transition-colors"
               >
                 {t("automation")}
                 <SquareArrowOutUpRight
@@ -324,9 +324,9 @@ const SMSInterface = ({ selectedClient, onBack }: SMSInterfaceProps) => {
                 />
               </Button>
             </DialogTrigger>
-            <DialogContent className="bg-[#0a0a0a] border border-[#1f1f23] text-white max-w-md">
+            <DialogContent className="bg-background border border-border text-foreground max-w-md">
               <DialogHeader>
-                <DialogTitle className="flex items-center gap-2 text-white mb-2">
+                <DialogTitle className="flex items-center gap-2 text-foreground mb-2">
                   {activeTab === "sms"
                     ? t("sms_settings")
                     : t("whatsapp_settings")}
@@ -359,7 +359,7 @@ const SMSInterface = ({ selectedClient, onBack }: SMSInterfaceProps) => {
           {/* Loading indicator for older messages */}
           {loadingMore && (
             <div className="flex justify-center py-2">
-              <div className="bg-[#27272a] text-gray-300 text-xs px-3 py-1 rounded-full">
+              <div className="bg-muted text-muted-foreground text-xs px-3 py-1 rounded-full">
                 Loading older messages...
               </div>
             </div>
@@ -368,7 +368,7 @@ const SMSInterface = ({ selectedClient, onBack }: SMSInterfaceProps) => {
             if (item.type === 'date') {
               return (
                 <div key={`date-${index}`} className="flex justify-center my-6">
-                  <div className="bg-[#27272a] text-gray-300 text-xs px-3 py-1 rounded-full">
+                  <div className="bg-muted text-muted-foreground text-xs px-3 py-1 rounded-full">
                     {item.data}
                   </div>
                 </div>
@@ -378,7 +378,7 @@ const SMSInterface = ({ selectedClient, onBack }: SMSInterfaceProps) => {
             if (item.type === 'hour') {
               return (
                 <div key={`hour-${index}`} className="flex justify-center my-3">
-                  <div className="bg-[#1a1a1a] text-gray-400 text-xs px-2 py-1 rounded">
+                  <div className="bg-muted text-muted-foreground text-xs px-2 py-1 rounded">
                     {item.data}
                   </div>
                 </div>
@@ -397,8 +397,8 @@ const SMSInterface = ({ selectedClient, onBack }: SMSInterfaceProps) => {
                   <div
                     className={` w-fit block px-4 py-2 rounded-lg ${
                       message.sender === "therapist"
-                        ? "bg-white text-black ml-auto"
-                        : "bg-[#27272a] text-white"
+                        ? "bg-primary text-primary-foreground ml-auto"
+                        : "bg-muted text-foreground"
                     }`}
                   >
                     <p className="text-sm [overflow-wrap:anywhere]">{message.text}</p>
@@ -408,7 +408,7 @@ const SMSInterface = ({ selectedClient, onBack }: SMSInterfaceProps) => {
                       message.sender === "therapist" ? "text-right" : "text-left"
                     }`}
                   >
-                    <span className="text-gray-400">
+                    <span className="text-muted-foreground">
                       {formatTime(message.timestamp)}
                       {getStatusDisplay(message, message.sender === "therapist")}
                     </span>
@@ -433,7 +433,7 @@ const SMSInterface = ({ selectedClient, onBack }: SMSInterfaceProps) => {
 
         {/* Input */}
         <div
-          className={`p-4 border-t border-[#1f1f23] ${
+          className={`p-4 border-t border-border ${
             isMobile && isNative ? "pb-7" : ""
           }`}
         >
@@ -452,18 +452,18 @@ const SMSInterface = ({ selectedClient, onBack }: SMSInterfaceProps) => {
                   handleSend();
                 }
               }}
-              className="bg-[#1a1a1a] border-[#1f1f23] text-white placeholder:text-gray-500 focus:border-gray-400"
+              className="bg-background border-border text-foreground placeholder:text-muted-foreground focus:border-ring"
               maxLength={getCharacterLimit()}
             />
             <Button
               onClick={handleSend}
               disabled={!newMessage.trim()}
-              className="bg-neutral-100 hover:bg-neutral-200 text-neutral-950 hover:text-neutral-800 h-10 w-10 p-0"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground hover:text-primary-foreground h-10 w-10 p-0"
             >
               <Send className="h-4 w-4" />
             </Button>
           </div>
-          <div className="text-xs text-gray-400 mt-1 text-right">
+          <div className="text-xs text-muted-foreground mt-1 text-right">
             {newMessage.length}/{getCharacterLimit()} {t("characters")}
           </div>
         </div>

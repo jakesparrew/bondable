@@ -265,7 +265,7 @@ const AdminAISettings = () => {
 
   if (loading) {
     return (
-      <Card className="bg-[#111111] border-[#1f1f23]">
+      <Card className="bg-card border-border">
         <CardContent className="p-6">
           <div className="animate-pulse">
             <div className="h-4 bg-[#1f1f23] rounded w-1/4 mb-4"></div>
@@ -280,23 +280,23 @@ const AdminAISettings = () => {
   return (
     <div className="space-y-6">
       {/* AI API Status */}
-      <Card className="bg-[#111111] border-[#1f1f23]">
+      <Card className="bg-card border-border">
         <CardHeader>
           <div className="flex items-center space-x-2">
-            <Bot className="h-5 w-5 text-gray-400" />
-            <CardTitle className="text-white text-lg">
+            <Bot className="h-5 w-5 text-muted-foreground" />
+            <CardTitle className="text-foreground text-lg">
               {t('ai_api_configuration')}
             </CardTitle>
           </div>
-          <CardDescription className="text-gray-400 text-sm">
+          <CardDescription className="text-muted-foreground text-sm">
             {t('control_ai_functionality')}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <h4 className="text-sm font-medium text-white">{t('enable_ai_api')}</h4>
-              <p className="text-sm text-gray-400">
+              <h4 className="text-sm font-medium text-foreground">{t('enable_ai_api')}</h4>
+              <p className="text-sm text-muted-foreground">
                 {t('allow_users_to_interact')}
               </p>
             </div>
@@ -307,24 +307,24 @@ const AdminAISettings = () => {
             />
           </div>
 
-          <div className="pt-4 border-t border-[#1f1f23]">
+          <div className="pt-4 border-t border-border">
             <div className="flex items-center gap-2 mb-3">
-              <h4 className="text-sm font-medium text-white">{t('current_status')}</h4>
+              <h4 className="text-sm font-medium text-foreground">{t('current_status')}</h4>
               <Badge
                 variant={isEnabled ? "default" : "secondary"}
                 className={
                   isEnabled
-                    ? "bg-neutral-100 text-gray-700 border-neutral-200 hover:bg-neutral-100"
-                    : "bg-[#1f1f23] text-gray-400 border-[#333] hover:bg-[#1f1f23]"
+                    ? "bg-muted text-foreground border-border hover:bg-muted"
+                    : "bg-muted text-muted-foreground border-border hover:bg-muted"
                 }
               >
                 {isEnabled ? t('active') : t('disabled')}
               </Badge>
             </div>
             {isEnabled && selectedModelData && (
-              <div className="text-sm text-gray-300">
+              <div className="text-sm text-muted-foreground">
                 {t('using')}{" "}
-                <span className="font-medium text-white">
+                <span className="font-medium text-foreground">
                   {selectedModelData.name}
                 </span>{" "}
                 - {selectedModelData.description}
@@ -335,21 +335,21 @@ const AdminAISettings = () => {
       </Card>
 
       {/* Model Selection */}
-      <Card className="bg-[#111111] border-[#1f1f23]">
+      <Card className="bg-card border-border">
         <CardHeader>
           <div className="flex items-center space-x-2">
-            <Brain className="h-5 w-5 text-gray-400" />
-            <CardTitle className="text-white text-lg">
+            <Brain className="h-5 w-5 text-muted-foreground" />
+            <CardTitle className="text-foreground text-lg">
               {t('ai_model_selection')}
             </CardTitle>
           </div>
-          <CardDescription className="text-gray-400 text-sm">
+          <CardDescription className="text-muted-foreground text-sm">
             {t('choose_ai_model')}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
-            <label className="text-sm font-medium text-white mb-2 block">
+            <label className="text-sm font-medium text-foreground mb-2 block">
               {t('select_model')}
             </label>
             <Select
@@ -357,15 +357,15 @@ const AdminAISettings = () => {
               onValueChange={handleModelChange}
               disabled={saving}
             >
-              <SelectTrigger className="bg-[#0a0a0a] border-[#1f1f23] text-white">
+              <SelectTrigger className="bg-background border-border text-foreground">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="bg-[#111111] border-[#1f1f23]">
+              <SelectContent className="bg-card border-border">
                 {AI_MODELS.map((model) => (
                   <SelectItem
                     key={model.id}
                     value={model.id}
-                    className="text-white hover:bg-[#1f1f23] focus:bg-[#1f1f23]"
+                    className="text-foreground hover:bg-muted focus:bg-muted"
                   >
                     <div className="flex items-center gap-2">
                       {getCategoryIcon(model.category)}
@@ -386,10 +386,10 @@ const AdminAISettings = () => {
 
           {/* Model Details */}
           {selectedModelData && (
-            <div className="mt-6 p-4 border border-[#1f1f23] rounded-lg bg-[#0a0a0a]">
+            <div className="mt-6 p-4 border border-border rounded-lg bg-card">
               <div className="flex items-start justify-between mb-3">
                 <div>
-                  <h5 className="font-medium text-white flex items-center gap-2">
+                  <h5 className="font-medium text-foreground flex items-center gap-2">
                     {selectedModelData.name}
                     <Badge
                       className={`${getCategoryColor(
@@ -399,21 +399,21 @@ const AdminAISettings = () => {
                       {selectedModelData.category}
                     </Badge>
                   </h5>
-                  <p className="text-sm text-gray-400 mt-1">
+                  <p className="text-sm text-muted-foreground mt-1">
                     {selectedModelData.description}
                   </p>
                 </div>
               </div>
 
-              <div className="mt-4 p-4 border border-[#1f1f23] rounded-lg bg-[#0a0a0a]">
+              <div className="mt-4 p-4 border border-border rounded-lg bg-card">
                 {/* Flex container for Key Features, Capabilities, and Pricing */}
                 <div className="flex flex-col md:flex-row gap-4 mb-1">
                   {/* Left side: Key Features */}
                   <div className="flex-1">
-                    <h6 className="text-sm font-medium text-white mb-2">
+                    <h6 className="text-sm font-medium text-foreground mb-2">
                       {t('key_features')}
                     </h6>
-                    <ul className="text-sm text-gray-300 space-y-1">
+                    <ul className="text-sm text-muted-foreground space-y-1">
                       {selectedModelData.features.map((feature, index) => (
                         <li key={index} className="flex items-center gap-2">
                           <div className="w-1 h-1 bg-gray-400 rounded-full"></div>
@@ -430,10 +430,10 @@ const AdminAISettings = () => {
 
                   {/* Center: Capabilities */}
                   <div className="flex-1">
-                    <h6 className="text-sm font-medium text-white mb-2">
+                    <h6 className="text-sm font-medium text-foreground mb-2">
                       {t('capabilities')}
                     </h6>
-                    <ul className="text-sm text-gray-300 space-y-1">
+                    <ul className="text-sm text-muted-foreground space-y-1">
                       {selectedModelData.capabilities.map((cap, index) => (
                         <li key={index} className="flex items-center gap-2">
                           <div className="w-1 h-1 bg-gray-400 rounded-full"></div>
@@ -451,11 +451,11 @@ const AdminAISettings = () => {
 
                   {/* Right side: Pricing */}
                   <div className="flex-1">
-                    <h6 className="text-sm font-medium text-white mb-2 flex items-center gap-1">
+                    <h6 className="text-sm font-medium text-foreground mb-2 flex items-center gap-1">
                       <DollarSign className="h-4 w-4" />
                       {t('pricing')}
                     </h6>
-                    <div className="text-sm text-gray-300 space-y-1">
+                    <div className="text-sm text-muted-foreground space-y-1">
                       <div>{t('input')}: {selectedModelData.pricing.input}</div>
                       <div>{t('output')}: {selectedModelData.pricing.output}</div>
                     </div>
@@ -468,15 +468,15 @@ const AdminAISettings = () => {
       </Card>
 
       {/* Model Comparison */}
-      <Card className="bg-[#111111] border-[#1f1f23]">
+      <Card className="bg-card border-border">
         <CardHeader>
           <div className="flex items-center space-x-2">
-            <Info className="h-5 w-5 text-gray-400" />
-            <CardTitle className="text-white text-lg">
+            <Info className="h-5 w-5 text-muted-foreground" />
+            <CardTitle className="text-foreground text-lg">
               {t('model_comparison')}
             </CardTitle>
           </div>
-          <CardDescription className="text-gray-400 text-sm">
+          <CardDescription className="text-muted-foreground text-sm">
             {t('compare_ai_models')}
           </CardDescription>
         </CardHeader>
@@ -488,12 +488,12 @@ const AdminAISettings = () => {
                 className={`p-4 rounded-lg border transition-all cursor-pointer ${
                   selectedModel === model.id
                     ? "border-neutral-500 bg-neutral-400/20"
-                    : "border-[#1f1f23] bg-[#0a0a0a] hover:border-neutral-500"
+                    : "border-border bg-card hover:border-neutral-500"
                 }`}
                 onClick={() => handleModelChange(model.id)}
               >
                 <div className="flex items-center justify-between mb-2">
-                  <h6 className="font-medium text-white flex items-center gap-2">
+                  <h6 className="font-medium text-foreground flex items-center gap-2">
                     {getCategoryIcon(model.category)}
                     {model.name}
                   </h6>
@@ -503,14 +503,14 @@ const AdminAISettings = () => {
                     {model.category}
                   </Badge>
                 </div>
-                <p className="text-xs text-gray-400 mb-3">
+                <p className="text-xs text-muted-foreground mb-3">
                   {model.description}
                 </p>
                 <div className="flex justify-between items-center text-xs">
-                  <span className="text-gray-300">
+                  <span className="text-muted-foreground">
                     {t('input')}: {model.pricing.input}
                   </span>
-                  <span className="text-gray-300">
+                  <span className="text-muted-foreground">
                     {t('output')}: {model.pricing.output}
                   </span>
                 </div>

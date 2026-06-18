@@ -10,11 +10,11 @@ export function IntakeFormRenderer({
       {snapshot.map((q) => {
         const ans = responses[q.id];
         return (
-          <div key={q.id} className="border border-[#1f1f23] rounded p-3">
-            <div className="text-sm text-white mb-1">{q.question_text}{q.is_required && " *"}</div>
-            {q.help_text && <div className="text-xs text-gray-500 mb-2">{q.help_text}</div>}
-            <div className="text-sm text-gray-300">
-              {!ans ? <span className="text-gray-600">—</span>
+          <div key={q.id} className="border border-border rounded p-3">
+            <div className="text-sm text-foreground mb-1">{q.question_text}{q.is_required && " *"}</div>
+            {q.help_text && <div className="text-xs text-muted-foreground mb-2">{q.help_text}</div>}
+            <div className="text-sm text-muted-foreground">
+              {!ans ? <span className="text-muted-foreground">—</span>
                 : q.question_type === "number"   ? (ans as any).value
                 : q.question_type === "text"     ? (ans as any).value
                 : q.question_type === "date"     ? (ans as any).value

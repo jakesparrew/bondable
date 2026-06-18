@@ -38,10 +38,10 @@ export default function IntakeTemplatesPage() {
     <DashboardLayout>
       <div className="p-6 space-y-6">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl text-white font-semibold">{t("intake:title")}</h1>
+          <h1 className="text-2xl text-foreground font-semibold">{t("intake:title")}</h1>
           <Dialog open={newOpen} onOpenChange={setNewOpen}>
             <DialogTrigger asChild>
-              <Button className="bg-white text-black hover:bg-gray-100">{t("intake:new_template")}</Button>
+              <Button className="bg-primary text-primary-foreground hover:bg-primary/90">{t("intake:new_template")}</Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader><DialogTitle>{t("intake:new_template")}</DialogTitle></DialogHeader>
@@ -60,20 +60,20 @@ export default function IntakeTemplatesPage() {
         </div>
 
         {isLoading ? (
-          <p className="text-gray-400">{t("intake:saving")}</p>
+          <p className="text-muted-foreground">{t("intake:saving")}</p>
         ) : templates.length === 0 ? (
-          <Card className="bg-[#111] border-[#1f1f23]">
-            <CardContent className="p-8 text-center text-gray-400">{t("intake:no_templates")}</CardContent>
+          <Card className="bg-card border-border">
+            <CardContent className="p-8 text-center text-muted-foreground">{t("intake:no_templates")}</CardContent>
           </Card>
         ) : (
           <div className="grid gap-3">
             {templates.map((tpl) => (
-              <Card key={tpl.id} className="bg-[#111] border-[#1f1f23] hover:border-[#2a2a2a] cursor-pointer"
+              <Card key={tpl.id} className="bg-card border-border hover:border-border cursor-pointer"
                     onClick={() => navigate(`/dashboard/therapist/intake-forms/${tpl.id}`)}>
                 <CardHeader className="flex flex-row items-center justify-between">
                   <div>
-                    <CardTitle className="text-white text-base">{tpl.title}</CardTitle>
-                    <div className="text-xs text-gray-400 mt-1 flex items-center gap-2">
+                    <CardTitle className="text-foreground text-base">{tpl.title}</CardTitle>
+                    <div className="text-xs text-muted-foreground mt-1 flex items-center gap-2">
                       <Badge variant={tpl.is_published ? "default" : "outline"}>
                         {tpl.is_published ? t("intake:published") : t("intake:draft")}
                       </Badge>

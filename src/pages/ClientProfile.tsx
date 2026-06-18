@@ -371,7 +371,7 @@ export default function OptimizedClientProfile() {
           <Button
             variant="ghost"
             onClick={handleGoBack}
-            className="text-gray-400 hover:text-white hover:bg-[#1f1f23] p-2"
+            className="text-muted-foreground hover:text-foreground hover:bg-muted p-2"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             {t("back_to_clients")}
@@ -387,7 +387,7 @@ export default function OptimizedClientProfile() {
                 alt={client.name}
                 className="non-invertable"
               />
-              <AvatarFallback className="bg-[#1a1a1a] text-gray-300 text-sm md:text-lg">
+              <AvatarFallback className="bg-card text-muted-foreground text-sm md:text-lg">
                 {client.name
                   .split(" ")
                   .map((n) => n[0])
@@ -396,7 +396,7 @@ export default function OptimizedClientProfile() {
               </AvatarFallback>
             </Avatar>
             <div className="flex-1 min-w-0">
-              <h1 className="text-2xl md:text-3xl font-bold text-white break-words">
+              <h1 className="text-2xl md:text-3xl font-bold text-foreground break-words">
                 {client.name}
               </h1>
               <div className="flex flex-wrap items-center gap-2 md:gap-4 mt-2">
@@ -405,7 +405,7 @@ export default function OptimizedClientProfile() {
                 >
                   {client.status}
                 </Badge>
-                <span className="text-gray-400 text-sm">
+                <span className="text-muted-foreground text-sm">
                   {t("client_since", { date: client.joinDate })}
                 </span>
               </div>
@@ -420,7 +420,7 @@ export default function OptimizedClientProfile() {
                   variant="outline"
                   onClick={handleCancel}
                   disabled={updateClientMutation.isPending}
-                  className="border-[#333] bg-[#1a1a1a] hover:bg-[#2a2a2a] text-gray-300 hover:text-white text-sm md:text-base"
+                  className="border-border bg-card hover:bg-muted text-muted-foreground hover:text-foreground text-sm md:text-base"
                 >
                   <X className="w-4 h-4 mr-2" />
                   {t("cancel")}
@@ -428,7 +428,7 @@ export default function OptimizedClientProfile() {
                 <Button
                   onClick={handleSave}
                   disabled={updateClientMutation.isPending}
-                  className="bg-neutral-50 hover:bg-[#d6d6d6] text-neutral-950 text-sm md:text-base"
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground text-sm md:text-base"
                 >
                   <Save className="w-4 h-4 mr-2" />
                   {updateClientMutation.isPending ? "Saving..." : t("save")}
@@ -437,7 +437,7 @@ export default function OptimizedClientProfile() {
             ) : (
               <Button
                 onClick={handleEdit}
-                className="bg-neutral-50 hover:bg-[#d6d6d6] text-neutral-950 text-sm md:text-base"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground text-sm md:text-base"
               >
                 <Edit className="w-4 h-4 mr-2" />
                 {t("edit_client")}
@@ -447,9 +447,9 @@ export default function OptimizedClientProfile() {
         </div>
 
         {/* Contact Information with Notes - Full Width */}
-        <Card className="bg-[#111111] border-[#1f1f23]">
+        <Card className="bg-card border-border">
           <CardHeader>
-            <CardTitle className="text-white text-lg">
+            <CardTitle className="text-foreground text-lg">
               {t("contact_information")}
             </CardTitle>
           </CardHeader>
@@ -464,10 +464,10 @@ export default function OptimizedClientProfile() {
                       setEditForm({ ...editForm, name: e.target.value })
                     }
                     readOnly
-                    className="bg-[#0a0a0a] border-[#1f1f23] text-white placeholder:text-gray-500 focus:border-gray-400"
+                    className="bg-background border-border text-foreground placeholder:text-muted-foreground focus:border-ring"
                   />
                   <div className="space-y-2">
-                    <label className="text-gray-300 text-sm font-medium">
+                    <label className="text-muted-foreground text-sm font-medium">
                       {t("status")} <span className="text-red-400">*</span>
                     </label>
                     <Select
@@ -476,25 +476,25 @@ export default function OptimizedClientProfile() {
                         value: "Active" | "Inactive" | "Pending"
                       ) => setEditForm({ ...editForm, status: value })}
                     >
-                      <SelectTrigger className="bg-[#0a0a0a] border-[#1f1f23] text-white">
+                      <SelectTrigger className="bg-background border-border text-foreground">
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent className="bg-[#111111] border-[#1f1f23]">
+                      <SelectContent className="bg-card border-border">
                         <SelectItem
                           value="Active"
-                          className="text-gray-300 hover:bg-[#2a2a2a]"
+                          className="text-muted-foreground hover:bg-muted"
                         >
                           Active
                         </SelectItem>
                         <SelectItem
                           value="Inactive"
-                          className="text-gray-300 hover:bg-[#2a2a2a]"
+                          className="text-muted-foreground hover:bg-muted"
                         >
                           Inactive
                         </SelectItem>
                         <SelectItem
                           value="Pending"
-                          className="text-gray-300 hover:bg-[#2a2a2a]"
+                          className="text-muted-foreground hover:bg-muted"
                         >
                           Pending
                         </SelectItem>
@@ -511,7 +511,7 @@ export default function OptimizedClientProfile() {
                     }
                     required
                     readOnly
-                    className="bg-[#0a0a0a] border-[#1f1f23] text-white placeholder:text-gray-500 focus:border-gray-400"
+                    className="bg-background border-border text-foreground placeholder:text-muted-foreground focus:border-ring"
                   />
                   <PhoneInputComponent
                     required
@@ -527,49 +527,49 @@ export default function OptimizedClientProfile() {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <label className="text-gray-300 text-sm font-medium">
+                  <label className="text-muted-foreground text-sm font-medium">
                     {t("full_name")} <span className="text-red-400">*</span>
                   </label>
-                  <div className="flex h-[2.5rem] w-full rounded-md border border-[#1f1f23] bg-[#1a1a1a] px-3 py-2 text-gray-500 text-[.9rem] break-words">
+                  <div className="flex h-[2.5rem] w-full rounded-md border border-border bg-card px-3 py-2 text-muted-foreground text-[.9rem] break-words">
                     {client.name}
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-gray-300 text-sm font-medium">
+                  <label className="text-muted-foreground text-sm font-medium">
                     {t("status")} <span className="text-red-400">*</span>
                   </label>
-                  <div className="flex h-[2.5rem] w-full rounded-md border border-[#1f1f23] bg-[#1a1a1a] px-3 py-2 text-gray-500 text-[.9rem]">
+                  <div className="flex h-[2.5rem] w-full rounded-md border border-border bg-card px-3 py-2 text-muted-foreground text-[.9rem]">
                     {client.status}
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-gray-300 text-sm font-medium">
+                  <label className="text-muted-foreground text-sm font-medium">
                     Email <span className="text-red-400">*</span>
                   </label>
                   <div className="relative">
-                    <div className="flex h-[2.5rem] w-full rounded-md border border-[#1f1f23] bg-[#1a1a1a] px-3 py-2 text-gray-500 text-[.9rem] pl-9 break-all">
+                    <div className="flex h-[2.5rem] w-full rounded-md border border-border bg-card px-3 py-2 text-muted-foreground text-[.9rem] pl-9 break-all">
                       {client.email}
                     </div>
-                    <div className="text-gray-500 pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3">
+                    <div className="text-muted-foreground pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3">
                       <Mail size={16} aria-hidden="true" />
                     </div>
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-gray-300 text-sm font-medium">
+                  <label className="text-muted-foreground text-sm font-medium">
                     Phone <span className="text-red-400">*</span>
                   </label>
-                  <div className="flex h-[2.5rem] w-full rounded-md border border-[#1f1f23] bg-[#1a1a1a] px-3 py-2 text-gray-500 text-[.9rem]">
+                  <div className="flex h-[2.5rem] w-full rounded-md border border-border bg-card px-3 py-2 text-muted-foreground text-[.9rem]">
                     {client.phone}
                   </div>
                 </div>
               </div>
             )}
 
-            <Separator className="bg-[#1f1f23]" />
+            <Separator className="bg-border" />
 
             <div>
-              <h4 className="text-white font-medium mb-4">{t('emergency_contact')}</h4>
+              <h4 className="text-foreground font-medium mb-4">{t('emergency_contact')}</h4>
               {isEditing && editForm ? (
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <OptionalInput
@@ -585,7 +585,7 @@ export default function OptimizedClientProfile() {
                         },
                       })
                     }
-                    className="bg-[#0a0a0a] border-[#1f1f23] text-white placeholder:text-gray-500 focus:border-gray-400"
+                    className="bg-background border-border text-foreground placeholder:text-muted-foreground focus:border-ring"
                   />
                   <OptionalInput
                     label="Relationship"
@@ -600,7 +600,7 @@ export default function OptimizedClientProfile() {
                         },
                       })
                     }
-                    className="bg-[#0a0a0a] border-[#1f1f23] text-white placeholder:text-gray-500 focus:border-gray-400"
+                    className="bg-background border-border text-foreground placeholder:text-muted-foreground focus:border-ring"
                   />
                   <PhoneInputComponent
                     label="Phone"
@@ -620,26 +620,26 @@ export default function OptimizedClientProfile() {
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="space-y-2">
-                    <label className="text-gray-300 text-sm font-medium">
+                    <label className="text-muted-foreground text-sm font-medium">
                       Name
                     </label>
-                    <div className="flex h-[2.5rem] w-full rounded-md border border-[#1f1f23] bg-[#1a1a1a] px-3 py-2 text-gray-500 text-[.9rem] break-words">
+                    <div className="flex h-[2.5rem] w-full rounded-md border border-border bg-card px-3 py-2 text-muted-foreground text-[.9rem] break-words">
                       {client.emergencyContact.name}
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <label className="text-gray-300 text-sm font-medium">
+                    <label className="text-muted-foreground text-sm font-medium">
                       Relationship
                     </label>
-                    <div className="flex h-[2.5rem] w-full rounded-md border border-[#1f1f23] bg-[#1a1a1a] px-3 py-2 text-gray-500 text-[.9rem]">
+                    <div className="flex h-[2.5rem] w-full rounded-md border border-border bg-card px-3 py-2 text-muted-foreground text-[.9rem]">
                       {client.emergencyContact.relationship}
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <label className="text-gray-300 text-sm font-medium">
+                    <label className="text-muted-foreground text-sm font-medium">
                       Phone
                     </label>
-                    <div className="flex h-[2.5rem] w-full rounded-md border border-[#1f1f23] bg-[#1a1a1a] px-3 py-2 text-gray-500 text-[.9rem]">
+                    <div className="flex h-[2.5rem] w-full rounded-md border border-border bg-card px-3 py-2 text-muted-foreground text-[.9rem]">
                       {client.emergencyContact.phone}
                     </div>
                   </div>
@@ -647,10 +647,10 @@ export default function OptimizedClientProfile() {
               )}
             </div>
 
-            <Separator className="bg-[#1f1f23]" />
+            <Separator className="bg-border" />
 
             <div>
-              <h4 className="text-white font-medium mb-2">{t('therapist_notes')}</h4>
+              <h4 className="text-foreground font-medium mb-2">{t('therapist_notes')}</h4>
               <Textarea
                 value={isEditing && editForm ? editForm.notes : client.notes || ""}
                 onChange={
@@ -659,7 +659,7 @@ export default function OptimizedClientProfile() {
                     : undefined
                 }
                 readOnly={!isEditing}
-                className={`${isEditing ? "bg-[#0a0a0a] text-white placeholder:text-gray-500 focus:border-gray-400" : "bg-[#1a1a1a] text-gray-500"} border-[#1f1f23] min-h-20`}
+                className={`${isEditing ? "bg-background text-foreground placeholder:text-muted-foreground focus:border-ring" : "bg-card text-muted-foreground"} border-border min-h-20`}
                 placeholder={t('enter_notes_placeholder')}
               />
             </div>
@@ -667,16 +667,16 @@ export default function OptimizedClientProfile() {
         </Card>
 
         {/* Tabbed Table for Sessions, Journal Entries, and Tasks */}
-        <Card className="bg-[#111111] border-[#1f1f23]">
+        <Card className="bg-card border-border">
           <CardContent className="p-4">
             <Tabs value={activeTab} onValueChange={setActiveTab}>
               <TabsList className="grid w-full grid-cols-4 gap-1">
-                <TabsTrigger value="sessions" className="text-neutral-400 data-[state=active]:text-neutral-950 data-[state=active]:bg-neutral-50 hover:bg-neutral-800 hover:text-neutral-300">{t('sessions')}</TabsTrigger>
-                <TabsTrigger value="journals" className="text-neutral-400 data-[state=active]:text-neutral-950 data-[state=active]:bg-neutral-50 hover:bg-neutral-800 hover:text-neutral-300">
+                <TabsTrigger value="sessions" className="text-muted-foreground data-[state=active]:text-primary-foreground data-[state=active]:bg-primary hover:bg-muted hover:text-muted-foreground">{t('sessions')}</TabsTrigger>
+                <TabsTrigger value="journals" className="text-muted-foreground data-[state=active]:text-primary-foreground data-[state=active]:bg-primary hover:bg-muted hover:text-muted-foreground">
                   {t('shared_journals')} ({journals.length})
                 </TabsTrigger>
-                <TabsTrigger value="tasks" className="text-neutral-400 data-[state=active]:text-neutral-950 data-[state=active]:bg-neutral-50 hover:bg-neutral-800 hover:text-neutral-300">{t('tasks')}</TabsTrigger>
-                <TabsTrigger value="intake" className="text-neutral-400 data-[state=active]:text-neutral-950 data-[state=active]:bg-neutral-50 hover:bg-neutral-800 hover:text-neutral-300">{t("intake:intake_tab")}</TabsTrigger>
+                <TabsTrigger value="tasks" className="text-muted-foreground data-[state=active]:text-primary-foreground data-[state=active]:bg-primary hover:bg-muted hover:text-muted-foreground">{t('tasks')}</TabsTrigger>
+                <TabsTrigger value="intake" className="text-muted-foreground data-[state=active]:text-primary-foreground data-[state=active]:bg-primary hover:bg-muted hover:text-muted-foreground">{t("intake:intake_tab")}</TabsTrigger>
               </TabsList>
 
               {/* --- SESSIONS --- */}
@@ -716,16 +716,16 @@ export default function OptimizedClientProfile() {
                                 onClick={() =>
                                   setExpandedSession(isOpen ? null : idx)
                                 }
-                                className="border-[#1f1f23] hover:bg-[#1a1a1a] cursor-pointer"
+                                className="border-border hover:bg-card cursor-pointer"
                               >
                                 <TableCell className="text-center">
                                   {isOpen ? (
-                                    <ChevronDown className="mx-auto w-4 h-4 text-gray-400" />
+                                    <ChevronDown className="mx-auto w-4 h-4 text-muted-foreground" />
                                   ) : (
-                                    <ChevronRight className="mx-auto w-4 h-4 text-gray-400" />
+                                    <ChevronRight className="mx-auto w-4 h-4 text-muted-foreground" />
                                   )}
                                 </TableCell>
-                                <TableCell className="text-gray-300">
+                                <TableCell className="text-muted-foreground">
                                   <div className="md:hidden">
                                     {format(parseISO(session.date), "MMM d", { locale: getDateLocale() })}
                                   </div>
@@ -737,10 +737,10 @@ export default function OptimizedClientProfile() {
                                     )}
                                   </div>
                                 </TableCell>
-                                <TableCell className="text-gray-300">
+                                <TableCell className="text-muted-foreground">
                                   {translateSessionType(session.type)}
                                 </TableCell>
-                                <TableCell className="text-gray-300 hidden md:table-cell">
+                                <TableCell className="text-muted-foreground hidden md:table-cell">
                                   {session.duration}
                                 </TableCell>
                                 <TableCell>
@@ -756,16 +756,16 @@ export default function OptimizedClientProfile() {
                               isOpen && (
                                 <TableRow
                                   key={`${key}-detail`}
-                                  className="border-[#1f1f23]"
+                                  className="border-border"
                                 >
                                   <TableCell
                                     colSpan={5}
-                                    className="bg-[#0a0a0a] p-4"
+                                    className="bg-background p-4"
                                   >
-                                    <h4 className="text-white font-medium mb-2">
+                                    <h4 className="text-foreground font-medium mb-2">
                                       {t('session_notes')}
                                     </h4>
-                                    <p className="text-gray-300">
+                                    <p className="text-muted-foreground">
                                       {session.notes}
                                     </p>
                                   </TableCell>
@@ -877,19 +877,19 @@ export default function OptimizedClientProfile() {
                                 onClick={() =>
                                   setExpandedTask(isOpen ? null : task.id)
                                 }
-                                className="border-[#1f1f23] hover:bg-[#1a1a1a] cursor-pointer"
+                                className="border-border hover:bg-card cursor-pointer"
                               >
                                 <TableCell className="text-center">
                                   {isOpen ? (
-                                    <ChevronDown className="mx-auto w-4 h-4 text-gray-400" />
+                                    <ChevronDown className="mx-auto w-4 h-4 text-muted-foreground" />
                                   ) : (
-                                    <ChevronRight className="mx-auto w-4 h-4 text-gray-400" />
+                                    <ChevronRight className="mx-auto w-4 h-4 text-muted-foreground" />
                                   )}
                                 </TableCell>
-                                <TableCell className="text-gray-300">
+                                <TableCell className="text-muted-foreground">
                                   {task.title}
                                 </TableCell>
-                                <TableCell className="text-gray-300 hidden md:table-cell">
+                                <TableCell className="text-muted-foreground hidden md:table-cell">
                                   {task.dueDate
                                     ? format(
                                         parseISO(task.dueDate),
@@ -920,19 +920,19 @@ export default function OptimizedClientProfile() {
                               isOpen && (
                                 <TableRow
                                   key={`${key}-detail`}
-                                  className="border-[#1f1f23]"
+                                  className="border-border"
                                 >
                                   <TableCell
                                     colSpan={5}
-                                    className="bg-[#0a0a0a] p-4"
+                                    className="bg-background p-4"
                                   >
-                                    <h4 className="text-white font-medium mb-2">
+                                    <h4 className="text-foreground font-medium mb-2">
                                       {task.title}
                                     </h4>
-                                    <p className="text-gray-300 mb-2">
+                                    <p className="text-muted-foreground mb-2">
                                       {task.description}
                                     </p>
-                                    <p className="text-gray-500 text-xs">
+                                    <p className="text-muted-foreground text-xs">
                                       {t('created')}{" "}
                                       {format(
                                         parseISO(task.createdAt),

@@ -68,7 +68,7 @@ const ImageThumbnailRenderer = ({ attachment, isCurrentUser }: ImageThumbnailRen
   if (!imageUrl) {
     return (
       <div className="w-48 h-32 bg-neutral-200 dark:bg-neutral-700 rounded-lg flex items-center justify-center">
-        <span className="text-sm text-neutral-500">{t("failed_to_load")}</span>
+        <span className="text-sm text-muted-foreground">{t("failed_to_load")}</span>
       </div>
     );
   }

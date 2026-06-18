@@ -42,13 +42,13 @@ const GoogleCalendarConnect = ({ onConnect }: GoogleCalendarConnectProps) => {
   };
 
   return (
-    <Card className="bg-[#111111] border-[#1f1f23] max-w-md mx-auto">
+    <Card className="bg-card border-border max-w-md mx-auto">
       <CardHeader className="text-center">
         <div className="mx-auto w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center mb-4">
           <Calendar className="w-6 h-6 text-white" />
         </div>
-        <CardTitle className="text-white">{t('google_calendar_permission_required')}</CardTitle>
-        <CardDescription className="text-gray-400">
+        <CardTitle className="text-foreground">{t('google_calendar_permission_required')}</CardTitle>
+        <CardDescription className="text-muted-foreground">
           {t('sync_events_permission')}
         </CardDescription>
       </CardHeader>
@@ -68,14 +68,14 @@ const GoogleCalendarConnect = ({ onConnect }: GoogleCalendarConnectProps) => {
         
         <Button
           variant="outline"
-          className="w-full border-[#333] bg-[#1a1a1a] hover:bg-[#2a2a2a] text-gray-300"
+          className="w-full border-border bg-card hover:bg-muted text-muted-foreground"
           onClick={() => window.open('https://console.cloud.google.com/', '_blank')}
         >
           <ExternalLink className="w-4 h-4 mr-2" />
           {t('google_cloud_console')}
         </Button>
 
-        <div className="text-xs text-gray-500 text-center">
+        <div className="text-xs text-muted-foreground text-center">
           <p>{t('calendar_scope_allows')}</p>
           <ul className="list-disc list-inside mt-1 space-y-1">
             <li>{t('read_calendar_events')}</li>

@@ -142,7 +142,7 @@ const AddClient = () => {
             variant="ghost"
             size="sm"
             onClick={handleCancel}
-            className="text-[#71717a] hover:text-white hover:bg-[#1f1f23]"
+            className="text-muted-foreground hover:text-foreground hover:bg-muted"
             disabled={isSubmitting}
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
@@ -151,19 +151,19 @@ const AddClient = () => {
         </div>
 
         <div>
-          <h2 className="text-2xl font-semibold text-white mb-1">
+          <h2 className="text-2xl font-semibold text-foreground mb-1">
             {t("add_new_client")}
           </h2>
-          <p className="text-gray-400 text-sm">
+          <p className="text-muted-foreground text-sm">
             {t("enter_client_info")}
           </p>
         </div>
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-6">
-          <Card className="bg-[#111111] border-[#1f1f23]">
+          <Card className="bg-card border-border">
             <CardHeader>
-              <CardTitle className="text-white text-lg">
+              <CardTitle className="text-foreground text-lg">
                 {t("personal_information")}
               </CardTitle>
             </CardHeader>
@@ -179,7 +179,7 @@ const AddClient = () => {
                       firstName: e.target.value,
                     }))
                   }
-                  className="bg-[#0a0a0a] border-[#1f1f23] text-white placeholder:text-gray-500 focus:border-gray-400"
+                  className="bg-background border-border text-foreground placeholder:text-muted-foreground focus:border-ring"
                 />
                 <RequiredInput
                   label={t("last_name")}
@@ -191,7 +191,7 @@ const AddClient = () => {
                       lastName: e.target.value,
                     }))
                   }
-                  className="bg-[#0a0a0a] border-[#1f1f23] text-white placeholder:text-gray-500 focus:border-gray-400"
+                  className="bg-background border-border text-foreground placeholder:text-muted-foreground focus:border-ring"
                 />
               </div>
 
@@ -204,7 +204,7 @@ const AddClient = () => {
                     setFormData((prev) => ({ ...prev, email: e.target.value }))
                   }
                   required
-                  className="bg-[#0a0a0a] border-[#1f1f23] text-white placeholder:text-gray-500 focus:border-gray-400"
+                  className="bg-background border-border text-foreground placeholder:text-muted-foreground focus:border-ring"
                 />
                 <PhoneInputComponent label={t("phone")} />
               </div>
@@ -214,7 +214,7 @@ const AddClient = () => {
                   <SimpleDatePicker label={t("date_of_birth")} />
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium text-gray-300">
+                  <Label className="text-sm font-medium text-muted-foreground">
                     {t("address")}
                   </Label>
                   <AddressAutoComplete
@@ -231,10 +231,10 @@ const AddClient = () => {
             </CardContent>
           </Card>
 
-          <Card className="bg-[#111111] border-[#1f1f23]">
+          <Card className="bg-card border-border">
             <CardHeader>
               <div className="flex items-center space-x-2">
-                <CardTitle className="text-white text-lg">
+                <CardTitle className="text-foreground text-lg">
                   {t("emergency_contact")}
                 </CardTitle>
               </div>
@@ -251,41 +251,41 @@ const AddClient = () => {
                       emergencyContact: e.target.value,
                     }))
                   }
-                  className="bg-[#0a0a0a] border-[#1f1f23] text-white placeholder:text-gray-500"
+                  className="bg-background border-border text-foreground placeholder:text-muted-foreground"
                 />
                 <div className="space-y-2">
-                  <Label className="text-gray-300">{t("relationship")}</Label>
+                  <Label className="text-muted-foreground">{t("relationship")}</Label>
                   <Input
                     name="emergencyRelationship"
                     value={formData.emergencyRelationship}
                     onChange={handleInputChange}
                     placeholder={t("relationship_to_client")}
-                    className="bg-[#0a0a0a] border-[#1f1f23] text-white placeholder:text-gray-500"
+                    className="bg-background border-border text-foreground placeholder:text-muted-foreground"
                   />
                 </div>
               </div>
               <div className="space-y-2">
-                <Label className="text-gray-300">{t("phone")}</Label>
+                <Label className="text-muted-foreground">{t("phone")}</Label>
                 <Input
                   name="emergencyPhone"
                   value={formData.emergencyPhone}
                   onChange={handleInputChange}
                   placeholder={t("emergency_contact_phone")}
-                  className="bg-[#0a0a0a] border-[#1f1f23] text-white placeholder:text-gray-500"
+                  className="bg-background border-border text-foreground placeholder:text-muted-foreground"
                 />
               </div>
             </CardContent>
           </Card>
 
-          <Card className="bg-[#111111] border-[#1f1f23]">
+          <Card className="bg-card border-border">
             <CardHeader>
-              <CardTitle className="text-white text-lg">
+              <CardTitle className="text-foreground text-lg">
                 {t("additional_notes")}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
-                <Label htmlFor="notes" className="text-gray-300">
+                <Label htmlFor="notes" className="text-muted-foreground">
                   {t("notes")}
                 </Label>
                 <Textarea
@@ -293,7 +293,7 @@ const AddClient = () => {
                   name="notes"
                   value={formData.notes}
                   onChange={handleInputChange}
-                  className="bg-[#0a0a0a] border-[#1f1f23] text-white placeholder:text-gray-500 min-h-[100px]"
+                  className="bg-background border-border text-foreground placeholder:text-muted-foreground min-h-[100px]"
                   placeholder={t("enter_additional_notes")}
                 />
               </div>
@@ -307,14 +307,14 @@ const AddClient = () => {
               variant="outline"
               onClick={handleCancel}
               disabled={isSubmitting}
-              className="border-[#333] bg-[#1a1a1a] hover:bg-[#2a2a2a] text-gray-300 hover:text-white"
+              className="border-border bg-card hover:bg-muted text-muted-foreground hover:text-foreground"
             >
               {t("cancel")}
             </Button>
             <Button
               type="submit"
               disabled={isSubmitting}
-              className="bg-neutral-50 hover:bg-[#d6d6d6] text-neutral-950 disabled:opacity-50"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground disabled:opacity-50"
             >
               <Plus className="w-4 h-4 mr-2" />
               {isSubmitting ? t("adding_client") : t("add_client")}

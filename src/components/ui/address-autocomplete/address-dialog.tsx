@@ -223,23 +223,23 @@ export default function AddressDialog(props: AddressDialogProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="bg-[#111111] border-[#1f1f23] text-white focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0">
+      <DialogContent className="bg-popover border-border text-foreground focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0">
         <DialogHeader>
-          <DialogTitle className="text-white">{dialogTitle}</DialogTitle>
-          <DialogDescription className="text-gray-400">
+          <DialogTitle className="text-foreground">{dialogTitle}</DialogTitle>
+          <DialogDescription className="text-muted-foreground">
             Edit the address details below. You can modify each field as needed.
           </DialogDescription>
         </DialogHeader>
 
         {isLoading ? (
           <div className="h-52 flex items-center justify-center">
-            <Loader2 className="size-6 animate-spin text-white" />
+            <Loader2 className="size-6 animate-spin text-foreground" />
           </div>
         ) : (
           <form onSubmit={handleSave}>
             <div className="space-y-4 py-7">
               <div className="space-y-0.5">
-                <Label htmlFor="address1" className="text-gray-300">Address line 1</Label>
+                <Label htmlFor="address1" className="text-muted-foreground">Address line 1</Label>
                 <Input
                   value={address1}
                   onChange={(e) => setAddress1(e.currentTarget.value)}
@@ -247,7 +247,7 @@ export default function AddressDialog(props: AddressDialogProps) {
                   id="address1"
                   name="address1"
                   placeholder="Address line 1"
-                  className="bg-[#0a0a0a] border-[#1f1f23] text-white"
+                  className="bg-background border-border text-foreground"
                 />
                 {errorMap.address1 && (
                   <div className="pt-1 text-sm text-red-500">
@@ -257,9 +257,9 @@ export default function AddressDialog(props: AddressDialogProps) {
               </div>
 
               <div className="space-y-0.5">
-                <Label htmlFor="address2" className="text-gray-300">
+                <Label htmlFor="address2" className="text-muted-foreground">
                   Address line 2{" "}
-                  <span className="text-xs text-gray-500">
+                  <span className="text-xs text-muted-foreground">
                     (Optional)
                   </span>
                 </Label>
@@ -270,13 +270,13 @@ export default function AddressDialog(props: AddressDialogProps) {
                   id="address2"
                   name="address2"
                   placeholder="Address line 2"
-                  className="bg-[#0a0a0a] border-[#1f1f23] text-white"
+                  className="bg-background border-border text-foreground"
                 />
               </div>
 
               <div className="flex gap-4">
                 <div className="flex-1 space-y-0.5">
-                  <Label htmlFor="city" className="text-gray-300">City</Label>
+                  <Label htmlFor="city" className="text-muted-foreground">City</Label>
                   <Input
                     value={city}
                     onChange={(e) => setCity(e.currentTarget.value)}
@@ -284,7 +284,7 @@ export default function AddressDialog(props: AddressDialogProps) {
                     id="city"
                     name="city"
                     placeholder="City"
-                    className="bg-[#0a0a0a] border-[#1f1f23] text-white"
+                    className="bg-background border-border text-foreground"
                   />
                   {errorMap.city && (
                     <div className="pt-1 text-sm text-red-500">
@@ -293,7 +293,7 @@ export default function AddressDialog(props: AddressDialogProps) {
                   )}
                 </div>
                 <div className="flex-1 space-y-0.5">
-                  <Label htmlFor="region" className="text-gray-300">State / Province / Region</Label>
+                  <Label htmlFor="region" className="text-muted-foreground">State / Province / Region</Label>
                   <Input
                     value={region}
                     onChange={(e) => setRegion(e.currentTarget.value)}
@@ -301,7 +301,7 @@ export default function AddressDialog(props: AddressDialogProps) {
                     id="region"
                     name="region"
                     placeholder="Region"
-                    className="bg-[#0a0a0a] border-[#1f1f23] text-white"
+                    className="bg-background border-border text-foreground"
                   />
                   {errorMap.region && (
                     <div className="pt-1 text-sm text-red-500">
@@ -313,7 +313,7 @@ export default function AddressDialog(props: AddressDialogProps) {
 
               <div className="flex gap-4">
                 <div className="flex-1 space-y-0.5">
-                  <Label htmlFor="postalCode" className="text-gray-300">Postal Code</Label>
+                  <Label htmlFor="postalCode" className="text-muted-foreground">Postal Code</Label>
                   <Input
                     value={postalCode}
                     onChange={(e) => setPostalCode(e.currentTarget.value)}
@@ -321,7 +321,7 @@ export default function AddressDialog(props: AddressDialogProps) {
                     id="postalCode"
                     name="postalCode"
                     placeholder="Postal Code"
-                    className="bg-[#0a0a0a] border-[#1f1f23] text-white"
+                    className="bg-background border-border text-foreground"
                   />
                   {errorMap.postalCode && (
                     <div className="pt-1 text-sm text-red-500">
@@ -330,14 +330,14 @@ export default function AddressDialog(props: AddressDialogProps) {
                   )}
                 </div>
                 <div className="flex-1 space-y-0.5">
-                  <Label htmlFor="country" className="text-gray-300">Country</Label>
+                  <Label htmlFor="country" className="text-muted-foreground">Country</Label>
                   <Input
                     value={address?.country}
                     id="country"
                     disabled
                     name="country"
                     placeholder="Country"
-                    className="bg-[#0a0a0a] border-[#1f1f23] text-white"
+                    className="bg-background border-border text-foreground"
                   />
                 </div>
               </div>
@@ -348,13 +348,13 @@ export default function AddressDialog(props: AddressDialogProps) {
                 type="button"
                 onClick={() => setOpen(false)}
                 variant="outline"
-                className="border-[#333] bg-[#1a1a1a] hover:bg-[#2a2a2a] text-gray-300 hover:text-white"
+                className="border-border bg-card hover:bg-muted text-muted-foreground hover:text-foreground"
               >
                 Cancel
               </Button>
-              <Button 
+              <Button
                 type="submit"
-                className="bg-neutral-50 hover:bg-[#d6d6d6] text-neutral-950"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground"
               >
                 Save
               </Button>

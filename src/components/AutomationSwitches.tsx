@@ -53,18 +53,18 @@ export function AutomationSwitches({
 
         {/* Main content with conditional opacity */}
         <div
-          className={`border-neutral-800 bg-neutral-900 relative flex w-full items-start gap-2 rounded-md border p-4 shadow-xs outline-none transition-opacity ${
+          className={`border-border bg-card relative flex w-full items-start gap-2 rounded-md border p-4 shadow-xs outline-none transition-opacity ${
             !autoReminders ? "opacity-50" : ""
           }`}
         >
           <div className="grid grow gap-2">
             <Label htmlFor={idReminders} className="flex items-center gap-2">
-              <Bell className="h-4 w-4 text-gray-400" />
+              <Bell className="h-4 w-4 text-muted-foreground" />
               {t('auto_reminders')}
             </Label>
             <p
               id={`${idReminders}-description`}
-              className="text-gray-300 text-xs"
+              className="text-muted-foreground text-xs"
             >
               {t('auto_reminders_desc')}
             </p>
@@ -90,16 +90,16 @@ export function AutomationSwitches({
 
         {/* Main content with conditional opacity */}
         <div
-          className={`border-neutral-800 bg-neutral-900 relative flex w-full items-start gap-2 rounded-md border p-4 shadow-xs outline-none transition-opacity ${
+          className={`border-border bg-card relative flex w-full items-start gap-2 rounded-md border p-4 shadow-xs outline-none transition-opacity ${
             !autoTasks ? "opacity-50" : ""
           }`}
         >
           <div className="grid grow gap-2">
             <Label htmlFor={idTasks} className="flex items-center gap-2">
-              <Calendar className="h-4 w-4 text-gray-400" />
+              <Calendar className="h-4 w-4 text-muted-foreground" />
               {t('task_notifications')}
             </Label>
-            <p id={`${idTasks}-description`} className="text-gray-300 text-xs">
+            <p id={`${idTasks}-description`} className="text-muted-foreground text-xs">
               {t(activeTab === "sms" ? 'task_notifications_sms_desc' : 'task_notifications_whatsapp_desc')}
             </p>
           </div>
@@ -123,18 +123,18 @@ export function AutomationSwitches({
 
         {/* Main content with conditional opacity */}
         <div
-          className={`border-neutral-800 bg-neutral-900 relative flex w-full items-start gap-2 rounded-md border p-4 shadow-xs outline-none transition-opacity ${
+          className={`border-border bg-card relative flex w-full items-start gap-2 rounded-md border p-4 shadow-xs outline-none transition-opacity ${
             !autoMessages ? "opacity-50" : ""
           }`}
         >
           <div className="grid grow gap-2">
             <Label htmlFor={idMessages} className="flex items-center gap-2">
-              <MessageSquare className="h-4 w-4 text-gray-400" />
+              <MessageSquare className="h-4 w-4 text-muted-foreground" />
               {t('message_notifications')}
             </Label>
             <p
               id={`${idMessages}-description`}
-              className="text-gray-300 text-xs"
+              className="text-muted-foreground text-xs"
             >
               {t(activeTab === "sms" ? 'message_notifications_sms_desc' : 'message_notifications_whatsapp_desc')}
             </p>

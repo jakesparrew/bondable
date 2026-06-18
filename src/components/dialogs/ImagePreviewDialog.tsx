@@ -26,12 +26,12 @@ export const ImagePreviewDialog = ({
   return (
     <Dialog>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
-      <DialogContent className="bg-[#111111] border-[#1f1f23] p-4 rounded shadow-lg max-w-lg w-full" disableCloseButton >
+      <DialogContent className="bg-card border-border p-4 rounded shadow-lg max-w-lg w-full" disableCloseButton >
         {/* Top row with close button aligned right */}
         <div className="flex justify-end ">
           <DialogClose asChild>
             <button
-              className="text-neutral-400 hover:text-white"
+              className="text-muted-foreground hover:text-foreground"
               aria-label={t("close")}
             >
               <X className="w-5 h-5" />
@@ -50,9 +50,9 @@ export const ImagePreviewDialog = ({
               e.currentTarget.src = "/placeholder.svg";
             }}
           />
-          <p className="text-gray-300 text-sm mt-2">{alt}</p>
+          <p className="text-muted-foreground text-sm mt-2">{alt}</p>
           {imageSrc === "/placeholder.svg" && (
-            <p className="text-gray-500 text-xs mt-1">{t("image_preview_not_available")}</p>
+            <p className="text-muted-foreground text-xs mt-1">{t("image_preview_not_available")}</p>
           )}
         </div>
       </DialogContent>

@@ -73,19 +73,19 @@ const WeekView = ({
   };
 
   return (
-    <div className="bg-[#111111] border border-[#1f1f23] rounded-lg overflow-hidden">
+    <div className="bg-card border border-border rounded-lg overflow-hidden">
       {/* Header with days */}
-      <div className="grid grid-cols-8 border-b border-[#1f1f23]">
-        <div className="p-3 text-center text-sm font-medium text-gray-400"></div>
+      <div className="grid grid-cols-8 border-b border-border">
+        <div className="p-3 text-center text-sm font-medium text-muted-foreground"></div>
         {weekDays.map((day, index) => (
           <div
             key={index}
-            className="p-3 text-center border-r border-[#1f1f23] last:border-r-0"
+            className="p-3 text-center border-r border-border last:border-r-0"
           >
-            <div className="text-sm font-medium text-white">
+            <div className="text-sm font-medium text-foreground">
               {t(day.toLocaleDateString("en-US", { weekday: "short" }).toLowerCase())}
             </div>
-            <div className="text-xs text-gray-400 mt-1">
+            <div className="text-xs text-muted-foreground mt-1">
               {day.toLocaleDateString(i18n.language === 'fr' ? 'fr-FR' : 'en-US', { month: "short", day: "numeric" })}
             </div>
           </div>
@@ -97,7 +97,7 @@ const WeekView = ({
         {hours.map((hour) => (
           <React.Fragment key={hour}>
             {/* Time label */}
-            <div className="p-3 text-center text-sm text-gray-400 border-b border-[#1f1f23] border-r border-[#1f1f23]">
+            <div className="p-3 text-center text-sm text-muted-foreground border-b border-border border-r border-border">
               {`${String(hour).padStart(2, "0")}:00`}
             </div>
             
@@ -108,7 +108,7 @@ const WeekView = ({
               return (
                 <div
                   key={`${dayIndex}-${hour}`}
-                  className="min-h-[60px] border-b border-[#1f1f23] border-r border-[#1f1f23] last:border-r-0 p-2 cursor-pointer hover:bg-[#1a1a1a]"
+                  className="min-h-[60px] border-b border-border border-r border-border last:border-r-0 p-2 cursor-pointer hover:bg-muted"
                   onClick={() => handleTimeSlotClick(day, hour)}
                 >
                   {dayEvents.map((event) => (

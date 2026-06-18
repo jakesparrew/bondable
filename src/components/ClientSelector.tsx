@@ -265,20 +265,20 @@ const loadLastActivityMap = async (therapistId: string) => {
   };
 
   return (
-    <div className="w-full md:w-80 bg-[#111111] border-r border-[#1f1f23] flex flex-col h-full md:rounded-bl-lg rounded-bl-none">
+    <div className="w-full md:w-80 bg-card border-r border-border flex flex-col h-full md:rounded-bl-lg rounded-bl-none">
       {/* Header */}
-      <div className="p-4 border-b border-[#1f1f23]">
+      <div className="p-4 border-b border-border">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-white font-medium">{t('clients')}</h2>
+          <h2 className="text-foreground font-medium">{t('clients')}</h2>
         </div>
         
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder={t('search_clients')}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 bg-[#1a1a1a] border-[#1f1f23] text-white placeholder:text-gray-500 focus:border-gray-400"
+            className="pl-10 bg-background border-border text-foreground placeholder:text-muted-foreground focus:border-ring"
           />
         </div>
       </div>
@@ -287,11 +287,11 @@ const loadLastActivityMap = async (therapistId: string) => {
       <div className="flex-1 overflow-y-auto">
         {loading ? (
           <div className="p-4 text-center">
-            <p className="text-gray-400 text-sm">{t('loading_clients')}</p>
+            <p className="text-muted-foreground text-sm">{t('loading_clients')}</p>
           </div>
         ) : filteredClients.length === 0 ? (
           <div className="p-4 text-center">
-            <p className="text-gray-400 text-sm">
+            <p className="text-muted-foreground text-sm">
               {searchTerm ? t('no_clients_found_search') : t('no_clients_found_add')}
             </p>
           </div>
@@ -304,8 +304,8 @@ const loadLastActivityMap = async (therapistId: string) => {
                 <div
                   key={client.id}
                   onClick={() => handleClientSelect(client)}
-                  className={`p-3 rounded-lg cursor-pointer transition-colors hover:bg-[#1a1a1a] ${
-                    selectedClient?.id === client.id ? "bg-[#1a1a1a]" : ""
+                  className={`p-3 rounded-lg cursor-pointer transition-colors hover:bg-muted ${
+                    selectedClient?.id === client.id ? "bg-muted" : ""
                   }`}
                 >
                   <div className="flex items-center space-x-3">
@@ -313,13 +313,13 @@ const loadLastActivityMap = async (therapistId: string) => {
                       {clientProfile?.avatar_url && (
                         <AvatarImage src={clientProfile.avatar_url} alt={client.name} className='non-invertable'/>
                       )}
-                      <AvatarFallback className="bg-[#27272a] text-white text-sm">
+                      <AvatarFallback className="bg-muted text-foreground text-sm">
                         {client.name.split(' ').map(n => n[0]).join('')}
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between">
-                        <h3 className="text-white font-medium text-sm truncate">
+                        <h3 className="text-foreground font-medium text-sm truncate">
                           {client.name}
                         </h3>
                         <Badge
@@ -329,7 +329,7 @@ const loadLastActivityMap = async (therapistId: string) => {
                           {getStatusText(client.status)}
                         </Badge>
                       </div>
-                      <p className="text-gray-400 text-xs truncate">{client.email}</p>
+                      <p className="text-muted-foreground text-xs truncate">{client.email}</p>
                     </div>
                   </div>
                 </div>

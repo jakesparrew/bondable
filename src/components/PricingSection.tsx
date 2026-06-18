@@ -57,7 +57,7 @@ const PricingSection = () => {
   };
 
   return (
-    <Card className="bg-[#111111]">
+    <Card className="bg-card">
       <CardHeader className="pb-4">
         <div className="flex items-center justify-between">
           <CardTitle className="text-lg">Pricing</CardTitle>

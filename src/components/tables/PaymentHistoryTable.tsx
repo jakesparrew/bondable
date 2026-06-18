@@ -240,12 +240,12 @@ export default function PaymentHistoryTable({
 
   const getSortIcon = (field: SortField) => {
     if (sortField !== field) {
-      return <ChevronDown className="h-4 w-4 text-gray-500 ml-1" />;
+      return <ChevronDown className="h-4 w-4 text-muted-foreground ml-1" />;
     }
     return sortDirection === "asc" ? (
-      <ChevronUp className="h-4 w-4 text-white ml-1" />
+      <ChevronUp className="h-4 w-4 text-foreground ml-1" />
     ) : (
-      <ChevronDown className="h-4 w-4 text-white ml-1" />
+      <ChevronDown className="h-4 w-4 text-foreground ml-1" />
     );
   };
 
@@ -323,10 +323,10 @@ export default function PaymentHistoryTable({
     field: SortField;
     children: React.ReactNode;
   }) => (
-    <TableHead className="text-gray-300">
+    <TableHead className="text-muted-foreground">
       <Button
         variant="ghost"
-        className="h-auto p-0 font-medium text-gray-300 hover:text-white flex items-center hover:bg-transparent"
+        className="h-auto p-0 font-medium text-muted-foreground hover:text-foreground flex items-center hover:bg-transparent"
         onClick={() => handleSort(field)}
       >
         {children}
@@ -338,7 +338,7 @@ export default function PaymentHistoryTable({
   return (
     <div className="space-y-6">
       {/* Compact Stats Bar */}
-      <Card className="bg-[#111111] border-[#1f1f23]">
+      <Card className="bg-card border-border">
         <CardContent className="p-4">
           <div className="flex items-center justify-between">
             <div
@@ -347,17 +347,17 @@ export default function PaymentHistoryTable({
               }`}
             >
               <div className="flex items-center gap-2">
-                <WalletCards className="h-4 w-4 text-neutral-400" />
-                <span className="text-sm text-neutral-400">{t("total")}:</span>
-                <span className="font-semibold text-white">
+                <WalletCards className="h-4 w-4 text-muted-foreground" />
+                <span className="text-sm text-muted-foreground">{t("total")}:</span>
+                <span className="font-semibold text-foreground">
                   {filteredAndSortedPayments.length}
                 </span>
               </div>
-              <div className="w-px h-4 bg-neutral-400 mx-2" />
+              <div className="w-px h-4 bg-border mx-2" />
               <div className="flex items-center gap-2">
-                <CreditCard className="h-4 w-4 text-neutral-400" />
-                <span className="text-sm text-gray-400">{t("paid")}:</span>
-                <span className="font-semibold text-white">
+                <CreditCard className="h-4 w-4 text-muted-foreground" />
+                <span className="text-sm text-muted-foreground">{t("paid")}:</span>
+                <span className="font-semibold text-foreground">
                   {
                     filteredAndSortedPayments.filter((p) => p.status === "paid")
                       .length
@@ -366,11 +366,11 @@ export default function PaymentHistoryTable({
               </div>
               {!isMobile && (
                 <>
-                  <div className="w-px h-4 bg-neutral-400 mx-2" />
+                  <div className="w-px h-4 bg-border mx-2" />
                   <div className="flex items-center gap-2">
-                    <Clock className="h-4 w-4 text-neutral-400" />
-                    <span className="text-sm text-gray-400">{t("pending")}:</span>
-                    <span className="font-semibold text-white">
+                    <Clock className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-sm text-muted-foreground">{t("pending")}:</span>
+                    <span className="font-semibold text-foreground">
                       {
                         filteredAndSortedPayments.filter(
                           (p) => p.status === "pending"
@@ -382,11 +382,11 @@ export default function PaymentHistoryTable({
               )}
               {!isMobile && (
                 <>
-                  <div className="w-px h-4 bg-neutral-400 mx-2" />
+                  <div className="w-px h-4 bg-border mx-2" />
                   <div className="flex items-center gap-2">
-                    <Ban className="h-4 w-4 text-neutral-400" />
-                    <span className="text-sm text-gray-400">{t("overdue")}:</span>
-                    <span className="font-semibold text-white">
+                    <Ban className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-sm text-muted-foreground">{t("overdue")}:</span>
+                    <span className="font-semibold text-foreground">
                       {
                         filteredAndSortedPayments.filter(
                           (p) => p.status === "overdue"
@@ -408,7 +408,7 @@ export default function PaymentHistoryTable({
         }`}
       >
         <div className={`relative ${isMobile ? "w-full" : "flex-1 min-w-64"}`}>
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
           <Input
             placeholder={
               userType === "client"
@@ -417,7 +417,7 @@ export default function PaymentHistoryTable({
             }
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 bg-[#111111] border-[#1f1f23] text-white placeholder:text-gray-400"
+            className="pl-10 bg-background border-border text-foreground placeholder:text-muted-foreground"
           />
         </div>
 
@@ -429,32 +429,32 @@ export default function PaymentHistoryTable({
             <SelectTrigger
               className={`${
                 isMobile ? "flex-1" : "w-36"
-              } bg-[#111111] border-[#1f1f23] text-white`}
+              } bg-background border-border text-foreground`}
             >
               <SelectValue placeholder={t("status")} />
             </SelectTrigger>
-            <SelectContent className="bg-[#111111] border-[#1f1f23]">
+            <SelectContent className="bg-card border-border">
               <SelectItem
                 value="all"
-                className="text-neutral-400 hover:!text-neutral-950 data-[state=checked]:text-neutral-50 data-[highlighted]:!text-neutral-950"
+                className="text-muted-foreground hover:!text-accent-foreground data-[state=checked]:text-foreground data-[highlighted]:!text-accent-foreground"
               >
                 {t("all_status")}
               </SelectItem>
               <SelectItem
                 value="paid"
-                className="text-neutral-400 hover:!text-neutral-950 data-[state=checked]:text-neutral-50 data-[highlighted]:!text-neutral-950"
+                className="text-muted-foreground hover:!text-accent-foreground data-[state=checked]:text-foreground data-[highlighted]:!text-accent-foreground"
               >
                 {t("paid")}
               </SelectItem>
               <SelectItem
                 value="pending"
-                className="text-neutral-400 hover:!text-neutral-950 data-[state=checked]:text-neutral-50 data-[highlighted]:!text-neutral-950"
+                className="text-muted-foreground hover:!text-accent-foreground data-[state=checked]:text-foreground data-[highlighted]:!text-accent-foreground"
               >
                 {t("pending")}
               </SelectItem>
               <SelectItem
                 value="overdue"
-                className="text-neutral-400 hover:!text-neutral-950 data-[state=checked]:text-neutral-50 data-[highlighted]:!text-neutral-950"
+                className="text-muted-foreground hover:!text-accent-foreground data-[state=checked]:text-foreground data-[highlighted]:!text-accent-foreground"
               >
                 {t("overdue")}
               </SelectItem>
@@ -468,32 +468,32 @@ export default function PaymentHistoryTable({
             <SelectTrigger
               className={`${
                 isMobile ? "flex-1" : "w-36"
-              } bg-[#111111] border-[#1f1f23] text-white`}
+              } bg-background border-border text-foreground`}
             >
               <SelectValue placeholder={t("method")} />
             </SelectTrigger>
-            <SelectContent className="bg-[#111111] border-[#1f1f23]">
+            <SelectContent className="bg-card border-border">
               <SelectItem
                 value="all"
-                className="text-neutral-400 hover:!text-neutral-950 data-[state=checked]:text-neutral-50 data-[highlighted]:!text-neutral-950"
+                className="text-muted-foreground hover:!text-accent-foreground data-[state=checked]:text-foreground data-[highlighted]:!text-accent-foreground"
               >
                 {t("all_methods")}
               </SelectItem>
               <SelectItem
                 value="bank_transfer"
-                className="text-neutral-400 hover:!text-neutral-950 data-[state=checked]:text-neutral-50 data-[highlighted]:!text-neutral-950"
+                className="text-muted-foreground hover:!text-accent-foreground data-[state=checked]:text-foreground data-[highlighted]:!text-accent-foreground"
               >
                 {t("bank_transfer")}
               </SelectItem>
               <SelectItem
                 value="credit_card"
-                className="text-neutral-400 hover:!text-neutral-950 data-[state=checked]:text-neutral-50 data-[highlighted]:!text-neutral-950"
+                className="text-muted-foreground hover:!text-accent-foreground data-[state=checked]:text-foreground data-[highlighted]:!text-accent-foreground"
               >
                 {t("credit_card")}
               </SelectItem>
               <SelectItem
                 value="cash"
-                className="text-neutral-400 hover:!text-neutral-950 data-[state=checked]:text-neutral-50 data-[highlighted]:!text-neutral-950"
+                className="text-muted-foreground hover:!text-accent-foreground data-[state=checked]:text-foreground data-[highlighted]:!text-accent-foreground"
               >
                 {t("cash")}
               </SelectItem>
@@ -506,7 +506,7 @@ export default function PaymentHistoryTable({
             variant="outline"
             size="sm"
             onClick={clearFilters}
-            className={`bg-neutral-950 hover:bg-neutral-800 text-neutral-50 border border-neutral-900 ${
+            className={`bg-primary hover:bg-primary/90 text-primary-foreground border border-primary ${
               isMobile ? "w-full" : ""
             }`}
           >
@@ -517,24 +517,24 @@ export default function PaymentHistoryTable({
       </div>
 
       {/* Payments Table */}
-      <Card className="bg-[#111111] border-[#1f1f23]">
+      <Card className="bg-card border-border">
         <CardHeader>
-          <CardTitle className="text-white text-lg">
+          <CardTitle className="text-foreground text-lg">
             {userType === "therapist" ? "Payment History" : "Your Payments"}
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0">
           {filteredAndSortedPayments.length === 0 ? (
             <div className="text-center py-16">
-              <div className="w-12 h-12 bg-[#1a1a1a] rounded-lg flex items-center justify-center mx-auto mb-4">
-                <Search className="h-6 w-6 text-gray-400" />
+              <div className="w-12 h-12 bg-muted rounded-lg flex items-center justify-center mx-auto mb-4">
+                <Search className="h-6 w-6 text-muted-foreground" />
               </div>
-              <h3 className="text-lg font-medium text-white mb-2">
+              <h3 className="text-lg font-medium text-foreground mb-2">
                 {hasActiveFilters
                   ? "No payments match your search"
                   : "No payments yet"}
               </h3>
-              <p className="text-gray-400 text-sm mb-6">
+              <p className="text-muted-foreground text-sm mb-6">
                 {hasActiveFilters
                   ? "Try adjusting your search or filters to see more results"
                   : userType === "therapist"
@@ -545,7 +545,7 @@ export default function PaymentHistoryTable({
                 <Button
                   variant="outline"
                   onClick={clearFilters}
-                  className="bg-neutral-950 hover:bg-neutral-800 text-neutral-50 border border-neutral-900"
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground border border-primary"
                 >
                   Clear Search & Filters
                 </Button>
@@ -555,7 +555,7 @@ export default function PaymentHistoryTable({
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
-                  <TableRow className="border-[#1f1f23] hover:bg-transparent">
+                  <TableRow className="border-border hover:bg-transparent">
                     {!isMobile && (
                       <SortableHeader field="invoiceNumber">
                         Invoice
@@ -568,10 +568,10 @@ export default function PaymentHistoryTable({
                       <SortableHeader field="amount">{t('amount')}</SortableHeader>
                     )}
                     {isMobile && (
-                      <TableHead className="text-gray-300">{t('invoice')}</TableHead>
+                      <TableHead className="text-muted-foreground">{t('invoice')}</TableHead>
                     )}
                     {isMobile && (
-                      <TableHead className="text-gray-300">{t('amount')}</TableHead>
+                      <TableHead className="text-muted-foreground">{t('amount')}</TableHead>
                     )}
                     {!isMobile && (
                       <SortableHeader field="status">{t('status')}</SortableHeader>
@@ -583,7 +583,7 @@ export default function PaymentHistoryTable({
                       <SortableHeader field="method">{t('method')}</SortableHeader>
                     )}
                     {!isMobile && (
-                      <TableHead className="text-gray-300 w-12">
+                      <TableHead className="text-muted-foreground w-12">
                         Actions
                       </TableHead>
                     )}
@@ -593,35 +593,35 @@ export default function PaymentHistoryTable({
                   {paginatedPayments.map((payment) => (
                     <TableRow
                       key={payment.id}
-                      className={`border-[#1f1f23] transition-colors ${
-                        isMobile ? "" : "hover:bg-[#1a1a1a]"
+                      className={`border-border transition-colors ${
+                        isMobile ? "" : "hover:bg-muted"
                       }`}
                     >
                       {!isMobile && (
-                        <TableCell className="text-white font-medium">
+                        <TableCell className="text-foreground font-medium">
                           {payment.invoiceNumber}
                         </TableCell>
                       )}
                       {userType === "therapist" && !isMobile && (
-                        <TableCell className="text-gray-300">
+                        <TableCell className="text-muted-foreground">
                           {payment.clientName}
                         </TableCell>
                       )}
                       {isMobile && (
                         <>
-                          <TableCell className="text-gray-300">
+                          <TableCell className="text-muted-foreground">
                             <div className="space-y-1">
-                              <div className="font-medium text-white">
+                              <div className="font-medium text-foreground">
                                 {payment.invoiceNumber}
                               </div>
-                              <div className="text-sm text-gray-400">
+                              <div className="text-sm text-muted-foreground">
                                 {payment.clientName}
                               </div>
                             </div>
                           </TableCell>
-                          <TableCell className="text-gray-300">
+                          <TableCell className="text-muted-foreground">
                             <div className="space-y-2">
-                              <div className="text-white font-medium">
+                              <div className="text-foreground font-medium">
                                 ${payment.amount.toFixed(2)}
                               </div>
                               <div className="flex items-center justify-between">
@@ -638,20 +638,20 @@ export default function PaymentHistoryTable({
                                     <Button
                                       variant="ghost"
                                       size="sm"
-                                      className="h-8 w-8 p-0 text-gray-400 hover:text-white hover:bg-neutral-700"
+                                      className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground hover:bg-muted"
                                     >
                                       <MoreHorizontal className="h-4 w-4" />
                                     </Button>
                                   </DropdownMenuTrigger>
                                   <DropdownMenuContent
                                     align="end"
-                                    className="bg-[#111111] border-[#1f1f23]"
+                                    className="bg-card border-border"
                                   >
                                     <DropdownMenuItem
                                       onClick={() =>
                                         handleViewInvoice(payment.invoiceNumber)
                                       }
-                                      className="text-gray-300 hover:text-white hover:bg-[#2a2a2a] cursor-pointer"
+                                      className="text-muted-foreground hover:text-foreground hover:bg-muted cursor-pointer"
                                     >
                                       <Eye className="w-4 h-4 mr-2" />
                                       View Invoice
@@ -662,7 +662,7 @@ export default function PaymentHistoryTable({
                                           payment.invoiceNumber
                                         )
                                       }
-                                      className="text-gray-300 hover:text-white hover:bg-[#2a2a2a] cursor-pointer"
+                                      className="text-muted-foreground hover:text-foreground hover:bg-muted cursor-pointer"
                                     >
                                       <Download className="w-4 h-4 mr-2" />
                                       Download
@@ -676,7 +676,7 @@ export default function PaymentHistoryTable({
                       )}
                       {!isMobile && (
                         <>
-                          <TableCell className="text-gray-300">
+                          <TableCell className="text-muted-foreground">
                             ${payment.amount.toFixed(2)}
                           </TableCell>
                           <TableCell>
@@ -689,7 +689,7 @@ export default function PaymentHistoryTable({
                                 payment.status.slice(1)}
                             </Badge>
                           </TableCell>
-                          <TableCell className="text-gray-300">
+                          <TableCell className="text-muted-foreground">
                             {payment.dueDate}
                             {payment.paidDate && (
                               <div className="text-xs text-green-500/70">
@@ -697,7 +697,7 @@ export default function PaymentHistoryTable({
                               </div>
                             )}
                           </TableCell>
-                          <TableCell className="text-gray-300 capitalize">
+                          <TableCell className="text-muted-foreground capitalize">
                             {payment.method.replace("_", " ")}
                           </TableCell>
                           <TableCell>
@@ -706,20 +706,20 @@ export default function PaymentHistoryTable({
                                 <Button
                                   variant="ghost"
                                   size="sm"
-                                  className="h-8 w-8 p-0 text-gray-400 hover:text-white hover:bg-neutral-700"
+                                  className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground hover:bg-muted"
                                 >
                                   <MoreHorizontal className="h-4 w-4" />
                                 </Button>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent
                                 align="end"
-                                className="bg-[#111111] border-[#1f1f23]"
+                                className="bg-card border-border"
                               >
                                 <DropdownMenuItem
                                   onClick={() =>
                                     handleViewInvoice(payment.invoiceNumber)
                                   }
-                                  className="text-gray-300 hover:text-white hover:bg-[#2a2a2a] cursor-pointer"
+                                  className="text-muted-foreground hover:text-foreground hover:bg-muted cursor-pointer"
                                 >
                                   <Eye className="w-4 h-4 mr-2" />
                                   View Invoice
@@ -728,7 +728,7 @@ export default function PaymentHistoryTable({
                                   onClick={() =>
                                     handleDownloadInvoice(payment.invoiceNumber)
                                   }
-                                  className="text-gray-300 hover:text-white hover:bg-[#2a2a2a] cursor-pointer"
+                                  className="text-muted-foreground hover:text-foreground hover:bg-muted cursor-pointer"
                                 >
                                   <Download className="w-4 h-4 mr-2" />
                                   Download

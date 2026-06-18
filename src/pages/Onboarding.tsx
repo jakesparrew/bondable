@@ -127,16 +127,16 @@ const Onboarding = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] flex">
+    <div className="min-h-screen bg-background flex">
       {/* Left side - welcome text */}
-      <div className="flex-1 hidden lg:flex flex-col justify-between p-10 bg-[#1a1a1a]">
+      <div className="flex-1 hidden lg:flex flex-col justify-between p-10 bg-card">
         <div className="flex items-center space-x-2">
           <img src="/favicon.ico" alt="Icon" className="w-6 h-6" />
-          <span className="text-white font-medium text-sm">Bondable</span>
+          <span className="text-foreground font-medium text-sm">Bondable</span>
         </div>
 
         <div className="mb-16">
-          <blockquote className="text-white text-sm leading-relaxed max-w-md">
+          <blockquote className="text-foreground text-sm leading-relaxed max-w-md">
             "Discover a powerful platform designed to enhance your therapeutic
             workflow and deliver better care to your clients."
           </blockquote>
@@ -144,16 +144,16 @@ const Onboarding = () => {
       </div>
 
       {/* Right side - onboarding form */}
-      <div className="flex-1 flex items-center justify-center p-8 bg-[#0a0a0a]">
+      <div className="flex-1 flex items-center justify-center p-8 bg-background">
         <div className="w-full max-w-sm">
           <div className="space-y-6">
             {step === 1 ? (
               <>
                 <div className="text-center space-y-2">
-                  <h1 className="text-white text-xl font-medium">
+                  <h1 className="text-foreground text-xl font-medium">
                     {t("welcome_to_bondable")}
                   </h1>
-                  <p className="text-gray-400 text-sm">
+                  <p className="text-muted-foreground text-sm">
                     {t("choose_your_role")}
                   </p>
                 </div>
@@ -162,21 +162,21 @@ const Onboarding = () => {
                   <Card
                     className={`cursor-pointer transition-all border ${
                       selectedRole === "therapist"
-                        ? "bg-[#2a2a2a] border-white"
-                        : "bg-[#1a1a1a] border-[#2a2a2a] hover:border-gray-400"
+                        ? "bg-muted border-primary"
+                        : "bg-card border-border hover:border-ring"
                     }`}
                     onClick={() => handleRoleSelect("therapist")}
                   >
                     <CardContent className="p-4">
                       <div className="flex items-center space-x-4">
-                        <div className="w-10 h-10 bg-[#333] rounded-lg flex items-center justify-center flex-shrink-0">
-                          <Users className="w-5 h-5 text-white" />
+                        <div className="w-10 h-10 bg-muted rounded-lg flex items-center justify-center flex-shrink-0">
+                          <Users className="w-5 h-5 text-foreground" />
                         </div>
                         <div className="text-left">
-                          <h3 className="text-white font-medium text-sm">
+                          <h3 className="text-foreground font-medium text-sm">
                             {t("therapist")}
                           </h3>
-                          <p className="text-gray-400 text-xs">
+                          <p className="text-muted-foreground text-xs">
                             {t("manage_clients_appointments")}
                           </p>
                         </div>
@@ -187,21 +187,21 @@ const Onboarding = () => {
                   <Card
                     className={`cursor-pointer transition-all border ${
                       selectedRole === "client"
-                        ? "bg-[#2a2a2a] border-white"
-                        : "bg-[#1a1a1a] border-[#2a2a2a] hover:border-gray-400"
+                        ? "bg-muted border-primary"
+                        : "bg-card border-border hover:border-ring"
                     }`}
                     onClick={() => handleRoleSelect("client")}
                   >
                     <CardContent className="p-4">
                       <div className="flex items-center space-x-4">
-                        <div className="w-10 h-10 bg-[#333] rounded-lg flex items-center justify-center flex-shrink-0">
-                          <User className="w-5 h-5 text-white" />
+                        <div className="w-10 h-10 bg-muted rounded-lg flex items-center justify-center flex-shrink-0">
+                          <User className="w-5 h-5 text-foreground" />
                         </div>
                         <div className="text-left">
-                          <h3 className="text-white font-medium text-sm">
+                          <h3 className="text-foreground font-medium text-sm">
                             {t("client")}
                           </h3>
-                          <p className="text-gray-400 text-xs">
+                          <p className="text-muted-foreground text-xs">
                             {t("connect_with_therapist")}
                           </p>
                         </div>
@@ -214,7 +214,7 @@ const Onboarding = () => {
                   <Button
                     onClick={handleNextStep}
                     disabled={!selectedRole}
-                    className="bg-white text-black hover:bg-gray-100 disabled:opacity-50 h-10 rounded-md font-medium text-sm"
+                    className="bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 h-10 rounded-md font-medium text-sm"
                   >
                     {t("next")}
                   </Button>
@@ -223,10 +223,10 @@ const Onboarding = () => {
             ) : step === 2 ? (
               <>
                 <div className="text-center space-y-2">
-                  <h1 className="text-white text-xl font-medium">
+                  <h1 className="text-foreground text-xl font-medium">
                     {t("whats_your_name")}
                   </h1>
-                  <p className="text-gray-400 text-sm">
+                  <p className="text-muted-foreground text-sm">
                     {t("tell_us_how_addressed")}
                   </p>
                 </div>
@@ -237,7 +237,7 @@ const Onboarding = () => {
                     placeholder={t("enter_your_full_name")}
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white placeholder:text-gray-500 h-10 rounded-md focus:border-gray-400 focus:ring-0"
+                    className="bg-background border-border text-foreground placeholder:text-muted-foreground h-10 rounded-md focus:border-ring focus:ring-0"
                   />
                 </div>
 
@@ -245,14 +245,14 @@ const Onboarding = () => {
                   <Button
                     variant="ghost"
                     onClick={handleBack}
-                    className="text-gray-400 hover:text-white text-sm"
+                    className="text-muted-foreground hover:text-foreground text-sm"
                   >
                     {t("back")}
                   </Button>
                   <Button
                     onClick={handleNextStep}
                     disabled={!name.trim() || isCreatingProfile}
-                    className="bg-white text-black hover:bg-gray-100 disabled:opacity-50 h-10 rounded-md font-medium text-sm"
+                    className="bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 h-10 rounded-md font-medium text-sm"
                   >
                     {selectedRole === "client" ? t("next") : t("get_started")}
                   </Button>
@@ -261,10 +261,10 @@ const Onboarding = () => {
             ) : (
               <>
                 <div className="text-center space-y-2">
-                  <h1 className="text-white text-xl font-medium">
+                  <h1 className="text-foreground text-xl font-medium">
                     {t("enter_invite_code")}
                   </h1>
-                  <p className="text-gray-400 text-sm">
+                  <p className="text-muted-foreground text-sm">
                     {t("enter_invite_code_desc")}
                   </p>
                 </div>
@@ -277,7 +277,7 @@ const Onboarding = () => {
                     onChange={(e) =>
                       setInviteCode(e.target.value.toUpperCase())
                     }
-                    className="bg-[#1a1a1a] border-[#2a2a2a] text-white placeholder:text-gray-500 h-10 rounded-md focus:border-gray-400 focus:ring-0"
+                    className="bg-background border-border text-foreground placeholder:text-muted-foreground h-10 rounded-md focus:border-ring focus:ring-0"
                   />
                   {validationResult && !validationResult.isValid && (
                     <p className="text-red-400 text-sm">
@@ -295,7 +295,7 @@ const Onboarding = () => {
                   <Button
                     variant="ghost"
                     onClick={handleBack}
-                    className="text-gray-400 hover:text-white text-sm"
+                    className="text-muted-foreground hover:text-foreground text-sm"
                   >
                     {t("back")}
                   </Button>
@@ -304,7 +304,7 @@ const Onboarding = () => {
                     disabled={
                       !inviteCode.trim() || isValidating || isCreatingProfile
                     }
-                    className="bg-white text-black hover:bg-gray-100 disabled:opacity-50 h-10 rounded-md font-medium text-sm"
+                    className="bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 h-10 rounded-md font-medium text-sm"
                   >
                      {isValidating || isCreatingProfile
                        ? t("loading")
@@ -317,18 +317,18 @@ const Onboarding = () => {
             <div className="flex justify-center space-x-2">
               <div
                 className={`w-2 h-2 rounded-full ${
-                  step === 1 ? "bg-white" : "bg-gray-600"
+                  step === 1 ? "bg-primary" : "bg-muted"
                 }`}
               ></div>
               <div
                 className={`w-2 h-2 rounded-full ${
-                  step === 2 ? "bg-white" : "bg-gray-600"
+                  step === 2 ? "bg-primary" : "bg-muted"
                 }`}
               ></div>
               {selectedRole === "client" && (
                 <div
                   className={`w-2 h-2 rounded-full ${
-                    step === 3 ? "bg-white" : "bg-gray-600"
+                    step === 3 ? "bg-primary" : "bg-muted"
                   }`}
                 ></div>
               )}

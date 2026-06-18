@@ -100,7 +100,7 @@ export function FileUpload({
           e.preventDefault();
         }}
         data-dragging={isDragging || undefined}
-        className="border-[#1f1f23] hover:bg-[#1a1a1a] data-[dragging=true]:bg-[#1a1a1a] flex min-h-32 flex-col items-center justify-center rounded-xl border border-dashed p-4 transition-colors cursor-pointer touch-manipulation"
+        className="border-border hover:bg-muted data-[dragging=true]:bg-muted flex min-h-32 flex-col items-center justify-center rounded-xl border border-dashed p-4 transition-colors cursor-pointer touch-manipulation"
         style={{ touchAction: 'manipulation' }}
       >
         <input
@@ -111,16 +111,16 @@ export function FileUpload({
 
         <div className="flex flex-col items-center justify-center text-center">
           <div
-            className="bg-[#0a0a0a] mb-2 flex size-11 shrink-0 items-center justify-center rounded-full border border-[#1f1f23]"
+            className="bg-background mb-2 flex size-11 shrink-0 items-center justify-center rounded-full border border-border"
             aria-hidden="true"
           >
-            <FileUpIcon className="size-4 opacity-60 text-gray-400" />
+            <FileUpIcon className="size-4 opacity-60 text-muted-foreground" />
           </div>
-          <p className="mb-1.5 text-sm font-medium text-gray-300">{t("upload_files")}</p>
-          <p className="text-gray-500 mb-2 text-xs">
+          <p className="mb-1.5 text-sm font-medium text-muted-foreground">{t("upload_files")}</p>
+          <p className="text-muted-foreground mb-2 text-xs">
             {t("drag_drop_click_browse")}
           </p>
-          <div className="text-gray-500 flex flex-wrap justify-center gap-1 text-xs">
+          <div className="text-muted-foreground flex flex-wrap justify-center gap-1 text-xs">
             <span>{t("all_files")}</span>
             <span>∙</span>
             <span>{t("max_files", { count: maxFiles })}</span>
@@ -145,19 +145,19 @@ export function FileUpload({
           {files.map((file) => (
             <div
               key={file.id}
-              className="bg-[#0a0a0a] text-neutral-50 flex items-center justify-between gap-2 rounded-lg border border-[#1f1f23] p-2 pe-3"
+              className="bg-card text-foreground flex items-center justify-between gap-2 rounded-lg border border-border p-2 pe-3"
             >
               <div className="flex items-center gap-3 overflow-hidden">
-                <div className="flex aspect-square size-10 shrink-0 items-center justify-center rounded border border-[#1f1f23]">
+                <div className="flex aspect-square size-10 shrink-0 items-center justify-center rounded border border-border">
                   {getFileIcon(file)}
                 </div>
                 <div className="flex min-w-0 flex-col gap-0.5">
-                  <p className="truncate text-[13px] font-medium text-gray-300 max-w-[200px]">
+                  <p className="truncate text-[13px] font-medium text-muted-foreground max-w-[200px]">
                     {file.file instanceof File
                       ? file.file.name
                       : file.file.name}
                   </p>
-                  <p className="text-gray-500 text-xs">
+                  <p className="text-muted-foreground text-xs">
                     {formatBytes(
                       file.file instanceof File
                         ? file.file.size
@@ -170,7 +170,7 @@ export function FileUpload({
               <Button
                 size="icon"
                 variant="ghost"
-                className="text-gray-400 hover:text-white -me-2 size-8 hover:bg-[#1f1f23]"
+                className="text-muted-foreground hover:text-foreground -me-2 size-8 hover:bg-accent"
                 onClick={() => handlers.removeFile(file.id)}
                 aria-label="Remove file"
               >
@@ -186,7 +186,7 @@ export function FileUpload({
                 size="sm" 
                 variant="outline" 
                 onClick={handlers.clearFiles}
-                className="border-[#333] bg-transparent hover:bg-[#1a1a1a] text-gray-300 hover:text-white"
+                className="border-border bg-transparent hover:bg-muted text-muted-foreground hover:text-foreground"
               >
                 {t("remove_all_files")}
               </Button>

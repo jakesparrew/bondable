@@ -21,10 +21,10 @@ const Clients = () => {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h2 className="text-xl sm:text-2xl font-semibold text-white mb-1">
+            <h2 className="text-xl sm:text-2xl font-semibold text-foreground mb-1">
               {t("clients")}
             </h2>
-            <p className="text-gray-400 text-sm">
+            <p className="text-muted-foreground text-sm">
               {t("invite_manage_clients")}
             </p>
           </div>
@@ -32,14 +32,14 @@ const Clients = () => {
             <Button
               onClick={() => setInviteDialogOpen(true)}
               variant="outline"
-              className="border-[#333] bg-[#1a1a1a] hover:bg-[#2a2a2a] text-gray-300 hover:text-white px-4 py-2 rounded-lg font-medium transition-colors w-full sm:w-auto"
+              className="border-border bg-card hover:bg-muted text-muted-foreground hover:text-foreground px-4 py-2 rounded-lg font-medium transition-colors w-full sm:w-auto"
             >
               <Copy className="-ms-1 opacity-60" size={16} aria-hidden="true" />
               {t("invite_code")}
             </Button>
             {/* Add client button */}
             <AddClientDialog>
-              <Button className="bg-neutral-50 hover:bg-[#d6d6d6] text-neutral-950 px-4 py-2 rounded-lg font-medium transition-colors w-full sm:w-auto">
+              <Button className="bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2 rounded-lg font-medium transition-colors w-full sm:w-auto">
                 <Send
                   className="-ms-1 opacity-60"
                   size={16}
@@ -52,12 +52,12 @@ const Clients = () => {
         </div>
 
         {/* Advanced Clients Table */}
-        <Card className="bg-[#111111] border-[#1f1f23]">
+        <Card className="bg-card border-border">
           <CardHeader className="pb-4">
-            <CardTitle className="text-white text-base sm:text-lg">
+            <CardTitle className="text-foreground text-base sm:text-lg">
               {t("client_management")}
             </CardTitle>
-            <p className="text-sm text-gray-400">
+            <p className="text-sm text-muted-foreground">
               {t("pending_account_setup")}
             </p>
           </CardHeader>

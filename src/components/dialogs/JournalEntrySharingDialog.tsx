@@ -113,9 +113,9 @@ export const JournalEntrySharingDialog = ({
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="bg-[#111111] border-[#1f1f23] text-white max-w-md">
+        <DialogContent className="bg-card border-border text-foreground max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-white flex items-center gap-2">
+            <DialogTitle className="text-foreground flex items-center gap-2">
               Entry Sharing Settings
             </DialogTitle>
           </DialogHeader>
@@ -123,11 +123,11 @@ export const JournalEntrySharingDialog = ({
 
           <div className="space-y-4">
             <div className="space-y-2">
-              <div className="text-sm text-gray-400">
+              <div className="text-sm text-muted-foreground">
                 Entry from {formatDate(entry.date)}
               </div>
-              <div className="bg-[#0a0a0a] border-[#1f1f23] rounded-lg p-3 max-h-24 overflow-y-auto">
-                <p className="text-sm text-gray-300">
+              <div className="bg-card border-border rounded-lg p-3 max-h-24 overflow-y-auto">
+                <p className="text-sm text-muted-foreground">
                   {entry.content.length > 100
                     ? `${entry.content.substring(0, 100)}...`
                     : entry.content}
@@ -136,7 +136,7 @@ export const JournalEntrySharingDialog = ({
 
               {entry.attachments && entry.attachments.length > 0 && (
                 <div className="space-y-2">
-                  <div className="text-xs text-gray-400">Attachments:</div>
+                  <div className="text-xs text-muted-foreground">Attachments:</div>
 
                   {images.length > 0 && (
                     <div className="flex flex-wrap gap-2">
@@ -146,10 +146,10 @@ export const JournalEntrySharingDialog = ({
                           src="/placeholder.svg"
                           alt={image.name}
                           trigger={
-                            <div className="w-full h-auto py-2 bg-[#1a1a1a] border border-[#1f1f23] rounded cursor-pointer hover:opacity-80 transition-opacity flex items-center justify-start pl-2">
+                            <div className="w-full h-auto py-2 bg-card border border-border rounded cursor-pointer hover:opacity-80 transition-opacity flex items-center justify-start pl-2">
                               <div className="text-center flex">
-                                <ImageIcon className="w-4 h-4 text-gray-400 mx-auto mb-1" />
-                                <p className="text-xs text-gray-500 truncate px-1">
+                                <ImageIcon className="w-4 h-4 text-muted-foreground mx-auto mb-1" />
+                                <p className="text-xs text-muted-foreground truncate px-1">
                                   {image.name.substring(0, 50)}
                                 </p>
                               </div>
@@ -165,11 +165,11 @@ export const JournalEntrySharingDialog = ({
                       {files.map((file) => (
                         <div
                           key={file.id}
-                          className="w-full h-auto py-2 bg-[#0f0f0f] border border-[#151518] rounded flex items-center justify-start pl-2"
+                          className="w-full h-auto py-2 bg-card border border-border rounded flex items-center justify-start pl-2"
                         >
                           <div className="text-center flex">
-                            <File className="w-4 h-4 text-gray-400 mx-auto mb-1" />
-                            <p className="text-xs text-gray-500 truncate px-1 max-w-[150px]">
+                            <File className="w-4 h-4 text-muted-foreground mx-auto mb-1" />
+                            <p className="text-xs text-muted-foreground truncate px-1 max-w-[150px]">
                               {file.name}
                             </p>
                           </div>
@@ -182,14 +182,14 @@ export const JournalEntrySharingDialog = ({
             </div>
 
             <div className="space-y-3">
-              <div className="text-sm text-gray-300">
+              <div className="text-sm text-muted-foreground">
                 Current sharing status:
               </div>
-              <div className="flex items-center gap-2 text-sm bg-neutral-800 p-2 rounded-lg">
+              <div className="flex items-center gap-2 text-sm bg-muted p-2 rounded-lg">
                 {entry.sharing === "private" ? (
                   <>
-                    <Lock className="w-4 h-4 text-gray-400" />
-                    <span className="text-gray-400">Private</span>
+                    <Lock className="w-4 h-4 text-muted-foreground" />
+                    <span className="text-muted-foreground">Private</span>
                   </>
                 ) : (
                   <>
@@ -206,7 +206,7 @@ export const JournalEntrySharingDialog = ({
             </div>
 
             <div className="space-y-3">
-              <div className="text-sm text-gray-300">
+              <div className="text-sm text-muted-foreground">
                 Update sharing preferences:
               </div>
               <TherapistSharingSelector
@@ -221,13 +221,13 @@ export const JournalEntrySharingDialog = ({
               <Button
                 variant="outline"
                 onClick={() => onOpenChange(false)}
-                className="border-[#333] bg-[#1a1a1a] hover:bg-[#2a2a2a] text-gray-300 hover:text-white"
+                className="border-border bg-muted hover:bg-muted text-muted-foreground hover:text-foreground"
               >
                 Cancel
               </Button>
               <Button
                 onClick={handleSave}
-                className="bg-neutral-50 hover:bg-[#d6d6d6] text-neutral-950"
+                className="bg-primary text-primary-foreground hover:bg-primary/90"
                 disabled={!isPrivate && selectedTherapists.length === 0}
               >
                 Update Sharing

@@ -503,7 +503,7 @@ const Profile = () => {
         <div className="flex items-center gap-4 mb-2">
           <Button
             variant="ghost"
-            className="text-gray-400 hover:text-white hover:bg-[#1f1f23] p-2"
+            className="text-muted-foreground hover:text-foreground hover:bg-muted p-2"
             onClick={handleGoBack}
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
@@ -520,12 +520,12 @@ const Profile = () => {
                 size="md"
               />
               <div>
-                <h2 className="text-2xl font-semibold text-white mb-1">
+                <h2 className="text-2xl font-semibold text-foreground mb-1">
                   {displayUserType === "admin"
                     ? t("admin_profile")
                     : t("therapist_profile")}
                 </h2>
-                <p className="text-gray-400 text-sm">
+                <p className="text-muted-foreground text-sm">
                   {displayUserType === "admin"
                     ? t("manage_admin_account_info_settings")
                     : t("manage_professional_info_settings")}
@@ -544,8 +544,8 @@ const Profile = () => {
                 variant={isEditMode ? "outline" : "default"}
                 className={` ${
                   isEditMode
-                    ? "border-[#333] bg-transparent hover:bg-[#1a1a1a] text-gray-300 hover:text-white"
-                    : " bg-neutral-50 hover:bg-[#d6d6d6] text-neutral-950 px-4 py-2 rounded-lg font-medium transition-colors"
+                    ? "border-border bg-transparent hover:bg-card text-muted-foreground hover:text-foreground"
+                    : " bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2 rounded-lg font-medium transition-colors"
                 }`}
               >
                 {isEditMode ? t("cancel") : t("edit_profile")}
@@ -565,8 +565,8 @@ const Profile = () => {
                 variant={isEditMode ? "outline" : "default"}
                 className={` ${
                   isEditMode
-                    ? "w-full border-[#333] bg-transparent hover:bg-[#1a1a1a] text-gray-300 hover:text-white"
-                    : "w-full bg-neutral-50 hover:bg-[#d6d6d6] text-neutral-950 px-4 py-2 rounded-lg font-medium transition-colors"
+                    ? "w-full border-border bg-transparent hover:bg-card text-muted-foreground hover:text-foreground"
+                    : "w-full bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2 rounded-lg font-medium transition-colors"
                 }`}
               >
                 {isEditMode ? t("cancel") : t("edit_profile")}
@@ -575,11 +575,11 @@ const Profile = () => {
           )}
 
           {/* Personal Information */}
-          <Card className="bg-[#111111] border-[#1f1f23]">
+          <Card className="bg-card border-border">
             <CardHeader>
               <div className="flex items-center space-x-2">
-                <User className="h-5 w-5 text-gray-400" />
-                <CardTitle className="text-white text-lg">
+                <User className="h-5 w-5 text-muted-foreground" />
+                <CardTitle className="text-foreground text-lg">
                   {t("personal_information")}
                 </CardTitle>
               </div>
@@ -596,9 +596,9 @@ const Profile = () => {
                   readOnly={!isEditMode}
                   className={`${
                     isEditMode
-                      ? "bg-[#0a0a0a] border-[#1f1f23]"
-                      : "bg-[#1a1a1a] border-[#1f1f23]"
-                  } text-white placeholder:text-gray-500 focus:border-gray-400`}
+                      ? "bg-background border-border"
+                      : "bg-card border-border"
+                  } text-foreground placeholder:text-muted-foreground focus:border-ring`}
                 />
                 <RequiredInput
                   label={t("last_name")}
@@ -610,9 +610,9 @@ const Profile = () => {
                   readOnly={!isEditMode}
                   className={`${
                     isEditMode
-                      ? "bg-[#0a0a0a] border-[#1f1f23]"
-                      : "bg-[#1a1a1a] border-[#1f1f23]"
-                  } text-white placeholder:text-gray-500 focus:border-gray-400`}
+                      ? "bg-background border-border"
+                      : "bg-card border-border"
+                  } text-foreground placeholder:text-muted-foreground focus:border-ring`}
                 />
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -625,9 +625,9 @@ const Profile = () => {
                   required
                   className={`${
                     isEditMode
-                      ? "bg-[#0a0a0a] border-[#1f1f23]"
-                      : "bg-[#1a1a1a] border-[#1f1f23]"
-                  } text-white placeholder:text-gray-500 focus:border-gray-400`}
+                      ? "bg-background border-border"
+                      : "bg-card border-border"
+                  } text-foreground placeholder:text-muted-foreground focus:border-ring`}
                 />
                 <PhoneInputComponent
                   label={t("phone")}
@@ -647,9 +647,9 @@ const Profile = () => {
                   readOnly={!isEditMode}
                   className={`${
                     isEditMode
-                      ? "bg-[#0a0a0a] border-[#1f1f23]"
-                      : "bg-[#1a1a1a] border-[#1f1f23]"
-                  } text-white placeholder:text-gray-500 focus:border-gray-400`}
+                      ? "bg-background border-border"
+                      : "bg-card border-border"
+                  } text-foreground placeholder:text-muted-foreground focus:border-ring`}
                 />
                 <SimpleDatePicker
                   label={t("date_of_birth")}
@@ -660,7 +660,7 @@ const Profile = () => {
                 />
               </div>
               <div className="space-y-2">
-                <Label className="text-sm font-medium text-gray-300">
+                <Label className="text-sm font-medium text-muted-foreground">
                   {t("location")}
                 </Label>
                 <AddressAutoComplete
@@ -673,9 +673,9 @@ const Profile = () => {
                   showInlineError={false}
                   className={`${
                     isEditMode
-                      ? "bg-[#0a0a0a] border-[#1f1f23]"
-                      : "bg-[#1a1a1a] border-[#1f1f23]"
-                  } text-white placeholder:text-gray-500 focus:border-gray-400`}
+                      ? "bg-background border-border"
+                      : "bg-card border-border"
+                  } text-foreground placeholder:text-muted-foreground focus:border-ring`}
                   readOnly={!isEditMode}
                 />
               </div>
@@ -684,15 +684,15 @@ const Profile = () => {
 
           {/* Weekly Availability - Only for therapists */}
           {displayUserType === "therapist" && (
-            <Card className="bg-[#111111] border-[#1f1f23]">
+            <Card className="bg-card border-border">
               <CardHeader>
                 <div className="flex items-center space-x-2">
-                  <Clock className="h-5 w-5 text-gray-400" />
-                  <CardTitle className="text-white text-lg">
+                  <Clock className="h-5 w-5 text-muted-foreground" />
+                  <CardTitle className="text-foreground text-lg">
                     {t("weekly_availability")}
                   </CardTitle>
                 </div>
-                <CardDescription className="text-gray-400 text-sm">
+                <CardDescription className="text-muted-foreground text-sm">
                   {t("set_available_time_slots")}
                 </CardDescription>
               </CardHeader>
@@ -708,15 +708,15 @@ const Profile = () => {
 
           {/* Local Documents - Only for therapists */}
           {displayUserType === "therapist" && (
-            <Card className="bg-[#111111] border-[#1f1f23]">
+            <Card className="bg-card border-border">
               <CardHeader>
                 <div className="flex items-center space-x-2">
-                  <FileUp className="h-5 w-5 text-gray-400" />
-                  <CardTitle className="text-white text-lg">
+                  <FileUp className="h-5 w-5 text-muted-foreground" />
+                  <CardTitle className="text-foreground text-lg">
                     {t("local_documents")}
                   </CardTitle>
                 </div>
-                <CardDescription className="text-gray-400 text-sm">
+                <CardDescription className="text-muted-foreground text-sm">
                   {t("store_documents_practice")}
                 </CardDescription>
               </CardHeader>
@@ -758,20 +758,20 @@ const Profile = () => {
                               const signedUrl = docSignedUrls[doc.id];
                               const LeftContent = (
                                 <div className="flex items-center space-x-3 min-w-0">
-                                  {doc.file_type === 'image' && <ImageIcon className="h-5 w-5 text-gray-400 shrink-0" />}
-                                  {doc.file_type === 'video' && <VideoIcon className="h-5 w-5 text-gray-400 shrink-0" />}
-                                  {doc.file_type === 'pdf' && <FileText className="h-5 w-5 text-gray-400 shrink-0" />}
-                                  {doc.file_type === 'other' && <FileText className="h-5 w-5 text-gray-400 shrink-0" />}
+                                  {doc.file_type === 'image' && <ImageIcon className="h-5 w-5 text-muted-foreground shrink-0" />}
+                                  {doc.file_type === 'video' && <VideoIcon className="h-5 w-5 text-muted-foreground shrink-0" />}
+                                  {doc.file_type === 'pdf' && <FileText className="h-5 w-5 text-muted-foreground shrink-0" />}
+                                  {doc.file_type === 'other' && <FileText className="h-5 w-5 text-muted-foreground shrink-0" />}
                                   <div className="min-w-0">
-                                    <p className="text-white text-sm truncate">{doc.file_name}</p>
-                                    <p className="text-xs text-gray-500 truncate">{doc.mime_type}</p>
+                                    <p className="text-foreground text-sm truncate">{doc.file_name}</p>
+                                    <p className="text-xs text-muted-foreground truncate">{doc.mime_type}</p>
                                   </div>
                                 </div>
                               );
                               return (
                                 <div
                                   key={doc.id}
-                                  className="flex items-center justify-between w-full bg-[#0a0a0a] border border-[#1f1f23] rounded-lg p-3 hover:bg-[#121212] transition"
+                                  className="flex items-center justify-between w-full bg-background border border-border rounded-lg p-3 hover:bg-muted transition"
                                 >
                                   <div className="flex-1 min-w-0">
                                     {doc.file_type === 'image' ? (
@@ -802,7 +802,7 @@ const Profile = () => {
                                     <Button
                                       variant="ghost"
                                       size="icon"
-                                      className="text-gray-400 hover:text-white"
+                                      className="text-muted-foreground hover:text-foreground"
                                       onClick={(e) => {
                                         e.stopPropagation();
                                         const url = signedUrl;
@@ -821,7 +821,7 @@ const Profile = () => {
                                     <Button
                                       variant="ghost"
                                       size="icon"
-                                      className="text-gray-400 hover:text-white"
+                                      className="text-muted-foreground hover:text-foreground"
                                       onClick={async (e) => {
                                         e.stopPropagation();
                                         try {
@@ -864,21 +864,21 @@ const Profile = () => {
           )}
 
           {/* Security Settings */}
-          <Card className="bg-[#111111] border-[#1f1f23]">
+          <Card className="bg-card border-border">
             <CardHeader>
               <div className="flex items-center space-x-2">
-                <Shield className="h-5 w-5 text-gray-400" />
-                <CardTitle className="text-white text-lg">
+                <Shield className="h-5 w-5 text-muted-foreground" />
+                <CardTitle className="text-foreground text-lg">
                   {t("security_privacy")}
                 </CardTitle>
               </div>
-              <CardDescription className="text-gray-400 text-sm">
+              <CardDescription className="text-muted-foreground text-sm">
                 {t("manage_account_security")}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="currentPassword" className="text-gray-300">
+                <Label htmlFor="currentPassword" className="text-muted-foreground">
                   {t("current_password")}
                 </Label>
                 <Input
@@ -890,9 +890,9 @@ const Profile = () => {
                   readOnly={!isEditMode}
                   className={`${
                     isEditMode
-                      ? "bg-[#0a0a0a] border-[#1f1f23] text-white"
-                      : "bg-[#1a1a1a] border-[#1f1f23] text-gray-500"
-                  } placeholder:text-gray-500 focus:border-gray-400`}
+                      ? "bg-background border-border text-foreground"
+                      : "bg-card border-border text-muted-foreground"
+                  } placeholder:text-muted-foreground focus:border-ring`}
                 />
               </div>
 
@@ -904,16 +904,16 @@ const Profile = () => {
                   onChange={setNewPassword}
                   className={`${
                     isEditMode
-                      ? "bg-[#0a0a0a] border-[#1f1f23] text-white"
-                      : "bg-[#1a1a1a] border-[#1f1f23] text-gray-500"
-                  } placeholder:text-gray-500 focus:border-gray-400`}
+                      ? "bg-background border-border text-foreground"
+                      : "bg-card border-border text-muted-foreground"
+                  } placeholder:text-muted-foreground focus:border-ring`}
                   readOnly={!isEditMode}
                   state={isEditMode ? "default" : "always"}
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="confirmPassword" className="text-gray-300">
+                <Label htmlFor="confirmPassword" className="text-muted-foreground">
                   {t("confirm_new_password")}
                 </Label>
                 <Input
@@ -925,9 +925,9 @@ const Profile = () => {
                   readOnly={!isEditMode}
                   className={`${
                     isEditMode
-                      ? "bg-[#0a0a0a] border-[#1f1f23] text-white"
-                      : "bg-[#1a1a1a] border-[#1f1f23] text-gray-500"
-                  } placeholder:text-gray-500 focus:border-gray-400`}
+                      ? "bg-background border-border text-foreground"
+                      : "bg-card border-border text-muted-foreground"
+                  } placeholder:text-muted-foreground focus:border-ring`}
                 />
               </div>
             </CardContent>
@@ -939,13 +939,13 @@ const Profile = () => {
               <Button
                 variant="outline"
                 onClick={handleCancel}
-                className="border-[#333] bg-transparent hover:bg-[#1a1a1a] text-gray-300 hover:text-white"
+                className="border-border bg-transparent hover:bg-card text-muted-foreground hover:text-foreground"
               >
                 {t("cancel")}
               </Button>
               <Button
                 onClick={handleSave}
-                className="bg-neutral-50 hover:bg-[#d6d6d6] text-neutral-950 px-6 py-2 rounded-lg font-medium transition-colors"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-2 rounded-lg font-medium transition-colors"
               >
                 {t("save_changes")}
               </Button>
@@ -969,7 +969,7 @@ const Profile = () => {
       <div className="flex items-center gap-4 mb-2">
         <Button
           variant="ghost"
-          className="text-gray-400 hover:text-white hover:bg-[#1f1f23] p-2"
+          className="text-muted-foreground hover:text-foreground hover:bg-muted p-2"
           onClick={handleGoBack}
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
@@ -986,10 +986,10 @@ const Profile = () => {
               size="md"
             />
             <div>
-              <h2 className="text-2xl font-semibold text-white mb-1">
+              <h2 className="text-2xl font-semibold text-foreground mb-1">
                 {t("client_profile")}
               </h2>
-              <p className="text-gray-400 text-sm">
+              <p className="text-muted-foreground text-sm">
                 {t("manage_personal_therapy_info")}
               </p>
             </div>
@@ -1006,8 +1006,8 @@ const Profile = () => {
               variant={isEditMode ? "outline" : "default"}
               className={` ${
                 isEditMode
-                  ? "border-[#333] bg-transparent hover:bg-[#1a1a1a] text-gray-300 hover:text-white"
-                  : " bg-neutral-50 hover:bg-[#d6d6d6] text-neutral-950 px-4 py-2 rounded-lg font-medium transition-colors"
+                  ? "border-border bg-transparent hover:bg-card text-muted-foreground hover:text-foreground"
+                  : " bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2 rounded-lg font-medium transition-colors"
               }`}
             >
               {isEditMode ? t("cancel") : t("edit_profile")}
@@ -1027,8 +1027,8 @@ const Profile = () => {
               variant={isEditMode ? "outline" : "default"}
               className={` ${
                 isEditMode
-                  ? "w-full border-[#333] bg-transparent hover:bg-[#1a1a1a] text-gray-300 hover:text-white"
-                  : "w-full bg-neutral-50 hover:bg-[#d6d6d6] text-neutral-950 px-4 py-2 rounded-lg font-medium transition-colors"
+                  ? "w-full border-border bg-transparent hover:bg-card text-muted-foreground hover:text-foreground"
+                  : "w-full bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2 rounded-lg font-medium transition-colors"
               }`}
             >
               {isEditMode ? t("cancel") : t("edit_profile")}
@@ -1037,11 +1037,11 @@ const Profile = () => {
         )}
 
         {/* Personal Information */}
-        <Card className="bg-[#111111] border-[#1f1f23]">
+        <Card className="bg-card border-border">
           <CardHeader>
             <div className="flex items-center space-x-2">
-              <User className="h-5 w-5 text-gray-400" />
-              <CardTitle className="text-white text-lg">
+              <User className="h-5 w-5 text-muted-foreground" />
+              <CardTitle className="text-foreground text-lg">
                 {t("personal_information")}
               </CardTitle>
             </div>
@@ -1058,9 +1058,9 @@ const Profile = () => {
                 readOnly={!isEditMode}
                 className={`${
                   isEditMode
-                    ? "bg-[#0a0a0a] border-[#1f1f23]"
-                    : "bg-[#1a1a1a] border-[#1f1f23]"
-                } text-white placeholder:text-gray-500 focus:border-gray-400`}
+                    ? "bg-background border-border"
+                    : "bg-card border-border"
+                } text-foreground placeholder:text-muted-foreground focus:border-ring`}
               />
               <RequiredInput
                 label={t("last_name")}
@@ -1070,9 +1070,9 @@ const Profile = () => {
                 readOnly={!isEditMode}
                 className={`${
                   isEditMode
-                    ? "bg-[#0a0a0a] border-[#1f1f23]"
-                    : "bg-[#1a1a1a] border-[#1f1f23]"
-                } text-white placeholder:text-gray-500 focus:border-gray-400`}
+                    ? "bg-background border-border"
+                    : "bg-card border-border"
+                } text-foreground placeholder:text-muted-foreground focus:border-ring`}
               />
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1085,9 +1085,9 @@ const Profile = () => {
                 required
                 className={`${
                   isEditMode
-                    ? "bg-[#0a0a0a] border-[#1f1f23]"
-                    : "bg-[#1a1a1a] border-[#1f1f23]"
-                } text-white placeholder:text-gray-500 focus:border-gray-400`}
+                    ? "bg-background border-border"
+                    : "bg-card border-border"
+                } text-foreground placeholder:text-muted-foreground focus:border-ring`}
               />
               <PhoneInputComponent
                 label={t("phone")}
@@ -1106,9 +1106,9 @@ const Profile = () => {
                 readOnly={!isEditMode}
                 className={`${
                   isEditMode
-                    ? "bg-[#0a0a0a] border-[#1f1f23]"
-                    : "bg-[#1a1a1a] border-[#1f1f23]"
-                } text-white placeholder:text-gray-500 focus:border-gray-400`}
+                    ? "bg-background border-border"
+                    : "bg-card border-border"
+                } text-foreground placeholder:text-muted-foreground focus:border-ring`}
               />
                <SimpleDatePicker
                  label={t("date_of_birth")}
@@ -1118,7 +1118,7 @@ const Profile = () => {
               />
             </div>
             <div className="space-y-2">
-               <Label className="text-sm font-medium text-gray-300">
+               <Label className="text-sm font-medium text-muted-foreground">
                  {t("address")}
                </Label>
               <AddressAutoComplete
@@ -1131,9 +1131,9 @@ const Profile = () => {
                 showInlineError={false}
                 className={`${
                   isEditMode
-                    ? "bg-[#0a0a0a] border-[#1f1f23]"
-                    : "bg-[#1a1a1a] border-[#1f1f23]"
-                } text-white placeholder:text-gray-500 focus:border-gray-400`}
+                    ? "bg-background border-border"
+                    : "bg-card border-border"
+                } text-foreground placeholder:text-muted-foreground focus:border-ring`}
                 readOnly={!isEditMode}
               />
             </div>
@@ -1141,10 +1141,10 @@ const Profile = () => {
         </Card>
 
         {/* Emergency Contact */}
-        <Card className="bg-[#111111] border-[#1f1f23]">
+        <Card className="bg-card border-border">
           <CardHeader>
             <div className="flex items-center space-x-2">
-               <CardTitle className="text-white text-lg">
+               <CardTitle className="text-foreground text-lg">
                  {t("emergency_contact")}
                </CardTitle>
             </div>
@@ -1161,9 +1161,9 @@ const Profile = () => {
                 readOnly={!isEditMode}
                 className={`${
                   isEditMode
-                    ? "bg-[#0a0a0a] border-[#1f1f23]"
-                    : "bg-[#1a1a1a] border-[#1f1f23]"
-                } text-white placeholder:text-gray-500 focus:border-gray-400`}
+                    ? "bg-background border-border"
+                    : "bg-card border-border"
+                } text-foreground placeholder:text-muted-foreground focus:border-ring`}
               />
               <RequiredInput
                  label={t("relationship")}
@@ -1178,9 +1178,9 @@ const Profile = () => {
                 readOnly={!isEditMode}
                 className={`${
                   isEditMode
-                    ? "bg-[#0a0a0a] border-[#1f1f23]"
-                    : "bg-[#1a1a1a] border-[#1f1f23]"
-                } text-white placeholder:text-gray-500 focus:border-gray-400`}
+                    ? "bg-background border-border"
+                    : "bg-card border-border"
+                } text-foreground placeholder:text-muted-foreground focus:border-ring`}
               />
             </div>
             <PhoneInputComponent
@@ -1194,15 +1194,15 @@ const Profile = () => {
         </Card>
 
         {/* Documents for Therapist */}
-        <Card className="bg-[#111111] border-[#1f1f23]">
+        <Card className="bg-card border-border">
           <CardHeader>
             <div className="flex items-center space-x-2">
-              <FileUp className="h-5 w-5 text-gray-400" />
-               <CardTitle className="text-white text-lg">
+              <FileUp className="h-5 w-5 text-muted-foreground" />
+               <CardTitle className="text-foreground text-lg">
                  {t("documents_for_therapist")}
                </CardTitle>
              </div>
-             <CardDescription className="text-gray-400 text-sm">
+             <CardDescription className="text-muted-foreground text-sm">
                {t("upload_documents_therapist_requested")}
              </CardDescription>
           </CardHeader>
@@ -1218,21 +1218,21 @@ const Profile = () => {
         </Card>
 
         {/* Security Settings */}
-        <Card className="bg-[#111111] border-[#1f1f23]">
+        <Card className="bg-card border-border">
           <CardHeader>
             <div className="flex items-center space-x-2">
-              <Shield className="h-5 w-5 text-gray-400" />
-               <CardTitle className="text-white text-lg">
+              <Shield className="h-5 w-5 text-muted-foreground" />
+               <CardTitle className="text-foreground text-lg">
                  {t("security_privacy")}
                </CardTitle>
              </div>
-             <CardDescription className="text-gray-400 text-sm">
+             <CardDescription className="text-muted-foreground text-sm">
                {t("manage_account_security")}
              </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-               <Label htmlFor="currentPassword" className="text-gray-300">
+               <Label htmlFor="currentPassword" className="text-muted-foreground">
                  {t("current_password")}
                </Label>
               <Input
@@ -1244,9 +1244,9 @@ const Profile = () => {
                 readOnly={!isEditMode}
                 className={`${
                   isEditMode
-                    ? "bg-[#0a0a0a] border-[#1f1f23] text-white"
-                    : "bg-[#1a1a1a] border-[#1f1f23] text-gray-500"
-                } placeholder:text-gray-500 focus:border-gray-400`}
+                    ? "bg-background border-border text-foreground"
+                    : "bg-card border-border text-muted-foreground"
+                } placeholder:text-muted-foreground focus:border-ring`}
               />
             </div>
 
@@ -1258,16 +1258,16 @@ const Profile = () => {
                 onChange={setNewPassword}
                 className={`${
                   isEditMode
-                    ? "bg-[#0a0a0a] border-[#1f1f23] text-white"
-                    : "bg-[#1a1a1a] border-[#1f1f23] text-gray-500"
-                } placeholder:text-gray-500 focus:border-gray-400`}
+                    ? "bg-background border-border text-foreground"
+                    : "bg-card border-border text-muted-foreground"
+                } placeholder:text-muted-foreground focus:border-ring`}
                 readOnly={!isEditMode}
                 state={isEditMode ? "default" : "always"}
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword" className="text-gray-300">
+              <Label htmlFor="confirmPassword" className="text-muted-foreground">
                 {t("confirm_new_password")}
               </Label>
               <Input
@@ -1279,9 +1279,9 @@ const Profile = () => {
                 readOnly={!isEditMode}
                 className={`${
                   isEditMode
-                    ? "bg-[#0a0a0a] border-[#1f1f23] text-white"
-                    : "bg-[#1a1a1a] border-[#1f1f23] text-gray-500"
-                } placeholder:text-gray-500 focus:border-gray-400`}
+                    ? "bg-background border-border text-foreground"
+                    : "bg-card border-border text-muted-foreground"
+                } placeholder:text-muted-foreground focus:border-ring`}
               />
             </div>
           </CardContent>
@@ -1293,13 +1293,13 @@ const Profile = () => {
             <Button
               variant="outline"
               onClick={handleCancel}
-              className="border-[#333] bg-transparent hover:bg-[#1a1a1a] text-gray-300 hover:text-white"
+              className="border-border bg-transparent hover:bg-card text-muted-foreground hover:text-foreground"
             >
               {t("cancel")}
             </Button>
             <Button
               onClick={handleSave}
-              className="bg-neutral-50 hover:bg-[#d6d6d6] text-neutral-950 px-6 py-2 rounded-lg font-medium transition-colors"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-2 rounded-lg font-medium transition-colors"
             >
               {t("save_changes")}
             </Button>

@@ -104,10 +104,10 @@ export function ChartAreaGradient({ period = "month" }: ChartAreaGradientProps) 
   const labels = getPeriodLabels(period);
 
   return (
-    <Card className="bg-[#111111] border-[#1f1f23]">
+    <Card className="bg-card border-border">
       <CardHeader>
-        <CardTitle className="text-white">{labels.title}</CardTitle>
-        <CardDescription className="text-gray-400">
+        <CardTitle className="text-foreground">{labels.title}</CardTitle>
+        <CardDescription className="text-muted-foreground">
           {labels.description}
         </CardDescription>
       </CardHeader>
@@ -121,21 +121,21 @@ export function ChartAreaGradient({ period = "month" }: ChartAreaGradientProps) 
               right: 12,
             }}
           >
-            <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="#2a2a2a" />
+            <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="hsl(var(--border))" />
             <XAxis
               dataKey="day"
               tickLine={false}
               axisLine={false}
               tickMargin={8}
-              tick={{ fill: "#9ca3af", fontSize: 12 }}
+              tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }}
               tickFormatter={(value) => value.slice(0, 3)}
             />
             <ChartTooltip 
               cursor={false} 
               content={
                 <ChartTooltipContent
-                  className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
-                  labelClassName="text-gray-300"
+                  className="bg-card border-border text-foreground"
+                  labelClassName="text-muted-foreground"
                 />
               } 
             />
@@ -187,10 +187,10 @@ export function ChartAreaGradient({ period = "month" }: ChartAreaGradientProps) 
       <CardFooter>
         <div className="flex w-full items-start gap-2 text-sm">
           <div className="grid gap-2">
-            <div className="flex items-center gap-2 leading-none font-medium text-white">
+            <div className="flex items-center gap-2 leading-none font-medium text-foreground">
               {t("trending_up_by")} {labels.change} {t("this_period")} <TrendingUp className="h-4 w-4 text-green-500" />
             </div>
-            <div className="text-gray-400 flex items-center gap-2 leading-none">
+            <div className="text-muted-foreground flex items-center gap-2 leading-none">
               {t("showing_data_for")} {labels.footer}
             </div>
           </div>

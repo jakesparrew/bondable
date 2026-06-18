@@ -37,7 +37,7 @@ const TherapistAvatar = ({ therapistId, name }: { therapistId: string; name: str
   return (
     <Avatar className="w-8 h-8">
       <AvatarImage src={avatarUrl} alt={name} className="non-invertable" />
-      <AvatarFallback className="bg-[#27272a] text-white text-xs">
+      <AvatarFallback className="bg-muted text-foreground text-xs">
         {name.split(' ').map(n => n[0]).join('')}
       </AvatarFallback>
     </Avatar>
@@ -125,8 +125,8 @@ export const TherapistSharingSelector = ({
           variant="outline" 
           size="sm" 
           onClick={handlePrivateClick}
-          className={`border-[#333] hover:bg-[#2a2a2a] text-gray-300 hover:text-white rounded-lg px-3 py-1.5 font-medium ${
-            isPrivate ? "bg-[#2a2a2a] text-white" : "bg-[#1a1a1a]"
+          className={`border-border hover:bg-muted text-muted-foreground hover:text-foreground rounded-lg px-3 py-1.5 font-medium ${
+            isPrivate ? "bg-muted text-foreground" : "bg-card"
           }`}
         >
           <Lock className="w-3 h-3 mr-1" />
@@ -139,8 +139,8 @@ export const TherapistSharingSelector = ({
               variant="outline"
               size="sm"
               disabled={loading || connectedTherapists.length === 0}
-              className={`border-[#333] hover:bg-[#2a2a2a] text-gray-300 hover:text-white rounded-lg px-3 py-1.5 font-medium ${
-                !isPrivate ? "bg-[#2a2a2a] text-white" : "bg-[#1a1a1a]"
+              className={`border-border hover:bg-muted text-muted-foreground hover:text-foreground rounded-lg px-3 py-1.5 font-medium ${
+                !isPrivate ? "bg-muted text-foreground" : "bg-card"
               } disabled:opacity-50 disabled:cursor-not-allowed`}
             >
               <Users className="w-3 h-3 mr-1" />
@@ -149,10 +149,10 @@ export const TherapistSharingSelector = ({
           </DropdownMenuTrigger>
           <DropdownMenuContent 
             align="start" 
-            className="w-64 bg-[#1a1a1a] border-[#1f1f23] text-white z-50"
+            className="w-64 bg-card border-border text-foreground z-50"
           >
             {connectedTherapists.length === 0 ? (
-              <div className="p-3 text-center text-gray-400 text-sm">
+              <div className="p-3 text-center text-muted-foreground text-sm">
                 {t("no_connected_therapists_found")}
               </div>
             ) : (
@@ -160,13 +160,13 @@ export const TherapistSharingSelector = ({
                 <DropdownMenuItem
                   key={therapist.id}
                   onClick={() => handleTherapistSelection(therapist)}
-                  className="p-3 cursor-pointer hover:bg-[#2a2a2a] focus:bg-[#2a2a2a] text-white"
+                  className="p-3 cursor-pointer hover:bg-muted focus:bg-muted text-foreground"
                 >
                   <div className="flex items-center space-x-3 w-full">
                     <TherapistAvatar therapistId={therapist.id} name={therapist.name} />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between">
-                        <h3 className="text-white font-medium text-sm truncate">
+                        <h3 className="text-foreground font-medium text-sm truncate">
                           {therapist.name}
                         </h3>
                         <div className="flex items-center gap-2">
@@ -175,7 +175,7 @@ export const TherapistSharingSelector = ({
                           )}
                         </div>
                       </div>
-                      <p className="text-gray-400 text-xs truncate">{therapist.specialty}</p>
+                      <p className="text-muted-foreground text-xs truncate">{therapist.specialty}</p>
                     </div>
                   </div>
                 </DropdownMenuItem>
@@ -192,13 +192,13 @@ export const TherapistSharingSelector = ({
             <Badge 
               key={therapist.id}
               variant="secondary"
-              className="bg-[#2a2a2a] text-gray-300 border-[#333] text-xs pr-1"
+              className="bg-muted text-muted-foreground border-border text-xs pr-1"
             >
               {therapist.name}
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-4 w-4 ml-1 hover:bg-[#3a3a3a] text-gray-400 hover:text-white"
+                className="h-4 w-4 ml-1 hover:bg-muted text-muted-foreground hover:text-foreground"
                 onClick={(e) => removeTherapist(therapist.id, e)}
               >
                 <X className="w-3 h-3" />

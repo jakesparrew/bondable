@@ -35,36 +35,36 @@ const ActivityFilters = ({
   const hasActiveFilters = activityFilter !== "all" || clientFilter !== "all" || timeFilter !== "all";
 
   return (
-    <Card className="bg-[#111111] border-[#1f1f23] mb-4">
+    <Card className="bg-card border-border mb-4">
       <CardContent className="pt-6">
         <div className="flex flex-wrap gap-4 items-center">
           <div className="flex-1 min-w-[150px]">
-            <label className="text-sm text-gray-400 mb-1 block">{t('activity_type')}</label>
+            <label className="text-sm text-muted-foreground mb-1 block">{t('activity_type')}</label>
             <Select value={activityFilter} onValueChange={onActivityFilterChange}>
-              <SelectTrigger className="bg-[#1a1a1a] border-[#1f1f23] text-white">
+              <SelectTrigger className="bg-background border-border text-foreground">
                 <SelectValue placeholder={t('all_activities')} />
               </SelectTrigger>
-              <SelectContent className="bg-[#1a1a1a] border-[#1f1f23]">
-                <SelectItem value="all" className="text-white hover:bg-[#2a2a2a]">{t('all_activities_cap')}</SelectItem>
-                <SelectItem value="session" className="text-white hover:bg-[#2a2a2a]">{t('sessions')}</SelectItem>
-                <SelectItem value="message" className="text-white hover:bg-[#2a2a2a]">{t('messages')}</SelectItem>
-                <SelectItem value="task" className="text-white hover:bg-[#2a2a2a]">{t('tasks')}</SelectItem>
-                <SelectItem value="journal" className="text-white hover:bg-[#2a2a2a]">{t('journal')}</SelectItem>
+              <SelectContent className="bg-card border-border">
+                <SelectItem value="all" className="text-foreground hover:bg-muted">{t('all_activities_cap')}</SelectItem>
+                <SelectItem value="session" className="text-foreground hover:bg-muted">{t('sessions')}</SelectItem>
+                <SelectItem value="message" className="text-foreground hover:bg-muted">{t('messages')}</SelectItem>
+                <SelectItem value="task" className="text-foreground hover:bg-muted">{t('tasks')}</SelectItem>
+                <SelectItem value="journal" className="text-foreground hover:bg-muted">{t('journal')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           {showClientFilter && (
             <div className="flex-1 min-w-[150px]">
-              <label className="text-sm text-gray-400 mb-1 block">{t(clientFilterLabel)}</label>
+              <label className="text-sm text-muted-foreground mb-1 block">{t(clientFilterLabel)}</label>
               <Select value={clientFilter} onValueChange={onClientFilterChange}>
-                <SelectTrigger className="bg-[#1a1a1a] border-[#1f1f23] text-white">
+                <SelectTrigger className="bg-background border-border text-foreground">
                   <SelectValue placeholder={`${t('all')} ${t(clientFilterLabel)}s`} />
                 </SelectTrigger>
-                <SelectContent className="bg-[#1a1a1a] border-[#1f1f23]">
-                  <SelectItem value="all" className="text-white hover:bg-[#2a2a2a]">{t('all')} {t(clientFilterLabel)}s</SelectItem>
+                <SelectContent className="bg-card border-border">
+                  <SelectItem value="all" className="text-foreground hover:bg-muted">{t('all')} {t(clientFilterLabel)}s</SelectItem>
                   {availableClients.map((client) => (
-                    <SelectItem key={client} value={client} className="text-white hover:bg-[#2a2a2a]">
+                    <SelectItem key={client} value={client} className="text-foreground hover:bg-muted">
                        {t(client)}
                     </SelectItem>
                   ))}
@@ -74,16 +74,16 @@ const ActivityFilters = ({
           )}
 
           <div className="flex-1 min-w-[150px]">
-            <label className="text-sm text-gray-400 mb-1 block">{t('time_period')}</label>
+            <label className="text-sm text-muted-foreground mb-1 block">{t('time_period')}</label>
             <Select value={timeFilter} onValueChange={onTimeFilterChange}>
-              <SelectTrigger className="bg-[#1a1a1a] border-[#1f1f23] text-white">
+              <SelectTrigger className="bg-background border-border text-foreground">
                 <SelectValue placeholder={t('all_time')} />
               </SelectTrigger>
-              <SelectContent className="bg-[#1a1a1a] border-[#1f1f23]">
-                <SelectItem value="all" className="text-white hover:bg-[#2a2a2a]">{t('all_time_cap')}</SelectItem>
-                <SelectItem value="today" className="text-white hover:bg-[#2a2a2a]">{t('today')}</SelectItem>
-                <SelectItem value="week" className="text-white hover:bg-[#2a2a2a]">{t('this_week')}</SelectItem>
-                <SelectItem value="month" className="text-white hover:bg-[#2a2a2a]">{t('this_month')}</SelectItem>
+              <SelectContent className="bg-card border-border">
+                <SelectItem value="all" className="text-foreground hover:bg-muted">{t('all_time_cap')}</SelectItem>
+                <SelectItem value="today" className="text-foreground hover:bg-muted">{t('today')}</SelectItem>
+                <SelectItem value="week" className="text-foreground hover:bg-muted">{t('this_week')}</SelectItem>
+                <SelectItem value="month" className="text-foreground hover:bg-muted">{t('this_month')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -93,7 +93,7 @@ const ActivityFilters = ({
             variant="outline"
             size="sm"
             onClick={onClearFilters}
-            className="h-[38px] px-3 mt-[24px] bg-[#1a1a1a] border-[#1f1f23] text-gray-400 hover:bg-[#2a2a2a] hover:text-white flex items-center"
+            className="h-[38px] px-3 mt-[24px] bg-background border-border text-muted-foreground hover:bg-muted hover:text-foreground flex items-center"
           >
             <X className="h-4 w-4 mr-1" />
             {t('clear')}

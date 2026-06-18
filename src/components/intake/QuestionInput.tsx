@@ -29,7 +29,7 @@ export function QuestionInput({
         {(q.options ?? []).map((o) => (
           <div key={o.id} className="flex items-center gap-2">
             <RadioGroupItem value={o.id} id={`${q.id}-${o.id}`} />
-            <label htmlFor={`${q.id}-${o.id}`} className="text-sm text-gray-200">{o.label}</label>
+            <label htmlFor={`${q.id}-${o.id}`} className="text-sm text-foreground">{o.label}</label>
           </div>
         ))}
       </RadioGroup>
@@ -46,7 +46,7 @@ export function QuestionInput({
         {(q.options ?? []).map((o) => (
           <div key={o.id} className="flex items-center gap-2">
             <Checkbox checked={ids.includes(o.id)} onCheckedChange={() => toggle(o.id)} id={`${q.id}-${o.id}`} />
-            <label htmlFor={`${q.id}-${o.id}`} className="text-sm text-gray-200">{o.label}</label>
+            <label htmlFor={`${q.id}-${o.id}`} className="text-sm text-foreground">{o.label}</label>
           </div>
         ))}
       </div>

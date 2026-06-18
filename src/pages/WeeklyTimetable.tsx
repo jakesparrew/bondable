@@ -143,7 +143,7 @@ const WeeklyTimetable = () => {
     const isToday = format(currentDay, 'yyyy-MM-dd') === format(today, 'yyyy-MM-dd');
 
     return (
-      <Card className="bg-[#111111] border-[#1f1f23]">
+      <Card className="bg-card border-border">
         <CardHeader>
           <div className="flex items-center justify-between">
             <Button
@@ -151,21 +151,21 @@ const WeeklyTimetable = () => {
               size="sm"
               onClick={() => navigateDay('prev')}
               disabled={currentDayIndex === 0}
-              className="text-gray-400 hover:text-white hover:bg-[#1f1f23] h-9 w-9 p-0"
+              className="text-muted-foreground hover:text-foreground hover:bg-muted h-9 w-9 p-0"
             >
               <ChevronLeft className="h-4 w-4" />
             </Button>
-            
+
             <div className="text-center">
-              <CardTitle className={`text-lg ${isToday ? 'text-white' : 'text-gray-300'}`}>
+              <CardTitle className={`text-lg ${isToday ? 'text-foreground' : 'text-muted-foreground'}`}>
                 {formatDate(currentDay, "EEEE")}
               </CardTitle>
-              <p className="text-sm text-gray-400 mt-1">
+              <p className="text-sm text-muted-foreground mt-1">
                 {formatDate(currentDay, "MMMM d, yyyy")}
               </p>
               <div className="flex items-center justify-center space-x-1 mt-2">
-                <Clock className="h-3 w-3 text-gray-500" />
-                <span className="text-xs text-gray-500">
+                <Clock className="h-3 w-3 text-muted-foreground" />
+                <span className="text-xs text-muted-foreground">
                   {availableCount} available slot{availableCount !== 1 ? 's' : ''}
                 </span>
               </div>
@@ -176,7 +176,7 @@ const WeeklyTimetable = () => {
               size="sm"
               onClick={() => navigateDay('next')}
               disabled={currentDayIndex === 6}
-              className="text-gray-400 hover:text-white hover:bg-[#1f1f23] h-9 w-9 p-0"
+              className="text-muted-foreground hover:text-foreground hover:bg-muted h-9 w-9 p-0"
             >
               <ChevronRight className="h-4 w-4" />
             </Button>
@@ -186,10 +186,10 @@ const WeeklyTimetable = () => {
           <ScrollArea className="w-full">
             <div className="grid grid-cols-2 gap-2">
               {/* Time column */}
-              <div className="text-center font-medium text-gray-300 py-3">
+              <div className="text-center font-medium text-muted-foreground py-3">
                 {t("time")}
               </div>
-              <div className="text-center font-medium text-gray-300 py-3">
+              <div className="text-center font-medium text-muted-foreground py-3">
                 {formatDate(currentDay, "EEE, MMM d")}
               </div>
 
@@ -201,7 +201,7 @@ const WeeklyTimetable = () => {
                 return (
                   <React.Fragment key={time}>
                     {/* Time label */}
-                    <div className="flex items-center justify-center py-2 text-sm text-gray-400 border-r border-[#1f1f23]">
+                    <div className="flex items-center justify-center py-2 text-sm text-muted-foreground border-r border-border">
                       {time}
                     </div>
                     
@@ -212,8 +212,8 @@ const WeeklyTimetable = () => {
                         size="sm"
                         className={`w-full h-8 text-xs ${
                           isAvailable
-                            ? "bg-neutral-50 hover:bg-[#d6d6d6] text-neutral-950"
-                            : "bg-[#1a1a1a] border-[#333] text-gray-400 hover:bg-[#1f1f23] hover:text-gray-300"
+                            ? "bg-primary hover:bg-primary/90 text-primary-foreground"
+                            : "bg-card border-border text-muted-foreground hover:bg-muted hover:text-foreground"
                         }`}
                         onClick={() => handleTimeSlotToggle(dayKey, time)}
                       >
@@ -232,22 +232,22 @@ const WeeklyTimetable = () => {
 
   // Desktop full grid view
   const renderDesktopGridView = () => (
-    <Card className="bg-[#111111] border-[#1f1f23]">
+    <Card className="bg-card border-border">
       <CardHeader>
         <div className="flex items-center space-x-2">
-          <Clock className="h-5 w-5 text-gray-400" />
-          <CardTitle className="text-white text-lg">
+          <Clock className="h-5 w-5 text-muted-foreground" />
+          <CardTitle className="text-foreground text-lg">
             {t("availability_schedule")}
           </CardTitle>
         </div>
-        <CardDescription className="text-gray-400">
+        <CardDescription className="text-muted-foreground">
           {isEditMode ? t("click_time_slots_toggle") : t("full_week_view_slots")}
         </CardDescription>
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-8 gap-2">
           {/* Time column header */}
-          <div className="text-center font-medium text-gray-300 py-3">
+          <div className="text-center font-medium text-muted-foreground py-3">
             {t("time")}
           </div>
           
@@ -259,13 +259,13 @@ const WeeklyTimetable = () => {
             
             return (
               <div key={dayKey} className="text-center py-3">
-                <div className={`font-medium ${isToday ? 'text-neutral-50' : 'text-neutral-400'}`}>
+                <div className={`font-medium ${isToday ? 'text-foreground' : 'text-muted-foreground'}`}>
                   {formatDate(day, "EEE")}
                 </div>
-                <div className="text-xs text-gray-400 mt-1">
+                <div className="text-xs text-muted-foreground mt-1">
                   {formatDate(day, "MMM d")}
                 </div>
-                <div className="text-xs text-gray-500 mt-1">
+                <div className="text-xs text-muted-foreground mt-1">
                   {t("slots_count", { count: availableCount })}
                 </div>
               </div>
@@ -276,7 +276,7 @@ const WeeklyTimetable = () => {
           {defaultTimeSlots.map(({ time }) => (
             <div key={time} className="contents">
               {/* Time label */}
-              <div className="flex items-center justify-center py-2 text-sm text-gray-400 border-r border-[#1f1f23]">
+              <div className="flex items-center justify-center py-2 text-sm text-muted-foreground border-r border-border">
                 {time}
               </div>
               
@@ -294,8 +294,8 @@ const WeeklyTimetable = () => {
                       size="sm"
                       className={`w-full h-8 text-xs ${
                         isAvailable
-                          ? "bg-neutral-50 hover:bg-[#d6d6d6] text-neutral-950"
-                          : "bg-[#1a1a1a] border-[#333] text-gray-400 hover:bg-[#1f1f23] hover:text-gray-300"
+                          ? "bg-primary hover:bg-primary/90 text-primary-foreground"
+                          : "bg-card border-border text-muted-foreground hover:bg-muted hover:text-foreground"
                       } ${!isEditMode ? "cursor-default" : ""}`}
                       onClick={() => handleTimeSlotToggle(dayKey, time)}
                       disabled={!isEditMode}
@@ -322,7 +322,7 @@ const WeeklyTimetable = () => {
               variant="ghost"
               size="sm"
               onClick={() => navigate(`/dashboard/${userType}/profile`)}
-              className="text-gray-400 hover:text-white hover:bg-[#1f1f23] h-9 px-3"
+              className="text-muted-foreground hover:text-foreground hover:bg-muted h-9 px-3"
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
               {t("back_to_profile")}
@@ -332,16 +332,16 @@ const WeeklyTimetable = () => {
 
         {/* Week Navigation - Desktop Only */}
         {!isMobile && (
-          <Card className="bg-[#111111] border-[#1f1f23]">
+          <Card className="bg-card border-border">
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
-                  <Calendar className="h-5 w-5 text-gray-400" />
-                  <CardTitle className="text-white text-lg">
+                  <Calendar className="h-5 w-5 text-muted-foreground" />
+                  <CardTitle className="text-foreground text-lg">
                     {t("week_of", { date: formatDate(weekStart, "MMMM d, yyyy") })}
                   </CardTitle>
                 </div>
-                <div className="text-sm text-gray-400">
+                <div className="text-sm text-muted-foreground">
                   {isEditMode ? t("click_time_slots_toggle") : t("view_only_mode_enable_edit")}
                 </div>
               </div>

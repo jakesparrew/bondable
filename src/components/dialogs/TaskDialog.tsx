@@ -163,26 +163,26 @@ export default function TaskDialog({
       open={open} 
       onOpenChange={setOpen}
     >
-      <DialogContent 
-        className="bg-[#0a0a0a] border border-[#1f1f23] text-white max-w-2xl"
+      <DialogContent
+        className="bg-card border border-border text-foreground max-w-2xl"
         onCloseAutoFocus={(e) => {
           // Prevent auto focus to avoid focus trapping
           e.preventDefault();
         }}
       >
         <DialogHeader>
-          <DialogTitle className="text-white">{title}</DialogTitle>
+          <DialogTitle className="text-foreground">{title}</DialogTitle>
         </DialogHeader>
         <div className="mt-2 h-px w-full bg-gradient-to-r from-transparent via-[#3f3f3f] to-transparent " />
         <div className="space-y-4 overflow-y-auto scrollbar-hide ">
           {mode === "view" && task && (
-            <div className="grid grid-cols-2 gap-4 p-4 bg-[#111111] rounded-lg border border-[#1f1f23]">
+            <div className="grid grid-cols-2 gap-4 p-4 bg-card rounded-lg border border-border">
               <div>
-                <Label className="text-gray-400 text-xs">{t('task_id')}</Label>
+                <Label className="text-muted-foreground text-xs">{t('task_id')}</Label>
                 <p className="font-mono text-sm">{task.id}</p>
               </div>
               <div>
-                <Label className="text-gray-400 text-xs">{t('assigned_date')}</Label>
+                <Label className="text-muted-foreground text-xs">{t('assigned_date')}</Label>
                 <p className="text-sm">
                   {task.assignedDate ? new Date(task.assignedDate).toLocaleDateString() : t("n_a")}
                 </p>
@@ -191,7 +191,7 @@ export default function TaskDialog({
           )}
 
           <div>
-            <Label htmlFor="client" className="text-gray-300 ">
+            <Label htmlFor="client" className="text-muted-foreground ">
               {t("client")} <span className="text-red-400">*</span>
             </Label>
             <Select
@@ -202,13 +202,13 @@ export default function TaskDialog({
               disabled={isReadOnly}
               required
             >
-              <SelectTrigger className="bg-[#111111] border-[#1f1f23] text-white mt-2 !cursor-default">
+              <SelectTrigger className="bg-card border-border text-foreground mt-2 !cursor-default">
                 <SelectValue placeholder={t("select_client")} />
               </SelectTrigger>
-              <SelectContent className="bg-[#111111] border-[#1f1f23]">
+              <SelectContent className="bg-card border-border">
                 {clients.map((client) => (
                   <SelectItem
-                    className="text-neutral-400 data-[state=checked]:text-neutral-50 data-[highlighted]:!text-neutral-50"
+                    className="text-muted-foreground data-[state=checked]:text-neutral-50 data-[highlighted]:!text-neutral-50"
                     key={client.id}
                     value={client.id}
                   >
@@ -220,7 +220,7 @@ export default function TaskDialog({
           </div>
 
           <div className="pb-2">
-            <Label htmlFor="title" className="text-gray-300 ">
+            <Label htmlFor="title" className="text-muted-foreground ">
               {t("task_title")} <span className="text-red-400">*</span>
             </Label>
             <Input
@@ -230,15 +230,15 @@ export default function TaskDialog({
                 setFormData({ ...formData, title: e.target.value })
               }
               placeholder={t("enter_task_title")}
-              className="bg-[#111111] border-[#1f1f23] text-white mt-2"
+              className="bg-background border-border text-foreground mt-2"
               readOnly={isReadOnly}
               required
             />
           </div>
 
-          <div className="flex-1 bg-neutral-800 border border-neutral-700 text-white p-4 rounded-lg pt-2 ">
+          <div className="flex-1 bg-muted border border-border text-foreground p-4 rounded-lg pt-2 ">
             <div>
-              <Label htmlFor="description" className="text-gray-300">
+              <Label htmlFor="description" className="text-muted-foreground">
                 {t("description")}
               </Label>
               <Textarea
@@ -248,7 +248,7 @@ export default function TaskDialog({
                   setFormData({ ...formData, description: e.target.value })
                 }
                 placeholder={t("describe_task_purpose")}
-                className="bg-[#111111] border-[#1f1f23] text-white mt-2"
+                className="bg-background border-border text-foreground mt-2"
                 rows={4}
                 readOnly={isReadOnly}
               />
@@ -268,12 +268,12 @@ export default function TaskDialog({
                         }
                       }}
                     />
-                    <Label htmlFor="priority-checkbox" className="text-gray-300">
+                    <Label htmlFor="priority-checkbox" className="text-muted-foreground">
                       {t("set_priority")}
                     </Label>
                   </div>
                 ) : (
-                  <Label className="text-gray-300">{t('priority')}</Label>
+                  <Label className="text-muted-foreground">{t('priority')}</Label>
                 )}
                 
                 {(hasPriority || isReadOnly) && (
@@ -285,24 +285,24 @@ export default function TaskDialog({
                       }
                       disabled={isReadOnly}
                     >
-                      <SelectTrigger className="bg-[#111111] border-[#1f1f23] text-white">
+                      <SelectTrigger className="bg-card border-border text-foreground">
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent className="bg-[#111111] border-[#1f1f23]">
+                      <SelectContent className="bg-card border-border">
                         <SelectItem
-                          className="text-neutral-400 hover:!text-neutral-950 data-[state=checked]:text-neutral-50 data-[highlighted]:!text-neutral-950"
+                          className="text-muted-foreground hover:!text-neutral-950 data-[state=checked]:text-neutral-50 data-[highlighted]:!text-neutral-950"
                           value="low"
                         >
                           {t("low")}
                         </SelectItem>
                         <SelectItem
-                          className="text-neutral-400 hover:!text-neutral-950 data-[state=checked]:text-neutral-50 data-[highlighted]:!text-neutral-950"
+                          className="text-muted-foreground hover:!text-neutral-950 data-[state=checked]:text-neutral-50 data-[highlighted]:!text-neutral-950"
                           value="medium"
                         >
                           {t("medium")}
                         </SelectItem>
                         <SelectItem
-                          className="text-neutral-400 hover:!text-neutral-950 data-[state=checked]:text-neutral-50 data-[highlighted]:!text-neutral-950"
+                          className="text-muted-foreground hover:!text-neutral-950 data-[state=checked]:text-neutral-50 data-[highlighted]:!text-neutral-950"
                           value="high"
                         >
                           {t("high")}
@@ -326,12 +326,12 @@ export default function TaskDialog({
                         }
                       }}
                     />
-                    <Label htmlFor="duedate-checkbox" className="text-gray-300">
+                    <Label htmlFor="duedate-checkbox" className="text-muted-foreground">
                       {t("set_due_date")}
                     </Label>
                   </div>
                 ) : (
-                  <Label className="text-gray-300">{t('due_date')}</Label>
+                  <Label className="text-muted-foreground">{t('due_date')}</Label>
                 )}
                 
                 {(hasDueDate || isReadOnly) && (
@@ -350,7 +350,7 @@ export default function TaskDialog({
           </div>
 
           <div>
-            <Label htmlFor="notes" className="text-gray-300">
+            <Label htmlFor="notes" className="text-muted-foreground">
               {t("additional_notes")}
             </Label>
             <Textarea
@@ -360,7 +360,7 @@ export default function TaskDialog({
                 setFormData({ ...formData, notes: e.target.value })
               }
               placeholder={t("additional_instructions")}
-              className="bg-[#111111] border-[#1f1f23] text-white mt-2"
+              className="bg-background border-border text-foreground mt-2"
               rows={3}
               readOnly={isReadOnly}
             />
@@ -368,8 +368,8 @@ export default function TaskDialog({
 
           {/* Client Status Update Section */}
           {userType === "client" && mode === "view" && task && task.status === "assigned" && (
-            <div className="space-y-4 p-4 bg-[#111111] rounded-lg border border-[#1f1f23]">
-              <Label className="text-gray-300">{t('update_task_status')}</Label>
+            <div className="space-y-4 p-4 bg-card rounded-lg border border-border">
+              <Label className="text-muted-foreground">{t('update_task_status')}</Label>
               <div className="flex gap-2">
                 <Button
                   onClick={() => handleStatusChange("in-progress")}
@@ -393,12 +393,12 @@ export default function TaskDialog({
               
               {showDeniedReason && (
                 <div className="space-y-2">
-                  <Label className="text-gray-300">{t("reason_for_declining")}</Label>
+                  <Label className="text-muted-foreground">{t("reason_for_declining")}</Label>
                   <Textarea
                     value={deniedReason}
                     onChange={(e) => setDeniedReason(e.target.value)}
                     placeholder={t("explain_declining_task")}
-                    className="bg-[#111111] border-[#1f1f23] text-white"
+                    className="bg-background border-border text-foreground"
                     rows={3}
                   />
                   <div className="flex gap-2">
@@ -412,7 +412,7 @@ export default function TaskDialog({
                     <Button
                       onClick={() => setShowDeniedReason(false)}
                       variant="outline"
-                      className="border-[#333] bg-transparent hover:bg-[#1a1a1a] text-gray-300"
+                      className="border-border bg-transparent hover:bg-muted text-muted-foreground"
                     >
                       {t("cancel")}
                     </Button>
@@ -427,13 +427,13 @@ export default function TaskDialog({
               <Button
                 variant="outline"
                 onClick={() => setOpen(false)}
-                className="border-[#333] bg-transparent hover:bg-[#1a1a1a] text-gray-300"
+                className="border-border bg-transparent hover:bg-muted text-muted-foreground"
               >
                 {t("cancel")}
               </Button>
               <Button
                 onClick={handleSave}
-                className="bg-white text-black hover:bg-gray-200"
+                className="bg-primary text-primary-foreground hover:bg-primary/90"
               >
                 {mode === "add" ? t("assign_task") : t("save_changes")}
               </Button>

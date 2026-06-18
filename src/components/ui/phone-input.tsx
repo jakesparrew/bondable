@@ -77,15 +77,15 @@ export function PhoneInputComponent({
 
   return (
     <div className="space-y-2" dir="ltr">
-      <Label htmlFor={id} className="text-gray-300 flex mt-2">
-        {label}{required && <span className="text-red-400">&nbsp;*</span>}<div className="text-xs text-gray-500 ml-4">{selectedCountryCode} {phoneNumber}</div>
+      <Label htmlFor={id} className="text-muted-foreground flex mt-2">
+        {label}{required && <span className="text-red-400">&nbsp;*</span>}<div className="text-xs text-muted-foreground ml-4">{selectedCountryCode} {phoneNumber}</div>
       </Label>
       <div className="flex rounded-md shadow-xs">
         {/* Country Code Selector */}
         <div
           className={cn(
-            "border-[#1f1f23] bg-[#0a0a0a] text-muted-foreground focus-within:border-ring focus-within:ring-ring/50 hover:bg-accent hover:text-foreground relative inline-flex items-center self-stretch rounded-s-md border py-2 ps-3 pe-2 transition-[color,box-shadow] outline-none focus-within:z-10 focus-within:ring-[3px]",
-            disabled && readOnly && "bg-[#1a1a1a] cursor-not-allowed pointer-events-none"
+            "border-border bg-background text-muted-foreground focus-within:border-ring focus-within:ring-ring/50 hover:bg-accent hover:text-foreground relative inline-flex items-center self-stretch rounded-s-md border py-2 ps-3 pe-2 transition-[color,box-shadow] outline-none focus-within:z-10 focus-within:ring-[3px]",
+            disabled && readOnly && "bg-muted cursor-not-allowed pointer-events-none"
           )}
         >
           <div className="inline-flex items-center gap-1" aria-hidden="true">
@@ -121,8 +121,8 @@ export function PhoneInputComponent({
           onChange={handlePhoneChange}
           readOnly={readOnly}
           className={cn(
-            "-ms-px rounded-s-none shadow-none focus-visible:z-10 bg-[#0a0a0a] border-[#1f1f23] text-white placeholder:text-gray-500 focus:border-gray-400",
-            disabled && readOnly && "bg-[#1a1a1a] "
+            "-ms-px rounded-s-none shadow-none focus-visible:z-10 bg-background border-border text-foreground placeholder:text-muted-foreground focus:border-ring",
+            disabled && readOnly && "bg-muted "
           )}
         />
       </div>

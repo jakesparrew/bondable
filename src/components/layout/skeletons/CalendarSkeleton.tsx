@@ -23,7 +23,7 @@ const CalendarSkeleton = ({ userType }: CalendarSkeletonProps) => {
         </div>
 
         {/* Calendar Grid */}
-        <Card className="bg-[#111111] border-[#1f1f23]">
+        <Card className="bg-muted border-border">
           <CardContent className="p-3 sm:p-6">
             {/* Day headers */}
             <div className="grid grid-cols-3 gap-1 sm:gap-2 mb-4">
@@ -36,7 +36,7 @@ const CalendarSkeleton = ({ userType }: CalendarSkeletonProps) => {
             {/* Calendar days */}
             <div className="grid grid-cols-3 gap-1 sm:gap-2">
               {Array.from({ length: 21 }).map((_, i) => (
-                <div key={i} className="h-[7rem] sm:h-24 border border-[#1f1f23] rounded p-1 sm:p-2 hover:bg-[#1a1a1a]">
+                <div key={i} className="h-[7rem] sm:h-24 border border-border rounded p-1 sm:p-2 hover:bg-muted">
                   <Skeleton className="h-3 sm:h-4 w-4 sm:w-6 mb-1 sm:mb-2" />
                   {Math.random() > 0.3 && (
                     <Skeleton className="h-1 sm:h-2 w-full mb-1" />

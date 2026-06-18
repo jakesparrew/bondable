@@ -68,28 +68,28 @@ const getFileIcon = (fileType: string, fileName: string) => {
     fileName.endsWith(".doc") ||
     fileName.endsWith(".docx")
   ) {
-    return <FileText className="w-4 h-4 text-gray-400" />;
+    return <FileText className="w-4 h-4 text-muted-foreground" />;
   } else if (
     fileType.includes("zip") ||
     fileType.includes("archive") ||
     fileName.endsWith(".zip") ||
     fileName.endsWith(".rar")
   ) {
-    return <FileArchive className="w-4 h-4 text-gray-400" />;
+    return <FileArchive className="w-4 h-4 text-muted-foreground" />;
   } else if (
     fileType.includes("excel") ||
     fileName.endsWith(".xls") ||
     fileName.endsWith(".xlsx")
   ) {
-    return <FileSpreadsheet className="w-4 h-4 text-gray-400" />;
+    return <FileSpreadsheet className="w-4 h-4 text-muted-foreground" />;
   } else if (fileType.includes("video/")) {
-    return <Video className="w-4 h-4 text-gray-400" />;
+    return <Video className="w-4 h-4 text-muted-foreground" />;
   } else if (fileType.includes("audio/")) {
-    return <Headphones className="w-4 h-4 text-gray-400" />;
+    return <Headphones className="w-4 h-4 text-muted-foreground" />;
   } else if (fileType.startsWith("image/")) {
-    return <ImageIcon className="w-4 h-4 text-gray-400" />;
+    return <ImageIcon className="w-4 h-4 text-muted-foreground" />;
   }
-  return <File className="w-4 h-4 text-gray-400" />;
+  return <File className="w-4 h-4 text-muted-foreground" />;
 };
 
 export const JournalEntryCard = ({
@@ -145,17 +145,17 @@ export const JournalEntryCard = ({
 
   return (
     <>
-      <Card className="bg-[#111111] border-[#1f1f23]">
+      <Card className="bg-card border-border">
         <CardContent className="p-4">
           <div className="flex justify-between items-start ">
-            <div className="flex items-center gap-2 text-sm text-gray-400">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Calendar className="w-4 h-4" />
               <span>{formatDate(entry.date)}</span>
               <span>•</span>
               <span>{formatTime(entry.date)}</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="flex items-center gap-1 text-xs text-gray-500">
+              <div className="flex items-center gap-1 text-xs text-muted-foreground">
                 {entry.sharing === "private" ? (
                   <>
                     <Lock className="w-3 h-3" />
@@ -187,25 +187,25 @@ export const JournalEntryCard = ({
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="h-8 w-8 text-gray-400 hover:text-white hover:bg-[#1f1f23]"
+                    className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-muted"
                   >
                     <MoreHorizontal className="w-4 h-4" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="bg-[#111111] border-[#1f1f23] text-white">
+                <DropdownMenuContent className="bg-card border-border text-foreground">
                   <DropdownMenuItem
                     onClick={() => {
                       setDropdownOpen(false);
                       setDialogOpen(true);
                     }}
-                    className="focus:bg-[#1f1f23] text-neutral-400 hover:!bg-neutral-800 hover:!text-neutral-300"
+                    className="focus:bg-muted text-muted-foreground hover:!bg-muted hover:!text-muted-foreground"
                   >
                     <Pencil className="w-4 h-4 mr-2" />
                     {t("edit")}
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={handleDelete}
-                    className=" focus:bg-[#1f1f23] text-red-400 hover:!bg-neutral-800 hover:!text-neutral-300"
+                    className=" focus:bg-muted text-red-400 hover:!bg-muted hover:!text-muted-foreground"
                   >
                     <Trash2 className="w-4 h-4 mr-2" />
                     {t("delete")}
@@ -215,7 +215,7 @@ export const JournalEntryCard = ({
             </div>
           </div>
 
-          <div className="text-white leading-relaxed mb-3">
+          <div className="text-foreground leading-relaxed mb-3">
             {entry.content.split("\n").map((paragraph, index) => (
               <p key={index} className="mb-2 last:mb-0">
                 {paragraph}
@@ -227,7 +227,7 @@ export const JournalEntryCard = ({
             <>
               <div className="mb-3 -mt-1 h-px w-full bg-gradient-to-r from-transparent via-[#3f3f3f] to-transparent" />
               <div className="space-y-3">
-                <div className="text-xs text-gray-400 mb-2">
+                <div className="text-xs text-muted-foreground mb-2">
                   {images.length > 0 && `${t("images")} (${images.length})`}
                   {images.length > 0 && files.length > 0 && " / "}
                   {files.length > 0 && `${t("files")} (${files.length})`}
@@ -241,13 +241,13 @@ export const JournalEntryCard = ({
                         src={image.url || "/placeholder.svg"}
                         alt={image.name}
                         trigger={
-                          <div className="flex items-center gap-3 p-2 bg-[#0a0a0a] border border-[#1f1f23] rounded cursor-pointer hover:opacity-80 transition-opacity">
-                            <div className="flex items-center justify-center w-8 h-8 border border-[#1f1f23] rounded">
-                              <ImageIcon className="w-5 h-5 text-gray-400" />
+                          <div className="flex items-center gap-3 p-2 bg-background border border-border rounded cursor-pointer hover:opacity-80 transition-opacity">
+                            <div className="flex items-center justify-center w-8 h-8 border border-border rounded">
+                              <ImageIcon className="w-5 h-5 text-muted-foreground" />
                             </div>
                             <div className="flex-1 min-w-0">
-                              <p className="text-sm text-gray-300 truncate">{image.name}</p>
-                              <p className="text-xs text-gray-500">{t("click_to_preview")}</p>
+                              <p className="text-sm text-muted-foreground truncate">{image.name}</p>
+                              <p className="text-xs text-muted-foreground">{t("click_to_preview")}</p>
                             </div>
                           </div>
                         }
@@ -261,14 +261,14 @@ export const JournalEntryCard = ({
                     {files.map((file) => (
                       <div
                         key={file.id}
-                        className="flex items-center gap-3 p-2 bg-[#0a0a0a] border border-[#1f1f23] rounded"
+                        className="flex items-center gap-3 p-2 bg-background border border-border rounded"
                       >
-                        <div className="flex items-center justify-center w-8 h-8 border border-[#1f1f23] rounded">
+                        <div className="flex items-center justify-center w-8 h-8 border border-border rounded">
                           {getFileIcon(file.type, file.name)}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm text-gray-300 truncate max-w-[200px]">{file.name}</p>
-                          <p className="text-xs text-gray-500">
+                          <p className="text-sm text-muted-foreground truncate max-w-[200px]">{file.name}</p>
+                          <p className="text-xs text-muted-foreground">
                             {t("no_preview_available")} • {formatBytes(file.size)}
                           </p>
                         </div>

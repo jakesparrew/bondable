@@ -20,11 +20,11 @@ const SettingsSkeleton = ({ userType }: SettingsSkeletonProps) => {
         </div>
 
         {/* Profile Management */}
-        <Card className="bg-[#111111] border-[#1f1f23]">
+        <Card className="bg-muted border-border">
           <CardHeader>
             <div className="flex items-center space-x-2">
               <Skeleton className="h-5 w-5" />
-              <CardTitle className="text-white text-lg">
+              <CardTitle className="text-foreground text-lg">
                 <Skeleton className="h-6 w-36" />
               </CardTitle>
             </div>
@@ -33,7 +33,7 @@ const SettingsSkeleton = ({ userType }: SettingsSkeletonProps) => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 border border-[#1f1f23] rounded-lg bg-[#0a0a0a]">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 border border-border rounded-lg bg-background">
               <div>
                 <Skeleton className="h-5 w-48 mb-1" />
                 <Skeleton className="h-4 w-full max-w-64" />
@@ -44,11 +44,11 @@ const SettingsSkeleton = ({ userType }: SettingsSkeletonProps) => {
         </Card>
 
         {/* Theme Selection */}
-        <Card className="bg-[#111111] border-[#1f1f23]">
+        <Card className="bg-muted border-border">
           <CardHeader>
             <div className="flex items-center space-x-2">
               <Skeleton className="h-5 w-5" />
-              <CardTitle className="text-white text-lg">
+              <CardTitle className="text-foreground text-lg">
                 <Skeleton className="h-6 w-16" />
               </CardTitle>
             </div>
@@ -66,11 +66,11 @@ const SettingsSkeleton = ({ userType }: SettingsSkeletonProps) => {
         </Card>
 
         {/* Notification Settings */}
-        <Card className="bg-[#111111] border-[#1f1f23]">
+        <Card className="bg-muted border-border">
           <CardHeader>
             <div className="flex items-center space-x-2">
               <Skeleton className="h-5 w-5" />
-              <CardTitle className="text-white text-lg">
+              <CardTitle className="text-foreground text-lg">
                 <Skeleton className="h-6 w-48" />
               </CardTitle>
             </div>
@@ -89,7 +89,7 @@ const SettingsSkeleton = ({ userType }: SettingsSkeletonProps) => {
                     </div>
                     <Skeleton className="h-6 w-11 rounded-full" />
                   </div>
-                  {i < 4 && <Separator className="bg-[#1f1f23] mt-4" />}
+                  {i < 4 && <Separator className="bg-border mt-4" />}
                 </div>
               ))}
             </div>

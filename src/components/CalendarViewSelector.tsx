@@ -26,10 +26,10 @@ const CalendarViewSelector = ({ currentView, onViewChange, isMobile }: CalendarV
             variant="outline"
             size="sm"
             onClick={() => onViewChange(view.key)}
-            className={`w-full border-[#333] rounded-lg px-3 py-1.5 font-medium transition-colors ${
+            className={`w-full border-border rounded-lg px-3 py-1.5 font-medium transition-colors ${
               currentView === view.key
-                ? 'bg-white text-black hover:bg-gray-200'
-                : 'bg-[#1a1a1a] hover:bg-[#2a2a2a] text-gray-300 hover:text-neutral-400'
+                ? 'bg-primary text-primary-foreground hover:bg-primary/90'
+                : 'bg-card hover:bg-muted text-muted-foreground hover:text-muted-foreground'
             }`}
           >
             {view.label}
@@ -47,10 +47,10 @@ const CalendarViewSelector = ({ currentView, onViewChange, isMobile }: CalendarV
           variant="outline"
           size="sm"
           onClick={() => onViewChange(view.key)}
-          className={`border-[#333] rounded-lg px-3 py-1.5 font-medium transition-colors ${
+          className={`border-border rounded-lg px-3 py-1.5 font-medium transition-colors ${
             currentView === view.key
-              ? 'bg-white text-black hover:bg-gray-200'
-              : 'bg-[#1a1a1a] hover:bg-[#2a2a2a] text-gray-300 hover:text-neutral-400'
+              ? 'bg-primary text-primary-foreground hover:bg-primary/90'
+              : 'bg-card hover:bg-muted text-muted-foreground hover:text-muted-foreground'
           }`}
         >
           {view.label}

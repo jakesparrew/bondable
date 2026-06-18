@@ -168,14 +168,14 @@ const FormDialog = ({
             type="button"
             variant="outline"
             onClick={() => onOpenChange(false)}
-            className="border-[#333] bg-[#1a1a1a] hover:bg-[#2a2a2a] text-gray-300 hover:text-white"
+            className="border-border bg-card hover:bg-muted text-muted-foreground hover:text-foreground"
           >
             {t("cancel")}
           </Button>
           <Button
             type="submit"
             disabled={mutation.isPending}
-            className="bg-neutral-50 hover:bg-[#d6d6d6] text-neutral-950"
+            className="bg-primary text-primary-foreground hover:bg-primary/90"
           >
             {mutation.isPending ? (loadingText || t("saving")) : submitButtonText}
           </Button>

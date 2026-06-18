@@ -136,7 +136,7 @@ const VideoThumbnailRenderer = ({ attachment, isCurrentUser }: VideoThumbnailRen
         )}
 
         {error && (
-          <div className="w-64 h-36 bg-[#1a1a1a] flex flex-col items-center justify-center text-gray-400">
+          <div className="w-64 h-36 bg-card flex flex-col items-center justify-center text-muted-foreground">
             <AlertCircle className="h-8 w-8 mb-2" />
             <span className="text-sm text-center px-2">{error}</span>
           </div>

@@ -46,20 +46,20 @@ const InviteCodeDialog = ({ open, onOpenChange }: InviteCodeDialogProps) => {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-[#111111] border-[#1f1f23] text-white sm:max-w-[425px]">
+      <DialogContent className="bg-card border-border text-foreground sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle className="text-white mb-4">
+          <DialogTitle className="text-foreground mb-4">
             {t("client_invite_code")}
           </DialogTitle>
           <div className="h-px w-full bg-gradient-to-r from-transparent via-[#3f3f3f] to-transparent" />
         </DialogHeader>
         <div className="space-y-4 ">
-          <div className="text-gray-400 text-sm">
+          <div className="text-muted-foreground text-sm">
             {t("share_code_with_clients")}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="inviteCode" className="text-gray-300">
+            <Label htmlFor="inviteCode" className="text-muted-foreground">
               {t("your_invite_code")}
             </Label>
             <div className="flex gap-2">
@@ -67,11 +67,11 @@ const InviteCodeDialog = ({ open, onOpenChange }: InviteCodeDialogProps) => {
                 id="inviteCode"
                 value={isLoading ? t("loading_ellipsis") : inviteCode}
                 readOnly
-                className="bg-[#0a0a0a] border-[#1f1f23] text-white font-mono text-lg tracking-wider"
+                className="bg-background border-border text-foreground font-mono text-lg tracking-wider"
               />
               <CopyButton
                 textToCopy={inviteCode}
-                className="bg-[#0a0a0a] border-[#1f1f23] text-white hover:bg-[#1a1a1a]"
+                className="bg-background border-border text-foreground hover:bg-muted"
               />
             </div>
           </div>
@@ -80,7 +80,7 @@ const InviteCodeDialog = ({ open, onOpenChange }: InviteCodeDialogProps) => {
             <Button
               variant="outline"
               onClick={() => onOpenChange(false)}
-              className="border-[#333] bg-[#1a1a1a] hover:bg-[#2a2a2a] text-gray-300 hover:text-white"
+              className="border-border bg-card hover:bg-muted text-muted-foreground hover:text-foreground"
             >
               {t("close")}
             </Button>

@@ -168,7 +168,7 @@ export default function ClientsTable() {
               alt={row.original.name}
               className="non-invertable"
             />
-            <AvatarFallback className="bg-[#1a1a1a] text-gray-300">
+            <AvatarFallback className="bg-muted text-muted-foreground">
               {row.original.name
                 .split(" ")
                 .map((n) => n[0])
@@ -177,8 +177,8 @@ export default function ClientsTable() {
             </AvatarFallback>
           </Avatar>
           <div>
-            <div className="font-medium text-white">{row.getValue("name")}</div>
-            <div className="text-gray-400 text-sm sm:hidden">
+            <div className="font-medium text-foreground">{row.getValue("name")}</div>
+            <div className="text-muted-foreground text-sm sm:hidden">
               {row.original.email}
             </div>
           </div>
@@ -192,7 +192,7 @@ export default function ClientsTable() {
       header: t("email"),
       accessorKey: "email",
       cell: ({ row }) => (
-        <div className="text-gray-300">{row.getValue("email")}</div>
+        <div className="text-muted-foreground">{row.getValue("email")}</div>
       ),
       size: 220,
       meta: {
@@ -205,7 +205,7 @@ export default function ClientsTable() {
       cell: ({ row }) => {
         const phone = row.getValue("phone") as string;
         const displayValue = phone === "No phone provided" ? t("no_phone_provided") : phone;
-        return <div className="text-gray-300">{displayValue}</div>;
+        return <div className="text-muted-foreground">{displayValue}</div>;
       },
       size: 150,
       meta: {
@@ -243,7 +243,7 @@ export default function ClientsTable() {
       header: t("join_date"),
       accessorKey: "joinDate",
       cell: ({ row }) => (
-        <div className="text-gray-300">{row.getValue("joinDate")}</div>
+        <div className="text-muted-foreground">{row.getValue("joinDate")}</div>
       ),
       size: 120,
       meta: {
@@ -256,7 +256,7 @@ export default function ClientsTable() {
       cell: ({ row }) => {
         const lastSession = row.getValue("lastSession") as string;
         const displayValue = lastSession === "N/A" ? t("n_a") : lastSession;
-        return <div className="text-gray-300">{displayValue}</div>;
+        return <div className="text-muted-foreground">{displayValue}</div>;
       },
       size: 120,
       meta: {
@@ -494,7 +494,7 @@ export default function ClientsTable() {
               id={`${id}-input`}
               ref={inputRef}
               className={cn(
-                "peer w-full sm:min-w-60 ps-9 bg-[#0a0a0a] border-[#1f1f23] text-white placeholder:text-gray-500 focus:border-gray-400",
+                "peer w-full sm:min-w-60 ps-9 bg-background border-border text-foreground placeholder:text-muted-foreground focus:border-ring",
                 Boolean(table.getColumn("name")?.getFilterValue()) && "pe-9"
               )}
               value={
@@ -507,12 +507,12 @@ export default function ClientsTable() {
               type="text"
               aria-label="Filter by name or email"
             />
-            <div className="text-gray-500 pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 peer-disabled:opacity-50">
+            <div className="text-muted-foreground pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 peer-disabled:opacity-50">
               <ListFilterIcon size={16} aria-hidden="true" />
             </div>
             {Boolean(table.getColumn("name")?.getFilterValue()) && (
               <button
-                className="text-gray-500 hover:text-white focus-visible:border-ring focus-visible:ring-ring/50 absolute inset-y-0 end-0 flex h-full w-9 items-center justify-center rounded-e-md transition-[color,box-shadow] outline-none focus:z-10 focus-visible:ring-[3px] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
+                className="text-muted-foreground hover:text-foreground focus-visible:border-ring focus-visible:ring-ring/50 absolute inset-y-0 end-0 flex h-full w-9 items-center justify-center rounded-e-md transition-[color,box-shadow] outline-none focus:z-10 focus-visible:ring-[3px] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
                 aria-label="Clear filter"
                 onClick={() => {
                   table.getColumn("name")?.setFilterValue("");
@@ -531,7 +531,7 @@ export default function ClientsTable() {
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
-                  className="border-[#333] bg-[#1a1a1a] hover:bg-[#2a2a2a] text-gray-300 hover:text-white"
+                  className="border-border bg-card hover:bg-muted text-muted-foreground hover:text-foreground"
                 >
                   <FilterIcon
                     className="-ms-1 opacity-60"
@@ -540,18 +540,18 @@ export default function ClientsTable() {
                   />
                   {t("status")}
                   {selectedStatuses.length > 0 && (
-                    <span className="bg-[#0a0a0a] text-gray-400 -me-1 inline-flex h-5 max-h-full items-center rounded border border-[#333] px-1 font-[inherit] text-[0.625rem] font-medium">
+                    <span className="bg-background text-muted-foreground -me-1 inline-flex h-5 max-h-full items-center rounded border border-border px-1 font-[inherit] text-[0.625rem] font-medium">
                       {selectedStatuses.length}
                     </span>
                   )}
                 </Button>
               </PopoverTrigger>
               <PopoverContent
-                className="w-auto min-w-36 p-3 bg-[#111111] border-[#1f1f23]"
+                className="w-auto min-w-36 p-3 bg-card border-border"
                 align="start"
               >
                 <div className="space-y-3">
-                  <div className="text-gray-400 text-xs font-medium">
+                  <div className="text-muted-foreground text-xs font-medium">
                     Filters
                   </div>
                   <div className="space-y-3">
@@ -566,10 +566,10 @@ export default function ClientsTable() {
                         />
                         <Label
                           htmlFor={`${id}-${i}`}
-                          className="flex grow justify-between gap-2 font-normal text-gray-300"
+                          className="flex grow justify-between gap-2 font-normal text-muted-foreground"
                         >
                           {t(value)}{" "}
-                          <span className="text-gray-400 ms-2 text-xs">
+                          <span className="text-muted-foreground ms-2 text-xs">
                             {statusCounts.get(value)}
                           </span>
                         </Label>
@@ -586,7 +586,7 @@ export default function ClientsTable() {
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="outline"
-                  className="border-[#333] bg-[#1a1a1a] hover:bg-[#2a2a2a] text-gray-300 hover:text-white"
+                  className="border-border bg-card hover:bg-muted text-muted-foreground hover:text-foreground"
                 >
                   <Columns3Icon
                     className="-ms-1 opacity-60"
@@ -598,9 +598,9 @@ export default function ClientsTable() {
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 align="end"
-                className="bg-[#111111] border-[#1f1f23]"
+                className="bg-card border-border"
               >
-                <DropdownMenuLabel className="text-gray-300">
+                <DropdownMenuLabel className="text-muted-foreground">
                   {t("toggle_columns")}
                 </DropdownMenuLabel>
                 {table
@@ -610,7 +610,7 @@ export default function ClientsTable() {
                     return (
                       <DropdownMenuCheckboxItem
                         key={column.id}
-                        className="capitalize text-gray-300 hover:bg-[#2a2a2a]"
+                        className="capitalize text-muted-foreground hover:bg-muted"
                         checked={column.getIsVisible()}
                         onCheckedChange={(value) =>
                           column.toggleVisibility(!!value)
@@ -636,7 +636,7 @@ export default function ClientsTable() {
               <AlertDialogTrigger asChild>
                 <Button
                   variant="outline"
-                  className="border-[#333] bg-[#1a1a1a] hover:bg-[#2a2a2a] text-gray-300 hover:text-white"
+                  className="border-border bg-card hover:bg-muted text-muted-foreground hover:text-foreground"
                 >
                   <TrashIcon
                     className="-ms-1 opacity-60"
@@ -644,18 +644,18 @@ export default function ClientsTable() {
                     aria-hidden="true"
                   />
                   Delete
-                  <span className="absolute bg-[#0a0a0a] text-gray-400 inline-flex aspect-square min-w-5 h-5 items-center justify-center rounded-full border border-[#333] px-1 text-[0.625rem] font-medium font-[inherit] mb-[2.2rem] ml-[5.5rem]">
+                  <span className="absolute bg-background text-muted-foreground inline-flex aspect-square min-w-5 h-5 items-center justify-center rounded-full border border-border px-1 text-[0.625rem] font-medium font-[inherit] mb-[2.2rem] ml-[5.5rem]">
                     {table.getSelectedRowModel().rows.length}
                   </span>
                 </Button>
               </AlertDialogTrigger>
-              <AlertDialogContent className="bg-[#111111] border-[#1f1f23]">
+              <AlertDialogContent className="bg-card border-border">
                 <div className="flex flex-col gap-2 max-sm:items-center sm:flex-row sm:gap-4">
                   <AlertDialogHeader>
-                    <AlertDialogTitle className="text-white">
+                    <AlertDialogTitle className="text-foreground">
                       Are you absolutely sure?
                     </AlertDialogTitle>
-                    <AlertDialogDescription className="text-gray-400">
+                    <AlertDialogDescription className="text-muted-foreground">
                       This action cannot be undone. This will permanently
                       disconnect {table.getSelectedRowModel().rows.length}{" "}
                       selected{" "}
@@ -667,7 +667,7 @@ export default function ClientsTable() {
                   </AlertDialogHeader>
                 </div>
                 <AlertDialogFooter>
-                  <AlertDialogCancel className="border-[#333] bg-[#1a1a1a] hover:bg-[#2a2a2a] text-gray-300 hover:text-white">
+                  <AlertDialogCancel className="border-border bg-card hover:bg-muted text-muted-foreground hover:text-foreground">
                     Cancel
                   </AlertDialogCancel>
                   <AlertDialogAction
@@ -684,14 +684,14 @@ export default function ClientsTable() {
       </div>
 
       {/* Table - Mobile optimized */}
-      <div className="bg-[#111111] border-[#1f1f23] overflow-hidden rounded-md border">
+      <div className="bg-card border-border overflow-hidden rounded-md border">
         <div className="overflow-x-auto">
           <Table className="table-fixed min-w-full">
             <TableHeader>
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow
                   key={headerGroup.id}
-                  className="hover:bg-transparent border-[#1f1f23]"
+                  className="hover:bg-transparent border-border"
                 >
                   {headerGroup.headers.map((header) => {
                     const meta = header.column.columnDef.meta as
@@ -701,7 +701,7 @@ export default function ClientsTable() {
                       <TableHead
                         key={header.id}
                         style={{ width: `${header.getSize()}px` }}
-                        className={cn("h-11 text-gray-300", meta?.className)}
+                        className={cn("h-11 text-muted-foreground", meta?.className)}
                       >
                         {header.isPlaceholder ? null : header.column.getCanSort() ? (
                           <div
@@ -761,7 +761,7 @@ export default function ClientsTable() {
                 [...Array(5)].map((_, idx) => (
                   <TableRow
                     key={`skeleton-${idx}`}
-                    className="border-[#1f1f23]"
+                    className="border-border"
                   >
                     {columns.map((col, i) => (
                       <TableCell key={i} className="py-4">
@@ -775,7 +775,7 @@ export default function ClientsTable() {
                   <TableRow
                     key={row.id}
                     data-state={row.getIsSelected() && "selected"}
-                    className="border-[#1f1f23] hover:bg-[#1a1a1a]"
+                    className="border-border hover:bg-muted"
                   >
                     {row.getVisibleCells().map((cell) => {
                       const meta = cell.column.columnDef.meta as
@@ -796,10 +796,10 @@ export default function ClientsTable() {
                   </TableRow>
                 ))
               ) : (
-                <TableRow className="border-[#1f1f23]">
+                <TableRow className="border-border">
                   <TableCell
                     colSpan={columns.length}
-                    className="h-24 text-center text-gray-400"
+                    className="h-24 text-center text-muted-foreground"
                   >
                     No clients found.
                   </TableCell>
@@ -825,7 +825,7 @@ export default function ClientsTable() {
       <div className="flex items-center justify-between gap-4 sm:gap-8">
         {/* Results per page */}
         <div className="flex items-center gap-3">
-          <Label htmlFor={id} className="max-sm:sr-only text-gray-300">
+          <Label htmlFor={id} className="max-sm:sr-only text-muted-foreground">
             {t("rows_per_page")}
           </Label>
           <Select
@@ -836,16 +836,16 @@ export default function ClientsTable() {
           >
             <SelectTrigger
               id={id}
-              className="w-fit whitespace-nowrap bg-[#0a0a0a] border-[#1f1f23] text-white"
+              className="w-fit whitespace-nowrap bg-background border-border text-foreground"
             >
               <SelectValue placeholder={t("select_number_results")} />
             </SelectTrigger>
-            <SelectContent className="bg-[#111111] border-[#1f1f23] [&_*[role=option]]:ps-2 [&_*[role=option]]:pe-8 [&_*[role=option]>span]:start-auto [&_*[role=option]>span]:end-2">
+            <SelectContent className="bg-card border-border [&_*[role=option]]:ps-2 [&_*[role=option]]:pe-8 [&_*[role=option]>span]:start-auto [&_*[role=option]>span]:end-2">
               {[5, 10, 25, 50].map((pageSize) => (
                 <SelectItem
                   key={pageSize}
                   value={pageSize.toString()}
-                  className="text-gray-300 hover:bg-[#2a2a2a]"
+                  className="text-muted-foreground hover:bg-muted"
                 >
                   {pageSize}
                 </SelectItem>
@@ -854,12 +854,12 @@ export default function ClientsTable() {
           </Select>
         </div>
         {/* Page number information */}
-        <div className="text-gray-400 flex grow justify-end text-sm whitespace-nowrap">
+        <div className="text-muted-foreground flex grow justify-end text-sm whitespace-nowrap">
           <p
-            className="text-gray-400 text-sm whitespace-nowrap"
+            className="text-muted-foreground text-sm whitespace-nowrap"
             aria-live="polite"
           >
-            <span className="text-white">
+            <span className="text-foreground">
               {table.getState().pagination.pageIndex *
                 table.getState().pagination.pageSize +
                 1}
@@ -875,7 +875,7 @@ export default function ClientsTable() {
               )}
             </span>{" "}
             {t("of")}{" "}
-            <span className="text-white">{table.getRowCount().toString()}</span>
+            <span className="text-foreground">{table.getRowCount().toString()}</span>
           </p>
         </div>
 
@@ -888,7 +888,7 @@ export default function ClientsTable() {
                 <Button
                   size="icon"
                   variant="outline"
-                  className="disabled:pointer-events-none disabled:opacity-50 border-[#333] bg-[#1a1a1a] hover:bg-[#2a2a2a] text-gray-300 hover:text-white"
+                  className="disabled:pointer-events-none disabled:opacity-50 border-border bg-card hover:bg-muted text-muted-foreground hover:text-foreground"
                   onClick={() => table.firstPage()}
                   disabled={!table.getCanPreviousPage()}
                   aria-label="Go to first page"
@@ -901,7 +901,7 @@ export default function ClientsTable() {
                 <Button
                   size="icon"
                   variant="outline"
-                  className="disabled:pointer-events-none disabled:opacity-50 border-[#333] bg-[#1a1a1a] hover:bg-[#2a2a2a] text-gray-300 hover:text-white"
+                  className="disabled:pointer-events-none disabled:opacity-50 border-border bg-card hover:bg-muted text-muted-foreground hover:text-foreground"
                   onClick={() => table.previousPage()}
                   disabled={!table.getCanPreviousPage()}
                   aria-label="Go to previous page"
@@ -914,7 +914,7 @@ export default function ClientsTable() {
                 <Button
                   size="icon"
                   variant="outline"
-                  className="disabled:pointer-events-none disabled:opacity-50 border-[#333] bg-[#1a1a1a] hover:bg-[#2a2a2a] text-gray-300 hover:text-white"
+                  className="disabled:pointer-events-none disabled:opacity-50 border-border bg-card hover:bg-muted text-muted-foreground hover:text-foreground"
                   onClick={() => table.nextPage()}
                   disabled={!table.getCanNextPage()}
                   aria-label="Go to next page"
@@ -927,7 +927,7 @@ export default function ClientsTable() {
                 <Button
                   size="icon"
                   variant="outline"
-                  className="disabled:pointer-events-none disabled:opacity-50 border-[#333] bg-[#1a1a1a] hover:bg-[#2a2a2a] text-gray-300 hover:text-white"
+                  className="disabled:pointer-events-none disabled:opacity-50 border-border bg-card hover:bg-muted text-muted-foreground hover:text-foreground"
                   onClick={() => table.lastPage()}
                   disabled={!table.getCanNextPage()}
                   aria-label="Go to last page"
@@ -956,13 +956,13 @@ export default function ClientsTable() {
 
       {/* Single Client Delete Dialog */}
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent className="bg-[#111111] border-[#1f1f23]">
+        <AlertDialogContent className="bg-card border-border">
           <div className="flex flex-col gap-2 max-sm:items-center sm:flex-row sm:gap-4">
             <AlertDialogHeader>
-              <AlertDialogTitle className="text-white">
+              <AlertDialogTitle className="text-foreground">
                 Disconnect Client
               </AlertDialogTitle>
-              <AlertDialogDescription className="text-gray-400">
+              <AlertDialogDescription className="text-muted-foreground">
                 Are you sure you want to disconnect {clientToDelete?.name}? This
                 will remove them from your client list but won't delete their
                 account.
@@ -970,7 +970,7 @@ export default function ClientsTable() {
             </AlertDialogHeader>
           </div>
           <AlertDialogFooter>
-            <AlertDialogCancel className="border-[#333] bg-[#1a1a1a] hover:bg-[#2a2a2a] text-gray-300 hover:text-white">
+            <AlertDialogCancel className="border-border bg-card hover:bg-muted text-muted-foreground hover:text-foreground">
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction
@@ -1009,7 +1009,7 @@ function RowActions({
           <Button
             size="icon"
             variant="ghost"
-            className="shadow-none text-gray-400 hover:text-white hover:bg-[#2a2a2a] h-8 w-8"
+            className="shadow-none text-muted-foreground hover:text-foreground hover:bg-muted h-8 w-8"
             aria-label="Client actions"
           >
             <EllipsisIcon size={16} aria-hidden="true" />
@@ -1018,39 +1018,39 @@ function RowActions({
       </DropdownMenuTrigger>
       <DropdownMenuContent
         align="end"
-        className="bg-[#111111] border-[#1f1f23]"
+        className="bg-card border-border"
       >
         <DropdownMenuGroup>
           <DropdownMenuItem
-            className="text-gray-300 hover:bg-[#2a2a2a] hover:text-white cursor-pointer"
+            className="text-muted-foreground hover:bg-muted hover:text-foreground cursor-pointer"
             onSelect={() => onEditClick(row.original)}
           >
             <span>{t('edit_client')}</span>
           </DropdownMenuItem>
 
           <DropdownMenuItem
-            className="text-gray-300 hover:bg-[#2a2a2a] hover:text-white cursor-pointer"
+            className="text-muted-foreground hover:bg-muted hover:text-foreground cursor-pointer"
             onSelect={() => onViewSessions(row.original)}
           >
             <span>{t('view_sessions')}</span>
           </DropdownMenuItem>
         </DropdownMenuGroup>
-        <DropdownMenuSeparator className="bg-[#333]" />
+        <DropdownMenuSeparator className="bg-border" />
         <DropdownMenuGroup>
           <DropdownMenuItem
-            className="text-gray-300 hover:bg-[#2a2a2a] hover:text-white cursor-pointer"
+            className="text-muted-foreground hover:bg-muted hover:text-foreground cursor-pointer"
             onSelect={() => onScheduleSession(row.original)}
           >
             <span>{t('schedule_session')}</span>
           </DropdownMenuItem>
           <DropdownMenuItem
-            className="text-gray-300 hover:bg-[#2a2a2a] hover:text-white cursor-pointer"
+            className="text-muted-foreground hover:bg-muted hover:text-foreground cursor-pointer"
             onSelect={() => onSendMessage(row.original)}
           >
             <span>{t('send_message')}</span>
           </DropdownMenuItem>
         </DropdownMenuGroup>
-        <DropdownMenuSeparator className="bg-[#333]" />
+        <DropdownMenuSeparator className="bg-border" />
         <DropdownMenuItem
           className="text-red-400 focus:text-red-500 cursor-pointer"
           onSelect={() => onDeleteClient(row.original)}

@@ -202,10 +202,10 @@ const EventDialog = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-md p-0 bg-[#111111] border-[#1f1f23] text-white">
+      <DialogContent className="max-w-md p-0 bg-card border-border text-foreground">
         <div className="p-6">
           <DialogHeader className="relative">
-            <DialogTitle className="text-left text-lg font-semibold text-white">
+            <DialogTitle className="text-left text-lg font-semibold text-foreground">
               {event ? t("edit_event") : t("create_event")}
               <div className="mt-4 h-px w-full bg-gradient-to-r from-transparent via-[#3f3f3f] to-transparent" />
             </DialogTitle>
@@ -215,7 +215,7 @@ const EventDialog = ({
             <div className="space-y-2">
               <Label
                 htmlFor={`title-${id}`}
-                className="text-sm font-medium text-gray-300"
+                className="text-sm font-medium text-muted-foreground"
               >
                 {t("title")} <span className="text-red-400">*</span>
               </Label>
@@ -226,14 +226,14 @@ const EventDialog = ({
                   setFormData((prev) => ({ ...prev, title: e.target.value }))
                 }
                 required
-                className="h-10 bg-[#0a0a0a] border-[#1f1f23] text-white"
+                className="h-10 bg-background border-border text-foreground"
               />
             </div>
 
             <div className="space-y-2">
               <Label
                 htmlFor={`description-${id}`}
-                className="text-sm font-medium text-gray-300"
+                className="text-sm font-medium text-muted-foreground"
               >
                 {t("description")}
               </Label>
@@ -247,15 +247,15 @@ const EventDialog = ({
                   }))
                 }
                 placeholder={t("description")}
-                className="resize-none bg-[#0a0a0a] border-[#1f1f23] text-white placeholder:text-gray-500"
+                className="resize-none bg-background border-border text-foreground placeholder:text-muted-foreground"
                 rows={3}
               />
             </div>
 
-            <div className="bg-neutral-900 border border-[#1f1f23] p-4 rounded-xl space-y-2">
+            <div className="bg-card border border-border p-4 rounded-xl space-y-2">
               <div className="grid grid-cols-2 gap-4 ">
                 <div className="space-y-1">
-                  <Label className="text-gray-300 text-sm font-medium">
+                  <Label className="text-muted-foreground text-sm font-medium">
                     {t("start_date")} <span className="text-red-400">*</span>
                   </Label>
                   <SimpleDatePicker
@@ -268,7 +268,7 @@ const EventDialog = ({
                   />
                 </div>
                 <div className="space-y-1">
-                  <Label className="text-gray-300 text-sm font-medium">
+                  <Label className="text-muted-foreground text-sm font-medium">
                     {t("start_time")} <span className="text-red-400">*</span>
                   </Label>
                   <TimePicker
@@ -283,7 +283,7 @@ const EventDialog = ({
 
               <div className="grid grid-cols-2 gap-4 ">
                 <div className="space-y-1">
-                  <Label className="text-gray-300 text-sm font-medium">
+                  <Label className="text-muted-foreground text-sm font-medium">
                     {t("end_date")} <span className="text-red-400">*</span>
                   </Label>
                   <SimpleDatePicker
@@ -297,7 +297,7 @@ const EventDialog = ({
                   />
                 </div>
                 <div className="space-y-1">
-                  <Label className="text-gray-300 text-sm font-medium">
+                  <Label className="text-muted-foreground text-sm font-medium">
                     {t("end_time")} <span className="text-red-400">*</span>
                   </Label>
                   <TimePicker
@@ -313,7 +313,7 @@ const EventDialog = ({
             </div>
 
             <div className="space-y-2">
-              <Label className="text-sm font-medium text-gray-300">
+              <Label className="text-sm font-medium text-muted-foreground">
                 {t("location")}
               </Label>
               <AddressAutoComplete
@@ -352,13 +352,13 @@ const EventDialog = ({
                   type="button"
                   variant="outline"
                   onClick={onClose}
-                  className="border-[#333] bg-[#1a1a1a] hover:bg-[#2a2a2a] text-gray-300 hover:text-white"
+                  className="border-border bg-card hover:bg-muted text-muted-foreground hover:text-foreground"
                 >
                   {t("cancel")}
                 </Button>
                 <Button
                   type="submit"
-                  className={`bg-neutral-50 hover:bg-[#d6d6d6] text-neutral-950 ${
+                  className={`bg-primary text-primary-foreground hover:bg-primary/90 ${
                     event && onDelete ? "" : "-mr-2"
                   }`}
                 >

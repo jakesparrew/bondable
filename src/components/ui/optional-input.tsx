@@ -29,7 +29,7 @@ export function OptionalInput({
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between gap-1">
-        <Label htmlFor={id} className="text-gray-300 leading-6">
+        <Label htmlFor={id} className="text-muted-foreground leading-6">
           {label}
         </Label>
       </div>

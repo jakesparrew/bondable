@@ -28,16 +28,16 @@ const Payments = () => {
         <div className="space-y-3">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="flex flex-col sm:flex-row sm:justify-between">
-              <span className="text-gray-400">{t("bank_name")}:</span>&nbsp;<span className="text-white">Chase Bank</span>
+              <span className="text-muted-foreground">{t("bank_name")}:</span>&nbsp;<span className="text-foreground">Chase Bank</span>
             </div>
             <div className="flex flex-col sm:flex-row sm:justify-between">
-              <span className="text-gray-400">{t("account_name")}:</span>&nbsp;<span className="text-white">Bondable Therapy Services</span>
+              <span className="text-muted-foreground">{t("account_name")}:</span>&nbsp;<span className="text-foreground">Bondable Therapy Services</span>
             </div>
             <div className="flex flex-col sm:flex-row sm:justify-between">
-              <span className="text-gray-400">{t("iban")}:</span>&nbsp;<span className="text-white font-mono text-sm break-all">US64 SVBK US6S 3300 0000 0000 0000 00</span>
+              <span className="text-muted-foreground">{t("iban")}:</span>&nbsp;<span className="text-foreground font-mono text-sm break-all">US64 SVBK US6S 3300 0000 0000 0000 00</span>
             </div>
             <div className="flex flex-col sm:flex-row sm:justify-between">
-              <span className="text-gray-400">{t("swift_code")}:</span>&nbsp;<span className="text-white">CHASUS33</span>
+              <span className="text-muted-foreground">{t("swift_code")}:</span>&nbsp;<span className="text-foreground">CHASUS33</span>
             </div>
           </div>
         </div>
@@ -49,7 +49,7 @@ const Payments = () => {
       title: t("payment_instructions"),
       sub: t("important_payment_guidelines"),
       content: (
-        <div className="space-y-2 text-sm text-gray-300">
+        <div className="space-y-2 text-sm text-muted-foreground">
           <p>{t("include_invoice_number")}</p>
           <p>{t("payments_due_14_days")}</p>
           <p>{t("late_fees_may_apply")}</p>
@@ -63,10 +63,10 @@ const Payments = () => {
       title: t("support_contact"),
       sub: t("need_help_payment"),
       content: (
-        <div className="space-y-2 text-sm text-gray-300">
+        <div className="space-y-2 text-sm text-muted-foreground">
           <p>{t("issues_questions_invoice")}</p>
-          <p>{t("email_billing")} <span className="text-white">billing@bondable.co</span></p>
-          <p>{t("call_billing_dept")} <span className="text-white">+1 (555) 123-4567</span></p>
+          <p>{t("email_billing")} <span className="text-foreground">billing@bondable.co</span></p>
+          <p>{t("call_billing_dept")} <span className="text-foreground">+1 (555) 123-4567</span></p>
           <p>{t("support_hours")}</p>
         </div>
       ),
@@ -79,8 +79,8 @@ const Payments = () => {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">{t("payments")}</h2>
-            <p className="text-gray-400">
+            <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2">{t("payments")}</h2>
+            <p className="text-muted-foreground">
               {userType === "therapist" ? t("manage_payments_billing") : t("view_payment_history")}
             </p>
           </div>
@@ -96,9 +96,9 @@ const Payments = () => {
 
         {/* Bank Transfer Information with Accordion - Only for therapists */}
         {userType === "therapist" && (
-          <Card className="bg-[#111111] border-[#1f1f23]">
+          <Card className="bg-card border-border">
             <CardHeader>
-              <CardTitle className="text-white text-lg">{t("bank_transfer_information")}</CardTitle>
+              <CardTitle className="text-foreground text-lg">{t("bank_transfer_information")}</CardTitle>
             </CardHeader>
             <CardContent>
               <Accordion type="single" collapsible className="w-full" defaultValue="1">
@@ -106,20 +106,20 @@ const Payments = () => {
                   <AccordionItem 
                     value={item.id} 
                     key={item.id} 
-                    className="py-2 border-[#1f1f23]"
+                    className="py-2 border-border"
                   >
                     <AccordionTrigger className="flex flex-1 items-center justify-between rounded-md py-2 text-left text-[15px] leading-6 font-semibold transition-all outline-none hover:no-underline [&[data-state=open]>svg]:rotate-180">
                       <span className="flex items-center gap-3">
                         <span
-                          className="flex size-10 shrink-0 items-center justify-center rounded-full border border-[#1f1f23] bg-[#0a0a0a]"
+                          className="flex size-10 shrink-0 items-center justify-center rounded-full border border-border bg-background"
                           aria-hidden="true"
                         >
-                          <item.icon size={16} className="opacity-60 text-gray-400" />
+                          <item.icon size={16} className="opacity-60 text-muted-foreground" />
                         </span>
                         <span className="flex flex-col space-y-1">
-                          <span className="text-white">{item.title}</span>
+                          <span className="text-foreground">{item.title}</span>
                           {item.sub && (
-                            <span className="text-sm font-normal text-gray-400">{item.sub}</span>
+                            <span className="text-sm font-normal text-muted-foreground">{item.sub}</span>
                           )}
                         </span>
                       </span>

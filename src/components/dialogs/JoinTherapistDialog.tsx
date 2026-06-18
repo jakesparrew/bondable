@@ -91,16 +91,16 @@ const JoinTherapistDialog = ({ children, onTherapistConnected }: JoinTherapistDi
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="sm:max-w-md bg-[#111111] border-[#1f1f23]">
+      <DialogContent className="sm:max-w-md bg-card border-border">
         <DialogHeader>
-          <DialogTitle className="text-white">{t("join_therapist")}</DialogTitle>
-          <DialogDescription className="text-gray-400">
+          <DialogTitle className="text-foreground">{t("join_therapist")}</DialogTitle>
+          <DialogDescription className="text-muted-foreground">
             {t("enter_invite_code_description")}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="inviteCode" className="text-gray-300">
+            <Label htmlFor="inviteCode" className="text-muted-foreground">
               {t("invite_code")}
             </Label>
             <Input
@@ -109,7 +109,7 @@ const JoinTherapistDialog = ({ children, onTherapistConnected }: JoinTherapistDi
               value={inviteCode}
               onChange={(e) => setInviteCode(e.target.value.toUpperCase())}
               maxLength={8}
-              className="bg-[#0a0a0a] border-[#1f1f23] text-white placeholder:text-gray-500"
+              className="bg-background border-border text-foreground placeholder:text-muted-foreground"
               disabled={isValidating || isConnecting}
             />
             {validationResult?.error && (
@@ -134,7 +134,7 @@ const JoinTherapistDialog = ({ children, onTherapistConnected }: JoinTherapistDi
             <Button
               type="submit"
               disabled={!inviteCode.trim() || isValidating || isConnecting}
-              className="flex-1 bg-neutral-50 hover:bg-[#d6d6d6] text-neutral-950"
+              className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90"
             >
               {isConnecting ? (
                 <>

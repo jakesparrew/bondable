@@ -110,14 +110,14 @@ export default function InvoiceGenerator() {
     <>
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogTrigger asChild>
-          <Button className="bg-neutral-50 hover:bg-[#d6d6d6] text-neutral-950">
+          <Button className="bg-primary text-primary-foreground hover:bg-primary/90">
             <Plus className="w-4 h-4 mr-2" />
             {t("generate_invoice")}
           </Button>
         </DialogTrigger>
-        <DialogContent className="max-w-3xl overflow-y-auto bg-[#111111] border-[#1f1f23]">
+        <DialogContent className="max-w-3xl overflow-y-auto bg-card border-border">
           <DialogHeader>
-            <DialogTitle className="text-white">
+            <DialogTitle className="text-foreground">
               {t("generate_new_invoice")}
             </DialogTitle>
           </DialogHeader>
@@ -126,22 +126,22 @@ export default function InvoiceGenerator() {
 
           <div className="space-y-4 mt-2">
             <div className="space-y-2">
-              <Label className="text-sm font-medium text-gray-300">
+              <Label className="text-sm font-medium text-muted-foreground">
                 {t("select_client")} <span className="text-red-400">*</span>
               </Label>
               <Select
                 value={invoiceData.clientId}
                 onValueChange={(val) => handleInputChange("clientId", val)}
               >
-                <SelectTrigger className="w-full bg-[#0a0a0a] border-[#1f1f23] text-white">
+                <SelectTrigger className="w-full bg-background border-border text-foreground">
                   <SelectValue placeholder={t("choose_a_client")} />
                 </SelectTrigger>
-                <SelectContent className="bg-[#111111] border-[#1f1f23]">
+                <SelectContent className="bg-card border-border">
                   {mockClients.map((client) => (
                     <SelectItem
                       key={client.id}
                       value={client.id}
-                      className="text-neutral-400 hover:!text-neutral-950 data-[state=checked]:text-neutral-50 data-[highlighted]:!text-neutral-950"
+                      className="text-muted-foreground hover:!text-neutral-950 data-[state=checked]:text-neutral-50 data-[highlighted]:!text-neutral-950"
                     >
                       {client.name} - {client.email}
                     </SelectItem>
@@ -156,7 +156,7 @@ export default function InvoiceGenerator() {
                 value={invoiceData.invoiceNumber}
                 onChange={() => {}}
                 readOnly
-                className="w-full bg-[#1a1a1a] border-[#1f1f23] text-white placeholder:text-gray-500 focus:border-gray-400"
+                className="w-full bg-background border-border text-foreground placeholder:text-muted-foreground focus:border-ring"
               />
             </div>
 
@@ -179,9 +179,9 @@ export default function InvoiceGenerator() {
               />
             </div>
 
-            <Card className="bg-[#0a0a0a] border-[#1f1f23]">
+            <Card className="bg-card border-border">
               <CardHeader className="pb-4">
-                <CardTitle className="text-white text-lg">
+                <CardTitle className="text-foreground text-lg">
                   {t("service_details")}
                 </CardTitle>
               </CardHeader>
@@ -194,7 +194,7 @@ export default function InvoiceGenerator() {
                       handleInputChange("serviceDescription", e.target.value)
                     }
                     placeholder={t("therapy_session")}
-                    className="bg-[#1a1a1a] border-[#1f1f23] text-white placeholder:text-gray-500 focus:border-gray-400"
+                    className="bg-background border-border text-foreground placeholder:text-muted-foreground focus:border-ring"
                   />
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -205,7 +205,7 @@ export default function InvoiceGenerator() {
                       handleInputChange("duration", newTime)
                     }
                     required
-                    className="bg-[#1a1a1a] border-[#1f1f23] text-white placeholder:text-gray-500 focus:border-gray-400"
+                    className="bg-background border-border text-foreground placeholder:text-muted-foreground focus:border-ring"
                   />
                   <PriceInput
                     price={invoiceData.price}
@@ -217,24 +217,24 @@ export default function InvoiceGenerator() {
               </CardContent>
             </Card>
 
-            <Card className="bg-[#0a0a0a] border-[#1f1f23]">
+            <Card className="bg-card border-border">
               <CardHeader className="pb-4">
-                <CardTitle className="text-white text-lg">
+                <CardTitle className="text-foreground text-lg">
                   {t("invoice_totals")}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <div className="flex justify-between text-gray-300">
+                  <div className="flex justify-between text-muted-foreground">
                     <span>{t("subtotal")}:</span>
                     <span>€{invoiceData.subtotal.toFixed(2)}</span>
                   </div>
-                  <div className="flex justify-between text-gray-300">
+                  <div className="flex justify-between text-muted-foreground">
                     <span>{t("tax")}:</span>
                     <span>€{invoiceData.tax.toFixed(2)}</span>
                   </div>
-                  <div className="border-t border-[#1f1f23] pt-2">
-                    <div className="flex justify-between text-white font-semibold text-lg">
+                  <div className="border-t border-border pt-2">
+                    <div className="flex justify-between text-foreground font-semibold text-lg">
                       <span>{t("total")}:</span>
                       <span>€{invoiceData.total.toFixed(2)}</span>
                     </div>
@@ -248,13 +248,13 @@ export default function InvoiceGenerator() {
             <Button
               variant="outline"
               onClick={() => setIsOpen(false)}
-              className="bg-neutral-950 hover:bg-neutral-800 text-neutral-50 border border-neutral-900 hover:text-neutral-300"
+              className="bg-background hover:bg-muted text-foreground border border-border hover:text-muted-foreground"
             >
               {t("cancel")}
             </Button>
             <Button
               onClick={generateInvoice}
-              className="bg-neutral-50 hover:bg-neutral-300 text-neutral-950 h-auto"
+              className="bg-primary text-primary-foreground hover:bg-primary/90 h-auto"
             >
               <Forward className="w-4 h-4 mr-2" />
               {t("generate_invoice")}

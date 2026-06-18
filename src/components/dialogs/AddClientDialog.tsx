@@ -126,7 +126,7 @@ const AddClientDialog = ({ children }: AddClientDialogProps) => {
       onOpenChange={setOpen}
       title={t("invite_new_client")}
       description={t("add_potential_client_send_invitation")}
-      className="bg-[#111111] border-[#1f1f23] text-white sm:max-w-[500px]"
+      className="bg-card border-border text-foreground sm:max-w-[500px]"
     >
 
         <form onSubmit={handleSubmit} className="space-y-4 pt-0">
@@ -151,7 +151,7 @@ const AddClientDialog = ({ children }: AddClientDialogProps) => {
               onChange={(e) =>
                 setFormData((prev) => ({ ...prev, first_name: e.target.value }))
               }
-              className="bg-[#0a0a0a] border-[#1f1f23] text-white placeholder:text-gray-500 focus:border-gray-400"
+              className="bg-background border-border text-foreground placeholder:text-muted-foreground focus:border-ring"
             />
             <RequiredInput
               label={t("last_name")}
@@ -160,7 +160,7 @@ const AddClientDialog = ({ children }: AddClientDialogProps) => {
               onChange={(e) =>
                 setFormData((prev) => ({ ...prev, last_name: e.target.value }))
               }
-              className="bg-[#0a0a0a] border-[#1f1f23] text-white placeholder:text-gray-500 focus:border-gray-400"
+              className="bg-background border-border text-foreground placeholder:text-muted-foreground focus:border-ring"
             />
           </div>
 
@@ -172,7 +172,7 @@ const AddClientDialog = ({ children }: AddClientDialogProps) => {
               setFormData((prev) => ({ ...prev, email: e.target.value }))
             }
             required
-            className="bg-[#0a0a0a] border-[#1f1f23] text-white placeholder:text-gray-500 focus:border-gray-400"
+            className="bg-background border-border text-foreground placeholder:text-muted-foreground focus:border-ring"
           />
 
           {/* Action Buttons */}
@@ -181,14 +181,14 @@ const AddClientDialog = ({ children }: AddClientDialogProps) => {
               type="button"
               variant="outline"
               onClick={() => setOpen(false)}
-              className="border-[#333] bg-[#1a1a1a] hover:bg-[#2a2a2a] text-gray-300 hover:text-white"
+              className="border-border bg-card hover:bg-muted text-muted-foreground hover:text-foreground"
             >
               {t("cancel")}
             </Button>
             <Button
               type="submit"
               disabled={createClientMutation.isPending}
-              className="bg-neutral-50 hover:bg-[#d6d6d6] text-neutral-950 flex items-center gap-2"
+              className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center gap-2"
             >
               <Send className="w-4 h-4" />
               {createClientMutation.isPending

@@ -44,40 +44,40 @@ const AdminSettings = () => {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-semibold text-white mb-1">{t("settings")}</h2>
-            <p className="text-gray-400 text-sm">
+            <h2 className="text-2xl font-semibold text-foreground mb-1">{t("settings")}</h2>
+            <p className="text-muted-foreground text-sm">
               {t("manage_account_preferences")}
             </p>
           </div>
         </div>
 
         {/* Profile Management */}
-        <Card className="bg-[#111111] border-[#1f1f23]">
+        <Card className="bg-card border-border">
           <CardHeader>
             <div className="flex items-center space-x-2">
-              <User className="h-5 w-5 text-gray-400" />
-              <CardTitle className="text-white text-lg">
+              <User className="h-5 w-5 text-muted-foreground" />
+              <CardTitle className="text-foreground text-lg">
                 {t("profile_management")}
               </CardTitle>
             </div>
-            <CardDescription className="text-gray-400 text-sm">
+            <CardDescription className="text-muted-foreground text-sm">
               {t("manage_personal_info_admin")}
             </CardDescription>
           </CardHeader>
           <CardContent>
             {!isMobile ? (
-              <div className="flex items-center justify-between p-4 border border-[#1f1f23] rounded-lg bg-[#0a0a0a]">
+              <div className="flex items-center justify-between p-4 border border-border rounded-lg bg-background">
                 <div>
-                  <h4 className="text-white font-medium mb-1">
+                  <h4 className="text-foreground font-medium mb-1">
                     {t("edit_profile_information")}
                   </h4>
-                  <p className="text-gray-400 text-sm">
+                  <p className="text-muted-foreground text-sm">
                     {t("update_personal_details")}
                   </p>
                 </div>
                 <Button
                   onClick={() => navigate(`/dashboard/admin/profile`)}
-                  className="bg-neutral-50 hover:bg-[#d6d6d6] text-neutral-950 px-4 py-2 rounded-lg font-medium transition-colors flex items-center space-x-2"
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2 rounded-lg font-medium transition-colors flex items-center space-x-2"
                 >
                   <span>{t("edit_profile")}</span>
                   <ExternalLink className="h-4 w-4" />
@@ -86,7 +86,7 @@ const AdminSettings = () => {
             ) : (
               <Button
                 onClick={() => navigate(`/dashboard/admin/profile`)}
-                className="w-full bg-neutral-50 hover:bg-[#d6d6d6] text-neutral-950 px-4 py-2 rounded-lg font-medium transition-colors flex items-center space-x-2"
+                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2 rounded-lg font-medium transition-colors flex items-center space-x-2"
               >
                 <span>{t("edit_profile")}</span>
                 <ExternalLink className="h-4 w-4" />
@@ -96,13 +96,13 @@ const AdminSettings = () => {
         </Card>
 
         {/* Theme Selection */}
-        <Card className="bg-[#111111] border-[#1f1f23]">
+        <Card className="bg-card border-border">
           <CardHeader>
             <div className="flex items-center space-x-2">
-              <Palette className="h-5 w-5 text-gray-400" />
-              <CardTitle className="text-white text-lg">{t("theme")}</CardTitle>
+              <Palette className="h-5 w-5 text-muted-foreground" />
+              <CardTitle className="text-foreground text-lg">{t("theme")}</CardTitle>
             </div>
-            <CardDescription className="text-gray-400 text-sm">
+            <CardDescription className="text-muted-foreground text-sm">
               {t("customize_dashboard_appearance")}
             </CardDescription>
           </CardHeader>
@@ -112,15 +112,15 @@ const AdminSettings = () => {
         </Card>
 
         {/* Notification Settings */}
-        <Card className="bg-[#111111] border-[#1f1f23]">
+        <Card className="bg-card border-border">
           <CardHeader>
             <div className="flex items-center space-x-2">
-              <Bell className="h-5 w-5 text-gray-400" />
-              <CardTitle className="text-white text-lg">
+              <Bell className="h-5 w-5 text-muted-foreground" />
+              <CardTitle className="text-foreground text-lg">
                 {t("notification_preferences")}
               </CardTitle>
             </div>
-            <CardDescription className="text-gray-400 text-sm">
+            <CardDescription className="text-muted-foreground text-sm">
               {t("choose_notification_method")}
             </CardDescription>
           </CardHeader>
@@ -128,38 +128,38 @@ const AdminSettings = () => {
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label className="text-gray-300">{t("email_notifications")}</Label>
-                  <p className="text-sm text-gray-400">
+                  <Label className="text-muted-foreground">{t("email_notifications")}</Label>
+                  <p className="text-sm text-muted-foreground">
                     {t("receive_notifications_email")}
                   </p>
                 </div>
                 <Switch />
               </div>
-              <Separator className="bg-[#1f1f23]" />
+              <Separator className="bg-border" />
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label className="text-gray-300">{t("push_notifications")}</Label>
-                  <p className="text-sm text-gray-400">
+                  <Label className="text-muted-foreground">{t("push_notifications")}</Label>
+                  <p className="text-sm text-muted-foreground">
                     {t("receive_push_notifications")}
                   </p>
                 </div>
                 <Switch />
               </div>
-              <Separator className="bg-[#1f1f23]" />
+              <Separator className="bg-border" />
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label className="text-gray-300">{t("system_alerts")}</Label>
-                  <p className="text-sm text-gray-400">
+                  <Label className="text-muted-foreground">{t("system_alerts")}</Label>
+                  <p className="text-sm text-muted-foreground">
                     {t("system_maintenance_updates")}
                   </p>
                 </div>
                 <Switch />
               </div>
-              <Separator className="bg-[#1f1f23]" />
+              <Separator className="bg-border" />
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label className="text-gray-300">{t("security_alerts")}</Label>
-                  <p className="text-sm text-gray-400">
+                  <Label className="text-muted-foreground">{t("security_alerts")}</Label>
+                  <p className="text-sm text-muted-foreground">
                     {t("receive_security_notifications")}
                   </p>
                 </div>

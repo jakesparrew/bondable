@@ -24,7 +24,7 @@ const TableSkeleton = ({ userType, title = "Loading..." }: TableSkeletonProps) =
         </div>
 
         {/* Main Table Card */}
-        <Card className="bg-[#111111] border-[#1f1f23]">
+        <Card className="bg-muted border-border">
           <CardContent className="px-3 sm:px-6 pt-4">
             {/* Search and Filters */}
             <div className="mb-4 space-y-3 flex flex-col">
@@ -36,10 +36,10 @@ const TableSkeleton = ({ userType, title = "Loading..." }: TableSkeletonProps) =
             </div>
 
             {/* Table */}
-            <div className="rounded-lg border border-[#1f1f23] overflow-hidden">
+            <div className="rounded-lg border border-border overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full">
-                  <thead className="bg-[#0a0a0a]">
+                  <thead className="bg-background">
                     <tr>
                       <th className="px-4 py-3 text-left">
                         <Skeleton className="h-4 w-12 " />
@@ -51,7 +51,7 @@ const TableSkeleton = ({ userType, title = "Loading..." }: TableSkeletonProps) =
                   </thead>
                   <tbody>
                     {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-                      <tr key={i} className="border-t border-[#1f1f23]">
+                      <tr key={i} className="border-t border-border">
                         <td className="px-4 py-3 text-left">
                           <Skeleton className="h-8 w-8 " />
                         </td>

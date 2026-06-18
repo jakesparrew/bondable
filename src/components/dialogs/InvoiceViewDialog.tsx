@@ -235,40 +235,40 @@ export default function InvoiceViewDialog({ isOpen, onClose, invoiceNumber }: In
 
   return (
     <Dialog open={internalOpen} onOpenChange={handleOpenChange}>
-      <DialogContent className="max-w-2xl bg-[#111111] border-[#1f1f23]">
+      <DialogContent className="max-w-2xl bg-card border-border">
         <DialogHeader>
-          <DialogTitle className="text-white flex items-center gap-2">
+          <DialogTitle className="text-foreground flex items-center gap-2">
             <FileText className="h-5 w-5" />
             Invoice {invoiceNumber}
           </DialogTitle>
-          <DialogDescription className="text-gray-400">
+          <DialogDescription className="text-muted-foreground">
             View detailed invoice information and download PDF
           </DialogDescription>
         </DialogHeader>
 
         {!invoice ? (
           <div className="py-8 text-center">
-            <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <p className="text-white mb-2">{t("invoice_not_found")}</p>
-            <p className="text-gray-400 text-sm">{t("unable_to_load_invoice", { invoiceNumber })}</p>
+            <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+            <p className="text-foreground mb-2">{t("invoice_not_found")}</p>
+            <p className="text-muted-foreground text-sm">{t("unable_to_load_invoice", { invoiceNumber })}</p>
           </div>
         ) : (
           <div className="space-y-4">
             {/* Compact Header with Key Info */}
-            <Card className="bg-[#0a0a0a] border-[#1f1f23]">
+            <Card className="bg-card border-border">
               <CardContent className="p-4">
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 bg-[#1f1f23] rounded-lg flex items-center justify-center">
-                      <FileText className="h-6 w-6 text-gray-400" />
+                    <div className="w-12 h-12 bg-card rounded-lg flex items-center justify-center">
+                      <FileText className="h-6 w-6 text-muted-foreground" />
                     </div>
                     <div>
-                      <h3 className="text-white font-semibold text-lg">{invoice.invoiceNumber}</h3>
-                      <p className="text-gray-400 text-sm">{invoice.serviceDescription}</p>
+                      <h3 className="text-foreground font-semibold text-lg">{invoice.invoiceNumber}</h3>
+                      <p className="text-muted-foreground text-sm">{invoice.serviceDescription}</p>
                     </div>
                   </div>
                   <div className="text-right">
-                    <div className="text-2xl font-bold text-white mb-1">${invoice.amount.toFixed(2)}</div>
+                    <div className="text-2xl font-bold text-foreground mb-1">${invoice.amount.toFixed(2)}</div>
                     <Badge className={`${getStatusColor(invoice.status)} text-xs`}>
                       {invoice.status.charAt(0).toUpperCase() + invoice.status.slice(1)}
                     </Badge>
@@ -280,38 +280,38 @@ export default function InvoiceViewDialog({ isOpen, onClose, invoiceNumber }: In
                 {/* Compact Info Grid */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
   {/* Client */}
-  <div className="flex items-start gap-3 bg-[#0a0a0a] border border-[#1f1f23] rounded-xl p-4 hover:border-gray-600 transition">
-    <User className="h-4 w-4 text-gray-400 mt-1" />
+  <div className="flex items-start gap-3 bg-background border border-border rounded-xl p-4 hover:border-gray-600 transition">
+    <User className="h-4 w-4 text-muted-foreground mt-1" />
                      <div>
-                       <p className="text-gray-400 text-xs">{t("client")}</p>
-                       <p className="text-white font-medium">{invoice.clientName}</p>
+                       <p className="text-muted-foreground text-xs">{t("client")}</p>
+                       <p className="text-foreground font-medium">{invoice.clientName}</p>
                      </div>
   </div>
 
   {/* Service Date */}
-  <div className="flex items-start gap-3 bg-[#0a0a0a] border border-[#1f1f23] rounded-xl p-4 hover:border-gray-600 transition">
-    <Calendar className="h-4 w-4 text-gray-400 mt-1" />
+  <div className="flex items-start gap-3 bg-background border border-border rounded-xl p-4 hover:border-gray-600 transition">
+    <Calendar className="h-4 w-4 text-muted-foreground mt-1" />
                      <div>
-                       <p className="text-gray-400 text-xs">{t("service_date")}</p>
-                       <p className="text-white font-medium">{invoice.serviceDate}</p>
+                       <p className="text-muted-foreground text-xs">{t("service_date")}</p>
+                       <p className="text-foreground font-medium">{invoice.serviceDate}</p>
                      </div>
   </div>
 
   {/* Duration */}
-  <div className="flex items-start gap-3 bg-[#0a0a0a] border border-[#1f1f23] rounded-xl p-4 hover:border-gray-600 transition">
-    <Clock className="h-4 w-4 text-gray-400 mt-1" />
+  <div className="flex items-start gap-3 bg-background border border-border rounded-xl p-4 hover:border-gray-600 transition">
+    <Clock className="h-4 w-4 text-muted-foreground mt-1" />
                      <div>
-                       <p className="text-gray-400 text-xs">{t("duration")}</p>
-                       <p className="text-white font-medium">{invoice.duration}</p>
+                       <p className="text-muted-foreground text-xs">{t("duration")}</p>
+                       <p className="text-foreground font-medium">{invoice.duration}</p>
                      </div>
   </div>
 
   {/* Payment Method */}
-  <div className="flex items-start gap-3 bg-[#0a0a0a] border border-[#1f1f23] rounded-xl p-4 hover:border-gray-600 transition">
-    <div className="h-4 w-4 text-gray-400 mt-1">{getPaymentMethodIcon(invoice.method)}</div>
+  <div className="flex items-start gap-3 bg-background border border-border rounded-xl p-4 hover:border-gray-600 transition">
+    <div className="h-4 w-4 text-muted-foreground mt-1">{getPaymentMethodIcon(invoice.method)}</div>
                      <div>
-                       <p className="text-gray-400 text-xs">{t("payment_method")}</p>
-                       <p className="text-white font-medium capitalize">
+                       <p className="text-muted-foreground text-xs">{t("payment_method")}</p>
+                       <p className="text-foreground font-medium capitalize">
                          {invoice.method.replace("_", " ")}
                        </p>
                      </div>
@@ -323,24 +323,24 @@ export default function InvoiceViewDialog({ isOpen, onClose, invoiceNumber }: In
 
             {/* Dates and Contact Info */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Card className="bg-[#0a0a0a] border-[#1f1f23]">
+              <Card className="bg-card border-border">
                 <CardContent className="p-4">
-                    <h4 className="text-white font-medium mb-3 flex items-center gap-2">
+                    <h4 className="text-foreground font-medium mb-3 flex items-center gap-2">
                       <Calendar className="h-4 w-4" />
                       {t("timeline")}
                     </h4>
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
-                      <span className="text-gray-400">{t("issued")}:</span>
-                      <span className="text-white">{invoice.issueDate}</span>
+                      <span className="text-muted-foreground">{t("issued")}:</span>
+                      <span className="text-foreground">{invoice.issueDate}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-400">{t("due")}:</span>
-                      <span className="text-white">{invoice.dueDate}</span>
+                      <span className="text-muted-foreground">{t("due")}:</span>
+                      <span className="text-foreground">{invoice.dueDate}</span>
                     </div>
                     {invoice.status === "paid" && (
                       <div className="flex justify-between">
-                        <span className="text-gray-400">{t("paid")}:</span>
+                        <span className="text-muted-foreground">{t("paid")}:</span>
                         <span className="text-green-500/80">{invoice.issueDate}</span>
                       </div>
                     )}
@@ -348,16 +348,16 @@ export default function InvoiceViewDialog({ isOpen, onClose, invoiceNumber }: In
                 </CardContent>
               </Card>
 
-              <Card className="bg-[#0a0a0a] border-[#1f1f23]">
+              <Card className="bg-card border-border">
                 <CardContent className="p-4">
-                  <h4 className="text-white font-medium mb-3 flex items-center gap-2">
+                  <h4 className="text-foreground font-medium mb-3 flex items-center gap-2">
                     <Mail className="h-4 w-4" />
                     {t("contact")}
                   </h4>
                   <div className="space-y-2 text-sm">
                     <div>
-                      <p className="text-gray-400">Email</p>
-                      <p className="text-white">{invoice.clientEmail}</p>
+                      <p className="text-muted-foreground">Email</p>
+                      <p className="text-foreground">{invoice.clientEmail}</p>
                     </div>
                   </div>
                 </CardContent>
@@ -370,14 +370,14 @@ export default function InvoiceViewDialog({ isOpen, onClose, invoiceNumber }: In
           <Button
             variant="outline"
             onClick={handleClose}
-            className="bg-neutral-950 hover:bg-neutral-800 text-neutral-50 border border-neutral-900 hover:text-neutral-300"
+            className="bg-card hover:bg-muted text-foreground border border-border hover:text-muted-foreground"
           >
             {t("close")}
           </Button>
           {invoice && (
             <Button
               onClick={handleDownload}
-              className="bg-neutral-50 hover:bg-neutral-300 text-neutral-950"
+              className="bg-primary text-primary-foreground hover:bg-primary/90"
             >
               <Download className="w-4 h-4 mr-2" />
               {t("download_pdf")}

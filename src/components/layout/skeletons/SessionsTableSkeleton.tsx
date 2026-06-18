@@ -42,7 +42,7 @@ const SessionsTableSkeleton = ({ userType }: SessionsTableSkeletonProps) => {
               </div>
               <div className="grid gap-3">
                 {[1, 2].map((i) => (
-                  <Card key={i} className="bg-[#111111] border-border">
+                  <Card key={i} className="bg-muted border-border">
                     <CardContent className="p-4">
                       <div className="flex items-start justify-between mb-3">
                         <div className="flex items-center gap-3">
@@ -87,7 +87,7 @@ const SessionsTableSkeleton = ({ userType }: SessionsTableSkeletonProps) => {
               </div>
               <div className="grid gap-3">
                 {[1, 2, 3].map((i) => (
-                  <Card key={i} className="bg-[#111111] border-border">
+                  <Card key={i} className="bg-muted border-border">
                     <CardContent className="p-4">
                       <div className="flex items-start justify-between mb-3">
                         <div className="flex items-center gap-3">
@@ -136,7 +136,7 @@ const SessionsTableSkeleton = ({ userType }: SessionsTableSkeletonProps) => {
               </div>
               <div className="grid gap-3">
                 {[1, 2].map((i) => (
-                  <Card key={i} className="bg-[#111111] border-border opacity-75">
+                  <Card key={i} className="bg-muted border-border opacity-75">
                     <CardContent className="p-4">
                       <div className="flex items-start justify-between mb-3">
                         <div className="flex items-center gap-3">

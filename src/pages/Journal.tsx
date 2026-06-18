@@ -115,8 +115,8 @@ const Journal = () => {
       <div className="space-y-4 md:space-y-6">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h2 className="text-xl md:text-2xl font-semibold text-white mb-1">{t("journal")}</h2>
-            <p className="text-gray-400 text-sm">
+            <h2 className="text-xl md:text-2xl font-semibold text-foreground mb-1">{t("journal")}</h2>
+            <p className="text-muted-foreground text-sm">
               {t("track_thoughts_feelings")}
             </p>
           </div>
@@ -129,7 +129,7 @@ const Journal = () => {
               });
             }}
             trigger={
-              <Button className="bg-neutral-50 hover:bg-[#d6d6d6] text-neutral-950 px-4 py-2 rounded-lg font-medium transition-colors w-full md:w-auto">
+              <Button className="bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2 rounded-lg font-medium transition-colors w-full md:w-auto">
                 <Plus className="w-4 h-4 mr-2" />
                 {t("new_entry")}
               </Button>
@@ -137,9 +137,9 @@ const Journal = () => {
           />
         </div>
 
-        <Card className="bg-[#111111] border-[#1f1f23]">
+        <Card className="bg-card border-border">
           <CardHeader className="pb-4 md:pb-6">
-            <CardTitle className="text-white text-lg">
+            <CardTitle className="text-foreground text-lg">
               {t("how_feeling_today")}
             </CardTitle>
           </CardHeader>
@@ -148,10 +148,10 @@ const Journal = () => {
               value={quickEntry}
               onChange={(e) => setQuickEntry(e.target.value)}
               placeholder={t("write_day_thoughts_feelings")}
-              className="bg-[#0a0a0a] border-[#1f1f23] text-white placeholder:text-gray-500 min-h-32 focus:border-gray-400 resize-none"
+              className="bg-background border-border text-foreground placeholder:text-muted-foreground min-h-32 focus:border-ring resize-none"
             />
             <div className="space-y-3">
-              <Label className="text-gray-300">
+              <Label className="text-muted-foreground">
                 {t("attach_files_images_optional")}
                 {files.length > 0 && (
                   <span className="text-sm text-blue-400">
@@ -170,7 +170,7 @@ const Journal = () => {
             <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4">
               <div className="flex-1">
                 <div className="flex flex-col md:flex-row gap-2 md:items-start">
-                  <span className="text-sm text-gray-400 md:mt-2">{t("sharing")}:</span>
+                  <span className="text-sm text-muted-foreground md:mt-2">{t("sharing")}:</span>
                   <div className="flex-1">
                     <TherapistSharingSelector
                       selectedTherapists={quickSelectedTherapists}
@@ -183,7 +183,7 @@ const Journal = () => {
               </div>
               <Button
                 onClick={handleQuickSave}
-                className="bg-neutral-50 hover:bg-[#d6d6d6] text-neutral-950 w-full md:w-auto"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground w-full md:w-auto"
                 disabled={
                   !quickIsPrivate && quickSelectedTherapists.length === 0
                 }
@@ -194,24 +194,24 @@ const Journal = () => {
           </CardContent>
         </Card>
 
-        <Card className="bg-[#111111] border-[#1f1f23]">
+        <Card className="bg-card border-border">
           <CardHeader className="pb-4 md:pb-6">
-            <CardTitle className="text-white text-lg">{t("recent_entries")}</CardTitle>
+            <CardTitle className="text-foreground text-lg">{t("recent_entries")}</CardTitle>
           </CardHeader>
           <CardContent className="p-4 md:p-6">
             {loading ? (
-              <div className="text-center py-8 text-gray-400">
+              <div className="text-center py-8 text-muted-foreground">
                 {t("loading_entries")}
               </div>
             ) : entries.length === 0 ? (
               <div className="text-center py-12 md:py-16">
-                <div className="w-12 h-12 bg-[#1a1a1a] rounded-lg flex items-center justify-center mx-auto mb-4">
-                  <BookOpen className="h-6 w-6 text-gray-400" />
+                <div className="w-12 h-12 bg-card rounded-lg flex items-center justify-center mx-auto mb-4">
+                  <BookOpen className="h-6 w-6 text-muted-foreground" />
                 </div>
-                <h3 className="text-lg font-medium text-white mb-2">
+                <h3 className="text-lg font-medium text-foreground mb-2">
                   {t("start_your_journal")}
                 </h3>
-                <p className="text-gray-400 text-sm mb-6 px-4">
+                <p className="text-muted-foreground text-sm mb-6 px-4">
                   {t("writing_regularly_helps_track_progress")}
                 </p>
                 <JournalEntryDialog
@@ -223,7 +223,7 @@ const Journal = () => {
                     });
                   }}
                   trigger={
-                    <Button className="bg-neutral-50 hover:bg-[#d6d6d6] text-neutral-950 w-full md:w-auto">
+                    <Button className="bg-primary hover:bg-primary/90 text-primary-foreground w-full md:w-auto">
                       <Plus className="w-4 h-4 mr-2" />
                       {t("write_first_entry")}
                     </Button>

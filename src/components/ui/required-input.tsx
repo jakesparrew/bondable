@@ -30,7 +30,7 @@ export function RequiredInput({
   
   return (
     <div className="space-y-2">
-      <Label htmlFor={id} className="text-gray-300">
+      <Label htmlFor={id} className="text-muted-foreground">
         {label} {required && <span className="text-red-400">*</span>}
       </Label>
       <Input

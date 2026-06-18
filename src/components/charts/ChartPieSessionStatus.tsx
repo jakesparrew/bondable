@@ -100,21 +100,21 @@ export function ChartPieSessionStatus({ period = "month" }: ChartPieSessionStatu
   const totalSessions = sessionData.reduce((sum, item) => sum + item.sessions, 0);
 
   return (
-    <Card data-chart={id} className="flex flex-col bg-[#111111] border-[#1f1f23] h-full">
+    <Card data-chart={id} className="flex flex-col bg-card border-border h-full">
       <ChartStyle id={id} config={chartConfig} />
       <CardHeader className="flex-row items-start space-y-0 pb-0">
         <div className="grid gap-1">
-          <CardTitle className="text-white">{t("session_status")}</CardTitle>
-          <CardDescription className="text-gray-400">{t("session_completion_breakdown")}</CardDescription>
+          <CardTitle className="text-foreground">{t("session_status")}</CardTitle>
+          <CardDescription className="text-muted-foreground">{t("session_completion_breakdown")}</CardDescription>
         </div>
         <Select value={activeStatus} onValueChange={setActiveStatus}>
           <SelectTrigger
-            className="ml-auto h-7 w-[130px] rounded-lg pl-2.5 bg-[#1a1a1a] border-[#1f1f23] text-white"
+            className="ml-auto h-7 w-[130px] rounded-lg pl-2.5 bg-background border-border text-foreground"
             aria-label={t("select_a_status")}
           >
             <SelectValue placeholder={t("select_status")} />
           </SelectTrigger>
-          <SelectContent align="end" className="rounded-xl bg-[#1a1a1a] border-[#1f1f23]">
+          <SelectContent align="end" className="rounded-xl bg-card border-border">
             {statuses.map((key) => {
               const config = chartConfig[key as keyof typeof chartConfig];
 
@@ -126,7 +126,7 @@ export function ChartPieSessionStatus({ period = "month" }: ChartPieSessionStatu
                 <SelectItem
                   key={key}
                   value={key}
-                  className="rounded-lg [&_span]:flex text-white hover:bg-[#2a2a2a]"
+                  className="rounded-lg [&_span]:flex text-foreground hover:bg-muted"
                 >
                   <div className="flex items-center gap-2 text-xs">
                     <span
@@ -153,9 +153,9 @@ export function ChartPieSessionStatus({ period = "month" }: ChartPieSessionStatu
             <ChartTooltip
               cursor={false}
               content={
-                <ChartTooltipContent 
-                  hideLabel 
-                  className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                <ChartTooltipContent
+                  hideLabel
+                  className="bg-card border-border text-foreground"
                   formatter={(value, name) => [
                     `${value} sessions (${(((value as number) / totalSessions) * 100).toFixed(1)}%)`,
                     name,
@@ -197,14 +197,14 @@ export function ChartPieSessionStatus({ period = "month" }: ChartPieSessionStatu
                         <tspan
                           x={viewBox.cx}
                           y={viewBox.cy}
-                          className="fill-white text-3xl font-bold"
+                          className="fill-foreground text-3xl font-bold"
                         >
                           {sessionData[activeIndex].sessions.toLocaleString()}
                         </tspan>
                         <tspan
                           x={viewBox.cx}
                           y={(viewBox.cy || 0) + 24}
-                          className="fill-gray-400"
+                          className="fill-muted-foreground"
                         >
                           {t("sessions")}
                         </tspan>

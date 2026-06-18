@@ -60,7 +60,7 @@ const BaseDialog = ({
   onOpenChange,
   title,
   description,
-  className = "bg-[#111111] border-[#1f1f23] text-white",
+  className = "bg-card border-border text-foreground",
   showDivider = true,
 }: BaseDialogProps) => {
   return (
@@ -69,7 +69,7 @@ const BaseDialog = ({
       <DialogContent className={className}>
         <DialogHeader>
           {title && (
-            <DialogTitle className="text-white mb-3">
+            <DialogTitle className="text-foreground mb-3">
               {title}
             </DialogTitle>
           )}
@@ -77,7 +77,7 @@ const BaseDialog = ({
             <div className="h-px w-full bg-gradient-to-r from-transparent via-[#3f3f3f] to-transparent" />
           )}
           {description && (
-            <p className="text-gray-400 text-sm pt-2">
+            <p className="text-muted-foreground text-sm pt-2">
               {description}
             </p>
           )}

@@ -98,23 +98,23 @@ export function ChartBarTasks({ period = "month" }: ChartBarTasksProps) {
   const labels = getPeriodLabels(period);
 
   return (
-    <Card className="bg-[#111111] border-[#1f1f23] h-full">
+    <Card className="bg-card border-border h-full">
       <CardHeader>
-        <CardTitle className="text-white">{labels.title}</CardTitle>
-        <CardDescription className="text-gray-400">
+        <CardTitle className="text-foreground">{labels.title}</CardTitle>
+        <CardDescription className="text-muted-foreground">
           {labels.description}
         </CardDescription>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig} className="max-h-[200px] w-full">
           <BarChart accessibilityLayer data={chartData}>
-            <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="#2a2a2a" />
+            <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="hsl(var(--border))" />
             <XAxis
               dataKey="date"
               tickLine={false}
               tickMargin={10}
               axisLine={false}
-              tick={{ fill: "#9ca3af", fontSize: 12 }}
+              tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }}
             />
             <Bar
               dataKey="completed"
@@ -138,7 +138,7 @@ export function ChartBarTasks({ period = "month" }: ChartBarTasksProps) {
               content={
                 <ChartTooltipContent
                   hideLabel
-                  className="w-[180px] bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                  className="w-[180px] bg-card border-border text-foreground"
                   formatter={(value, name, item, index) => (
                     <>
                       <div
@@ -150,17 +150,17 @@ export function ChartBarTasks({ period = "month" }: ChartBarTasksProps) {
                         }
                       />
                       {chartConfig[name as keyof typeof chartConfig]?.label || name}
-                      <div className="text-white ml-auto flex items-baseline gap-0.5 font-mono font-medium tabular-nums">
+                      <div className="text-foreground ml-auto flex items-baseline gap-0.5 font-mono font-medium tabular-nums">
                         {value}
-                        <span className="text-gray-400 font-normal">{t("tasks")}</span>
+                        <span className="text-muted-foreground font-normal">{t("tasks")}</span>
                       </div>
                       {/* Add total after the last item */}
                       {index === 2 && (
-                        <div className="text-white mt-1.5 flex basis-full items-center border-t border-[#2a2a2a] pt-1.5 text-xs font-medium">
+                        <div className="text-foreground mt-1.5 flex basis-full items-center border-t border-border pt-1.5 text-xs font-medium">
                           {t("total")}
-                          <div className="text-white ml-auto flex items-baseline gap-0.5 font-mono font-medium tabular-nums">
+                          <div className="text-foreground ml-auto flex items-baseline gap-0.5 font-mono font-medium tabular-nums">
                             {item.payload.completed + item.payload.inProgress + item.payload.denied}
-                            <span className="text-gray-400 font-normal">{t("tasks")}</span>
+                            <span className="text-muted-foreground font-normal">{t("tasks")}</span>
                           </div>
                         </div>
                       )}

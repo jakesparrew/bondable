@@ -20,9 +20,9 @@ const JournalSkeleton = ({ userType }: JournalSkeletonProps) => {
         </div>
 
         {/* Quick Entry Card */}
-        <Card className="bg-[#111111] border-[#1f1f23]">
+        <Card className="bg-muted border-border">
           <CardHeader className="pb-4 md:pb-6">
-            <CardTitle className="text-white text-lg">
+            <CardTitle className="text-foreground text-lg">
               <Skeleton className="h-6 w-48" />
             </CardTitle>
           </CardHeader>
@@ -54,16 +54,16 @@ const JournalSkeleton = ({ userType }: JournalSkeletonProps) => {
         </Card>
 
         {/* Recent Entries */}
-        <Card className="bg-[#111111] border-[#1f1f23]">
+        <Card className="bg-muted border-border">
           <CardHeader className="pb-4 md:pb-6">
-            <CardTitle className="text-white text-lg">
+            <CardTitle className="text-foreground text-lg">
               <Skeleton className="h-6 w-36" />
             </CardTitle>
           </CardHeader>
           <CardContent className="p-4 md:p-6">
             <div className="space-y-4">
               {[1, 2, 3, 4].map((i) => (
-                <Card key={i} className="bg-[#0a0a0a] border-[#1f1f23]">
+                <Card key={i} className="bg-background border-border">
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
                       <div className="space-y-1">

@@ -153,7 +153,7 @@ export default function AddressAutoComplete(props: AddressAutoCompleteProps) {
           value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}
           placeholder={placeholder || "Enter address manually"}
-          className="bg-[#0a0a0a] border-[#1f1f23] text-white"
+          className="bg-background border-border text-foreground"
         />
         <div className="text-sm text-yellow-500 bg-yellow-500/10 p-2 rounded border border-yellow-500/20">
           Google Places API unavailable. Please enter address manually or check
@@ -191,7 +191,7 @@ export default function AddressAutoComplete(props: AddressAutoCompleteProps) {
               disabled={isLoading}
               size="icon"
               variant="outline"
-              className="shrink-0 border-[#333] bg-[#1a1a1a] hover:bg-[#2a2a2a] text-gray-300 hover:text-white"
+              className="shrink-0 border-border bg-card hover:bg-muted text-muted-foreground hover:text-foreground"
             >
               <Pencil className="size-4" />
             </Button>
@@ -214,7 +214,7 @@ export default function AddressAutoComplete(props: AddressAutoCompleteProps) {
             }}
             size="icon"
             variant="outline"
-            className="shrink-0 border-[#333] bg-[#1a1a1a] hover:bg-[#2a2a2a] text-gray-300 hover:text-white"
+            className="shrink-0 border-border bg-card hover:bg-muted text-muted-foreground hover:text-foreground"
           >
             <Delete className="size-4" />
           </Button>
@@ -294,14 +294,14 @@ function AddressAutoCompleteInput(props: CommonProps) {
       onKeyDown={handleKeyDown}
       className="overflow-visible !rounded-lg"
     >
-      <div className="flex w-full items-center justify-between border border-[#1f1f23] bg-[#0a0a0a] ring-offset-background text-sm focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 rounded-lg ">
+      <div className="flex w-full items-center justify-between border border-border bg-background ring-offset-background text-sm focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 rounded-lg ">
         <CommandPrimitive.Input
           value={searchInput}
           onValueChange={setSearchInput}
           onBlur={close}
           onFocus={open}
           placeholder={placeholder || "Enter address"}
-          className="w-full p-[0.57rem] rounded-lg outline-none bg-transparent text-white placeholder:text-gray-500"
+          className="w-full p-[0.57rem] rounded-lg outline-none bg-transparent text-foreground placeholder:text-muted-foreground"
         />
       </div>
       {searchInput !== "" && !isOpen && !selectedPlaceId && showInlineError && (
@@ -314,10 +314,10 @@ function AddressAutoCompleteInput(props: CommonProps) {
         <div className="relative animate-in fade-in-0 zoom-in-95 h-auto">
           <CommandList>
             <div className="absolute top-1.5 z-50 w-full">
-              <CommandGroup className="relative h-auto z-50 min-w-[8rem] overflow-hidden rounded-md border border-[#1f1f23] shadow-md bg-[#111111]">
+              <CommandGroup className="relative h-auto z-50 min-w-[8rem] overflow-hidden rounded-md border border-border shadow-md bg-popover">
                 {isLoading ? (
                   <div className="h-28 flex items-center justify-center">
-                    <Loader2 className="size-6 animate-spin text-white" />
+                    <Loader2 className="size-6 animate-spin text-foreground" />
                   </div>
                 ) : (
                   <>
@@ -329,7 +329,7 @@ function AddressAutoCompleteInput(props: CommonProps) {
                           setSelectedPlaceId(prediction.place_id);
                           setIsOpenDialog(true);
                         }}
-                        className="flex select-text flex-col cursor-pointer gap-0.5 h-max p-2 px-3 rounded-md aria-selected:bg-[#1f1f23] aria-selected:text-white hover:bg-[#1f1f23] hover:text-white items-start text-white"
+                        className="flex select-text flex-col cursor-pointer gap-0.5 h-max p-2 px-3 rounded-md aria-selected:bg-accent aria-selected:text-accent-foreground hover:bg-accent hover:text-accent-foreground items-start text-foreground"
                         key={prediction.place_id}
                         onMouseDown={(e) => e.preventDefault()}
                       >
@@ -341,7 +341,7 @@ function AddressAutoCompleteInput(props: CommonProps) {
 
                 <CommandEmpty>
                   {!isLoading && predictions.length === 0 && (
-                    <div className="py-4 flex items-center justify-center text-gray-400">
+                    <div className="py-4 flex items-center justify-center text-muted-foreground">
                       {searchInput === ""
                         ? "Please enter an address"
                         : "No address found"}

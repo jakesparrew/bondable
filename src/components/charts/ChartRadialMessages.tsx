@@ -87,10 +87,10 @@ export function ChartRadialMessages({ period = "month" }: ChartRadialMessagesPro
   const labels = getPeriodLabels(period);
 
   return (
-    <Card className="flex flex-col bg-[#111111] border-[#1f1f23] h-full">
+    <Card className="flex flex-col bg-card border-border h-full">
       <CardHeader className="items-center pb-0">
-        <CardTitle className="text-white">{labels.title}</CardTitle>
-        <CardDescription className="text-gray-400">{labels.description}</CardDescription>
+        <CardTitle className="text-foreground">{labels.title}</CardTitle>
+        <CardDescription className="text-muted-foreground">{labels.description}</CardDescription>
       </CardHeader>
       <CardContent className="flex flex-1 items-center ">
         <ChartContainer
@@ -106,9 +106,9 @@ export function ChartRadialMessages({ period = "month" }: ChartRadialMessagesPro
             <ChartTooltip
               cursor={false}
               content={
-                <ChartTooltipContent 
-                  hideLabel 
-                  className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                <ChartTooltipContent
+                  hideLabel
+                  className="bg-card border-border text-foreground"
                   formatter={(value, name) => [
                     `${value} messages`,
                     chartConfig[name as keyof typeof chartConfig]?.label || name,
@@ -125,14 +125,14 @@ export function ChartRadialMessages({ period = "month" }: ChartRadialMessagesPro
                         <tspan
                           x={viewBox.cx}
                           y={(viewBox.cy || 0) - 16}
-                          className="fill-white text-2xl font-bold"
+                          className="fill-foreground text-2xl font-bold"
                         >
                           {totalMessages.toLocaleString()}
                         </tspan>
                         <tspan
                           x={viewBox.cx}
                           y={(viewBox.cy || 0) + 4}
-                          className="fill-gray-400"
+                          className="fill-muted-foreground"
                         >
                           {t("messages")}
                         </tspan>
@@ -167,10 +167,10 @@ export function ChartRadialMessages({ period = "month" }: ChartRadialMessagesPro
         </ChartContainer>
       </CardContent>
       <CardFooter className="flex-col gap-2 text-sm -mt-5">
-        <div className="flex items-center gap-2 leading-none font-medium text-white">
+        <div className="flex items-center gap-2 leading-none font-medium text-foreground">
           {t("trending_up_by")} {labels.change} {t("this_period")} <TrendingUp className="h-4 w-4 text-green-500" />
         </div>
-        <div className="text-gray-400 leading-none">
+        <div className="text-muted-foreground leading-none">
           {labels.footer}
         </div>
       </CardFooter>

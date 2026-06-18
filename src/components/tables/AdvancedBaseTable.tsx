@@ -183,17 +183,17 @@ function AdvancedBaseTable<T>({
             <DropdownMenuTrigger asChild>
               <Button
                 variant="ghost"
-                className="h-8 w-8 p-0 text-gray-400 hover:text-white"
+                className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground"
               >
                 <MoreHorizontal className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="bg-[#111111] border-[#1f1f23]">
+            <DropdownMenuContent align="end" className="bg-card border-border">
               {rowActions.map((action, index) => (
                 <DropdownMenuItem
                   key={index}
                   onClick={() => action.onClick(row.original)}
-                  className={action.className || "text-white hover:bg-[#2a2a2a]"}
+                  className={action.className || "text-foreground hover:bg-muted"}
                 >
                   {action.icon}
                   {action.label}
@@ -269,23 +269,23 @@ function AdvancedBaseTable<T>({
         {/* Filter skeleton */}
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-3 flex-wrap">
-            <div className="h-10 w-60 bg-[#1a1a1a] rounded-md animate-pulse" />
+            <div className="h-10 w-60 bg-muted rounded-md animate-pulse" />
             {!isMobile && (
               <>
-                <div className="h-10 w-20 bg-[#1a1a1a] rounded-md animate-pulse" />
-                <div className="h-10 w-16 bg-[#1a1a1a] rounded-md animate-pulse" />
+                <div className="h-10 w-20 bg-muted rounded-md animate-pulse" />
+                <div className="h-10 w-16 bg-muted rounded-md animate-pulse" />
               </>
             )}
           </div>
         </div>
 
         {/* Table skeleton */}
-        <div className="bg-[#111111] border-[#1f1f23] overflow-hidden rounded-md border">
+        <div className="bg-card border-border overflow-hidden rounded-md border">
           <Table>
             <TableHeader>
-              <TableRow className="hover:bg-transparent border-[#1f1f23]">
+              <TableRow className="hover:bg-transparent border-border">
                 {enhancedColumns.map((col, i) => (
-                  <TableHead key={i} className="text-gray-300">
+                  <TableHead key={i} className="text-muted-foreground">
                     <Skeleton className="h-4 w-20" />
                   </TableHead>
                 ))}
@@ -293,7 +293,7 @@ function AdvancedBaseTable<T>({
             </TableHeader>
             <TableBody>
               {[...Array(5)].map((_, idx) => (
-                <TableRow key={`skeleton-${idx}`} className="border-[#1f1f23]">
+                <TableRow key={`skeleton-${idx}`} className="border-border">
                   {enhancedColumns.map((col, i) => (
                     <TableCell key={i} className="py-4">
                       <Skeleton className="h-4 w-full max-w-[120px]" />
@@ -319,7 +319,7 @@ function AdvancedBaseTable<T>({
               <Input
                 id={`${id}-search`}
                 className={cn(
-                  "w-full sm:min-w-60 ps-9 bg-[#0a0a0a] border-[#1f1f23] text-white placeholder:text-gray-500 focus:border-gray-400",
+                  "w-full sm:min-w-60 ps-9 bg-background border-border text-foreground placeholder:text-muted-foreground focus:border-ring",
                   Boolean(table.getColumn(searchColumn)?.getFilterValue()) && "pe-9"
                 )}
                 value={(table.getColumn(searchColumn)?.getFilterValue() ?? "") as string}
@@ -327,13 +327,13 @@ function AdvancedBaseTable<T>({
                 placeholder={searchPlaceholder || t("search")}
                 type="text"
               />
-              <ListFilterIcon 
-                className="text-gray-500 pointer-events-none absolute inset-y-0 start-0 ps-3 top-1/2 transform -translate-y-1/2" 
-                size={16} 
+              <ListFilterIcon
+                className="text-muted-foreground pointer-events-none absolute inset-y-0 start-0 ps-3 top-1/2 transform -translate-y-1/2"
+                size={16}
               />
               {Boolean(table.getColumn(searchColumn)?.getFilterValue()) && (
                 <button
-                  className="text-gray-500 hover:text-white absolute inset-y-0 end-0 flex h-full w-9 items-center justify-center rounded-e-md"
+                  className="text-muted-foreground hover:text-foreground absolute inset-y-0 end-0 flex h-full w-9 items-center justify-center rounded-e-md"
                   onClick={() => table.getColumn(searchColumn)?.setFilterValue("")}
                 >
                   <CircleXIcon size={16} />
@@ -350,20 +350,20 @@ function AdvancedBaseTable<T>({
                   <PopoverTrigger asChild>
                     <Button
                       variant="outline"
-                      className="border-[#333] bg-[#1a1a1a] hover:bg-[#2a2a2a] text-gray-300 hover:text-white"
+                      className="border-border bg-card hover:bg-muted text-muted-foreground hover:text-foreground"
                     >
                       <FilterIcon className="-ms-1 opacity-60" size={16} />
                       {columnKey}
                       {selectedValues.length > 0 && (
-                        <span className="bg-[#0a0a0a] text-gray-400 -me-1 inline-flex h-5 items-center rounded border border-[#333] px-1 text-[0.625rem] font-medium">
+                        <span className="bg-background text-muted-foreground -me-1 inline-flex h-5 items-center rounded border border-border px-1 text-[0.625rem] font-medium">
                           {selectedValues.length}
                         </span>
                       )}
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-auto min-w-36 p-3 bg-[#111111] border-[#1f1f23]" align="start">
+                  <PopoverContent className="w-auto min-w-36 p-3 bg-card border-border" align="start">
                     <div className="space-y-3">
-                      <div className="text-gray-400 text-xs font-medium">{t("filters")}</div>
+                      <div className="text-muted-foreground text-xs font-medium">{t("filters")}</div>
                       <div className="space-y-3">
                         {values.map((value, i) => (
                           <div key={value} className="flex items-center gap-2">
@@ -376,10 +376,10 @@ function AdvancedBaseTable<T>({
                             />
                             <Label
                               htmlFor={`${id}-${columnKey}-${i}`}
-                              className="flex grow justify-between gap-2 font-normal text-gray-300"
+                              className="flex grow justify-between gap-2 font-normal text-muted-foreground"
                             >
                               {value}
-                              <span className="text-gray-400 ms-2 text-xs">
+                              <span className="text-muted-foreground ms-2 text-xs">
                                 {counts.get(value)}
                               </span>
                             </Label>
@@ -398,21 +398,21 @@ function AdvancedBaseTable<T>({
                 <DropdownMenuTrigger asChild>
                   <Button
                     variant="outline"
-                    className="border-[#333] bg-[#1a1a1a] hover:bg-[#2a2a2a] text-gray-300 hover:text-white"
+                    className="border-border bg-card hover:bg-muted text-muted-foreground hover:text-foreground"
                   >
                     <Columns3Icon className="-ms-1 opacity-60" size={16} />
                     {t("view")}
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="bg-[#111111] border-[#1f1f23]">
-                  <DropdownMenuLabel className="text-gray-300">{t("toggle_columns")}</DropdownMenuLabel>
+                <DropdownMenuContent align="end" className="bg-card border-border">
+                  <DropdownMenuLabel className="text-muted-foreground">{t("toggle_columns")}</DropdownMenuLabel>
                   {table
                     .getAllColumns()
                     .filter((column) => column.getCanHide())
                     .map((column) => (
                       <DropdownMenuCheckboxItem
                         key={column.id}
-                        className="capitalize text-gray-300 hover:bg-[#2a2a2a]"
+                        className="capitalize text-muted-foreground hover:bg-muted"
                         checked={column.getIsVisible()}
                         onCheckedChange={(value) => column.toggleVisibility(!!value)}
                         onSelect={(event) => event.preventDefault()}
@@ -431,11 +431,11 @@ function AdvancedBaseTable<T>({
               trigger={
                 <Button
                   variant="outline"
-                  className="border-[#333] bg-[#1a1a1a] hover:bg-[#2a2a2a] text-gray-300 hover:text-white relative"
+                  className="border-border bg-card hover:bg-muted text-muted-foreground hover:text-foreground relative"
                 >
                   <TrashIcon className="-ms-1 opacity-60" size={16} />
                   {t("delete")}
-                  <span className="absolute bg-[#0a0a0a] text-gray-400 inline-flex aspect-square min-w-5 h-5 items-center justify-center rounded-full border border-[#333] px-1 text-[0.625rem] font-medium mb-8 ml-12">
+                  <span className="absolute bg-background text-muted-foreground inline-flex aspect-square min-w-5 h-5 items-center justify-center rounded-full border border-border px-1 text-[0.625rem] font-medium mb-8 ml-12">
                     {table.getSelectedRowModel().rows.length}
                   </span>
                 </Button>
@@ -455,19 +455,19 @@ function AdvancedBaseTable<T>({
       )}
 
       {/* Table */}
-      <div className="bg-[#111111] border-[#1f1f23] overflow-hidden rounded-md border">
+      <div className="bg-card border-border overflow-hidden rounded-md border">
         <div className="overflow-x-auto">
           <Table className="table-fixed min-w-full">
             <TableHeader>
               {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id} className="hover:bg-transparent border-[#1f1f23]">
+                <TableRow key={headerGroup.id} className="hover:bg-transparent border-border">
                   {headerGroup.headers.map((header) => {
                     const meta = header.column.columnDef.meta as { className?: string } | undefined;
                     return (
                       <TableHead
                         key={header.id}
                         style={{ width: `${header.getSize()}px` }}
-                        className={cn("h-11 text-gray-300", meta?.className)}
+                        className={cn("h-11 text-muted-foreground", meta?.className)}
                       >
                         {header.isPlaceholder ? null : header.column.getCanSort() ? (
                           <div
@@ -495,7 +495,7 @@ function AdvancedBaseTable<T>({
                   <TableRow
                     key={row.id}
                     data-state={row.getIsSelected() && "selected"}
-                    className="border-[#1f1f23] hover:bg-[#1a1a1a]"
+                    className="border-border hover:bg-muted"
                   >
                     {row.getVisibleCells().map((cell) => {
                       const meta = cell.column.columnDef.meta as { className?: string } | undefined;
@@ -511,10 +511,10 @@ function AdvancedBaseTable<T>({
                   </TableRow>
                 ))
               ) : (
-                <TableRow className="border-[#1f1f23]">
+                <TableRow className="border-border">
                   <TableCell
                     colSpan={enhancedColumns.length}
-                    className="h-24 text-center text-gray-400"
+                    className="h-24 text-center text-muted-foreground"
                   >
                     {emptyMessage || t("no_data_available")}
                   </TableCell>
@@ -529,20 +529,20 @@ function AdvancedBaseTable<T>({
       {enablePagination && (
         <div className="flex items-center justify-between gap-4 sm:gap-8">
           <div className="flex items-center gap-3">
-            <Label className="max-sm:sr-only text-gray-300">{t("rows_per_page")}</Label>
+            <Label className="max-sm:sr-only text-muted-foreground">{t("rows_per_page")}</Label>
             <Select
               value={table.getState().pagination.pageSize.toString()}
               onValueChange={(value) => table.setPageSize(Number(value))}
             >
-              <SelectTrigger className="w-fit whitespace-nowrap bg-[#0a0a0a] border-[#1f1f23] text-white">
+              <SelectTrigger className="w-fit whitespace-nowrap bg-background border-border text-foreground">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="bg-[#111111] border-[#1f1f23]">
+              <SelectContent className="bg-card border-border">
                 {[5, 10, 25, 50].map((pageSize) => (
                   <SelectItem
                     key={pageSize}
                     value={pageSize.toString()}
-                    className="text-gray-300 hover:bg-[#2a2a2a]"
+                    className="text-muted-foreground hover:bg-muted"
                   >
                     {pageSize}
                   </SelectItem>
@@ -551,9 +551,9 @@ function AdvancedBaseTable<T>({
             </Select>
           </div>
 
-          <div className="text-gray-400 flex grow justify-end text-sm whitespace-nowrap">
-            <p className="text-gray-400 text-sm whitespace-nowrap">
-              <span className="text-white">
+          <div className="text-muted-foreground flex grow justify-end text-sm whitespace-nowrap">
+            <p className="text-muted-foreground text-sm whitespace-nowrap">
+              <span className="text-foreground">
                 {table.getState().pagination.pageIndex * table.getState().pagination.pageSize + 1}-
                 {Math.min(
                   (table.getState().pagination.pageIndex + 1) * table.getState().pagination.pageSize,
@@ -561,7 +561,7 @@ function AdvancedBaseTable<T>({
                 )}
               </span>{" "}
               of{" "}
-              <span className="text-white">{table.getRowCount()}</span>
+              <span className="text-foreground">{table.getRowCount()}</span>
             </p>
           </div>
 
@@ -571,7 +571,7 @@ function AdvancedBaseTable<T>({
                 <Button
                   size="icon"
                   variant="outline"
-                  className="border-[#333] bg-[#1a1a1a] hover:bg-[#2a2a2a] text-gray-300 hover:text-white"
+                  className="border-border bg-card hover:bg-muted text-muted-foreground hover:text-foreground"
                   onClick={() => table.firstPage()}
                   disabled={!table.getCanPreviousPage()}
                 >
@@ -582,7 +582,7 @@ function AdvancedBaseTable<T>({
                 <Button
                   size="icon"
                   variant="outline"
-                  className="border-[#333] bg-[#1a1a1a] hover:bg-[#2a2a2a] text-gray-300 hover:text-white"
+                  className="border-border bg-card hover:bg-muted text-muted-foreground hover:text-foreground"
                   onClick={() => table.previousPage()}
                   disabled={!table.getCanPreviousPage()}
                 >
@@ -593,7 +593,7 @@ function AdvancedBaseTable<T>({
                 <Button
                   size="icon"
                   variant="outline"
-                  className="border-[#333] bg-[#1a1a1a] hover:bg-[#2a2a2a] text-gray-300 hover:text-white"
+                  className="border-border bg-card hover:bg-muted text-muted-foreground hover:text-foreground"
                   onClick={() => table.nextPage()}
                   disabled={!table.getCanNextPage()}
                 >
@@ -604,7 +604,7 @@ function AdvancedBaseTable<T>({
                 <Button
                   size="icon"
                   variant="outline"
-                  className="border-[#333] bg-[#1a1a1a] hover:bg-[#2a2a2a] text-gray-300 hover:text-white"
+                  className="border-border bg-card hover:bg-muted text-muted-foreground hover:text-foreground"
                   onClick={() => table.lastPage()}
                   disabled={!table.getCanNextPage()}
                 >

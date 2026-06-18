@@ -638,13 +638,13 @@ const fetchProfileData = async (userIds: string[]) => {
     if (!isCurrentUser) return null;
 
     const statusMap = {
-      sending: { text: t("message_status_sending"), color: "text-gray-400" },
-      sent: { text: t("message_status_sent"), color: "text-gray-400" },
+      sending: { text: t("message_status_sending"), color: "text-muted-foreground" },
+      sent: { text: t("message_status_sent"), color: "text-muted-foreground" },
       delivered: {
         text: t("message_status_delivered"),
         color: "text-blue-400",
       },
-      read: { text: t("message_status_read"), color: "text-white" },
+      read: { text: t("message_status_read"), color: "text-foreground" },
     };
 
     const status =
@@ -680,15 +680,15 @@ const fetchProfileData = async (userIds: string[]) => {
 
   if (!selectedClient) {
     return (
-      <div className="flex-1 flex items-center justify-center bg-[#111111] h-full rounded-br-lg">
+      <div className="flex-1 flex items-center justify-center bg-card h-full rounded-br-lg">
         <div className="text-center">
-          <div className="w-12 h-12 bg-[#1a1a1a] rounded-lg flex items-center justify-center mx-auto mb-4">
-            <Send className="h-6 w-6 text-gray-400" />
+          <div className="w-12 h-12 bg-muted rounded-lg flex items-center justify-center mx-auto mb-4">
+            <Send className="h-6 w-6 text-muted-foreground" />
           </div>
-          <h3 className="text-lg font-medium text-white mb-2">
+          <h3 className="text-lg font-medium text-foreground mb-2">
             {t("no_conversation_selected")}
           </h3>
-          <p className="text-gray-400 text-sm">
+          <p className="text-muted-foreground text-sm">
             {t("select_client_to_start_messaging")}
           </p>
         </div>
@@ -717,8 +717,8 @@ const fetchProfileData = async (userIds: string[]) => {
       <div
         className={
           isMobile
-            ? `flex flex-col h-screen min-h-0 overflow-hidden bg-[#111111] ${isNative ? "pt-14" : ""}`
-            : "flex-1 flex flex-col bg-[#111111] h-full relative rounded-br-lg"
+            ? `flex flex-col h-screen min-h-0 overflow-hidden bg-card ${isNative ? "pt-14" : ""}`
+            : "flex-1 flex flex-col bg-card h-full relative rounded-br-lg"
         }
       >
         {/* File Upload Modal */}
@@ -729,7 +729,7 @@ const fetchProfileData = async (userIds: string[]) => {
         />
 
         {/* Header */}
-        <div className="shrink-0 sticky top-0 z-20 bg-[#111111]">
+        <div className="shrink-0 sticky top-0 z-20 bg-card">
         <ChatHeader
           type="conversation"
           client={selectedClient}
@@ -755,7 +755,7 @@ const fetchProfileData = async (userIds: string[]) => {
           {/* Loading indicator for older messages */}
           {loading && (
             <div className="flex justify-center py-2">
-              <div className="bg-[#27272a] text-gray-300 text-xs px-3 py-1 rounded-full">
+              <div className="bg-muted text-muted-foreground text-xs px-3 py-1 rounded-full">
                 Loading older messages...
               </div>
             </div>
@@ -790,7 +790,7 @@ const fetchProfileData = async (userIds: string[]) => {
                     key={`date-${index}`}
                     className="flex justify-center my-6"
                   >
-                    <div className="bg-[#27272a] text-gray-300 text-xs px-3 py-1 rounded-full">
+                    <div className="bg-muted text-muted-foreground text-xs px-3 py-1 rounded-full">
                       {item.data}
                     </div>
                   </div>
@@ -803,7 +803,7 @@ const fetchProfileData = async (userIds: string[]) => {
                     key={`hour-${index}`}
                     className="flex justify-center my-3"
                   >
-                    <div className="bg-[#1a1a1a] text-gray-400 text-xs px-2 py-1 rounded">
+                    <div className="bg-muted text-muted-foreground text-xs px-2 py-1 rounded">
                       {item.data}
                     </div>
                   </div>
@@ -834,7 +834,7 @@ const fetchProfileData = async (userIds: string[]) => {
                         {profile?.avatar_url ? (
                           <AvatarImage src={profile.avatar_url} />
                         ) : (
-                          <AvatarFallback className="bg-[#27272a] text-white text-xs">
+                          <AvatarFallback className="bg-muted text-foreground text-xs">
                             {profile?.first_name || profile?.last_name
                               ? `${profile.first_name || ""} ${
                                   profile.last_name || ""
@@ -860,8 +860,8 @@ const fetchProfileData = async (userIds: string[]) => {
                           isPdf
                             ? "bg-transparent leading-none"
                             : isCurrentUser
-                            ? "bg-white text-black"
-                            : "bg-[#27272a] text-white"
+                            ? "bg-primary text-primary-foreground"
+                            : "bg-muted text-foreground"
                         }`}
                       >
                         {/* Show text content if no attachments or if it's not a placeholder */}
@@ -888,7 +888,7 @@ const fetchProfileData = async (userIds: string[]) => {
                             : "justify-start"
                         }`}
                       >
-                        <span className="text-xs text-gray-400">
+                        <span className="text-xs text-muted-foreground">
                           {formatTime(message.created_at)}
                           {getStatusDisplay(message, isCurrentUser)}
                         </span>
@@ -917,9 +917,9 @@ const fetchProfileData = async (userIds: string[]) => {
         {/* Audio Recorder */}
         {showAudioRecorder && (
           <div
-            className={`p-3 border-t border-[#1f1f23] ${
+            className={`p-3 border-t border-border ${
               isMobile
-                ? `fixed bottom-0 left-0 right-0 bg-[#111111] z-50 ${isNative ? "pb-7" : ""}`
+                ? `fixed bottom-0 left-0 right-0 bg-card z-50 ${isNative ? "pb-7" : ""}`
                 : ""
             }`}
           >
@@ -935,10 +935,10 @@ const fetchProfileData = async (userIds: string[]) => {
           <div
             className={`${
               isMobile
-                ? `fixed bottom-0 left-0 right-0 bg-[#111111] border-t border-[#1f1f23] z-50 ${
+                ? `fixed bottom-0 left-0 right-0 bg-card border-t border-border z-50 ${
                     isNative ? "pb-7" : ""
                   }`
-                : "p-3 border-t border-[#1f1f23]"
+                : "p-3 border-t border-border"
             }`}
           >
             <div
@@ -950,7 +950,7 @@ const fetchProfileData = async (userIds: string[]) => {
                 variant="ghost"
                 size="sm"
                 onClick={() => setShowAudioRecorder(true)}
-                className="bg-[#1a1a1a] text-gray-400 hover:text-white hover:bg-neutral-800 h-10 w-10 p-0 touch-manipulation active:bg-neutral-700"
+                className="bg-card text-muted-foreground hover:text-foreground hover:bg-muted h-10 w-10 p-0 touch-manipulation active:bg-muted"
                 title="Record voice message"
               >
                 <Mic className="h-4 w-4" />
@@ -959,7 +959,7 @@ const fetchProfileData = async (userIds: string[]) => {
                 variant="ghost"
                 size="sm"
                 onClick={() => setShowFileUpload(true)}
-                className="bg-[#1a1a1a] text-gray-400 hover:text-white hover:bg-neutral-800 h-10 w-10 p-0 touch-manipulation active:bg-neutral-700"
+                className="bg-card text-muted-foreground hover:text-foreground hover:bg-muted h-10 w-10 p-0 touch-manipulation active:bg-muted"
                 title="Upload files"
               >
                 <Paperclip className="h-4 w-4" />
@@ -969,7 +969,7 @@ const fetchProfileData = async (userIds: string[]) => {
                 value={newMessage}
                 onChange={handleInputChange}
                 onKeyPress={handleKeyPress}
-                className={`bg-[#1a1a1a] border-[#1f1f23] text-white placeholder:text-gray-500 focus:border-gray-400 ${
+                className={`bg-background border-border text-foreground placeholder:text-muted-foreground focus:border-ring ${
                   isMobile ? "touch-manipulation text-base" : ""
                 }`}
                 autoComplete="off"
@@ -980,7 +980,7 @@ const fetchProfileData = async (userIds: string[]) => {
               <Button
                 onClick={handleSendMessage}
                 disabled={!newMessage.trim()}
-                className="bg-neutral-100 hover:bg-neutral-200 text-neutral-950 hover:text-neutral-800 h-10 w-10 p-0 touch-manipulation active:bg-neutral-300"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground hover:text-primary-foreground h-10 w-10 p-0 touch-manipulation active:bg-primary/80"
               >
                 <ArrowUp className="h-4 w-4" />
               </Button>

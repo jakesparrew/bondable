@@ -80,14 +80,14 @@ export function PasswordStrengthInput({
 
   return (
     <div className="space-y-2">
-      <Label htmlFor={id} className="text-gray-300">
+      <Label htmlFor={id} className="text-muted-foreground">
         {label}
       </Label>
 
       <div className="relative">
         <Input
           id={id}
-          className={`pe-9 bg-[#0a0a0a] border-[#1f1f23] text-white placeholder:text-gray-500 focus:border-gray-400 ${className}`}
+          className={`pe-9 bg-background border-border text-foreground placeholder:text-muted-foreground focus:border-ring ${className}`}
           placeholder={placeholder}
           type={isVisible ? "text" : "password"}
           value={value}
@@ -98,7 +98,7 @@ export function PasswordStrengthInput({
           readOnly={readOnly}
         />
         <button
-          className="absolute inset-y-0 end-0 flex h-full w-9 items-center justify-center rounded-e-md transition-colors text-muted-foreground/80 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
+          className="absolute inset-y-0 end-0 flex h-full w-9 items-center justify-center rounded-e-md transition-colors text-muted-foreground/80 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
           type="button"
           onClick={toggleVisibility}
           aria-label={isVisible ? "Hide password" : "Show password"}
@@ -137,7 +137,7 @@ export function PasswordStrengthInput({
             <>
               <p
                 id={`${id}-description`}
-                className="text-gray-300 mb-2 text-sm font-medium"
+                className="text-muted-foreground mb-2 text-sm font-medium"
               >
                 {getStrengthText(strengthScore)}. {t("must_contain")}:
               </p>
@@ -148,11 +148,11 @@ export function PasswordStrengthInput({
                     {req.met ? (
                       <CheckIcon size={16} className="text-emerald-500" aria-hidden="true" />
                     ) : (
-                      <XIcon size={16} className="text-neutral-400" aria-hidden="true" />
+                      <XIcon size={16} className="text-muted-foreground" aria-hidden="true" />
                     )}
                     <span
                       className={`text-xs ${
-                        req.met ? "text-emerald-600" : "text-neutral-400"
+                        req.met ? "text-emerald-600" : "text-muted-foreground"
                       }`}
                     >
                       {req.text}

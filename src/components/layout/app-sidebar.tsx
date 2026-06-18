@@ -37,31 +37,31 @@ export function AppSidebar({ userType, ...props }: AppSidebarProps) {
     return (
       <Sidebar
         variant="inset"
-        className="bg-neutral-900 border-sidebar-border animate-fade-in "
+        className="bg-sidebar border-sidebar-border animate-fade-in "
         {...props}
       >
-        <SidebarHeader className="bg-neutral-900">
+        <SidebarHeader className="bg-sidebar">
           <SidebarMenu>
             <SidebarMenuItem>
-              <div className="flex items-center gap-3 px-3 py-2 bg-neutral-800 rounded-lg animate-pulse">
-                <div className="w-8 h-8 bg-neutral-700 rounded"></div>
+              <div className="flex items-center gap-3 px-3 py-2 bg-sidebar-accent rounded-lg animate-pulse">
+                <div className="w-8 h-8 bg-sidebar-border rounded"></div>
                 <div className="grid flex-1 text-left">
-                  <div className="h-4 bg-neutral-700 rounded mb-1"></div>
-                  <div className="h-3 bg-neutral-700 rounded w-2/3"></div>
+                  <div className="h-4 bg-sidebar-border rounded mb-1"></div>
+                  <div className="h-3 bg-sidebar-border rounded w-2/3"></div>
                 </div>
               </div>
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarHeader>
-        <SidebarContent className="bg-neutral-900">
+        <SidebarContent className="bg-sidebar">
           <div className="space-y-2 p-2">
             {[...Array(4)].map((_, i) => (
-              <div key={i} className="h-10 bg-neutral-800 rounded animate-pulse"></div>
+              <div key={i} className="h-10 bg-sidebar-accent rounded animate-pulse"></div>
             ))}
           </div>
         </SidebarContent>
-        <SidebarFooter className="bg-neutral-900">
-          <div className="h-16 bg-neutral-800 rounded animate-pulse"></div>
+        <SidebarFooter className="bg-sidebar">
+          <div className="h-16 bg-sidebar-accent rounded animate-pulse"></div>
         </SidebarFooter>
       </Sidebar>
     );
@@ -70,13 +70,13 @@ export function AppSidebar({ userType, ...props }: AppSidebarProps) {
   return (
     <Sidebar
       variant="inset"
-      className="bg-neutral-900 border-sidebar-border animate-fade-in"
+      className="bg-sidebar border-sidebar-border animate-fade-in"
       {...props}
     >
-      <SidebarHeader className="bg-neutral-900">
+      <SidebarHeader className="bg-sidebar">
         <SidebarMenu>
           <SidebarMenuItem>
-            <div className="flex items-center gap-3 px-3 py-2 bg-neutral-800 rounded-lg transition-all duration-200 hover:bg-neutral-700">
+            <div className="flex items-center gap-3 px-3 py-2 bg-sidebar-accent rounded-lg transition-all duration-200 hover:bg-sidebar-border">
               <img 
                 src="/favicon.ico" 
                 alt="Icon" 
@@ -97,13 +97,13 @@ export function AppSidebar({ userType, ...props }: AppSidebarProps) {
         </SidebarMenu>
       </SidebarHeader>
       
-      <SidebarContent className="bg-neutral-900">
+      <SidebarContent className="bg-sidebar">
         <NavMain items={sidebarData.navMain} />
         <NavProjects projects={sidebarData.projects} />
         <NavSecondary items={sidebarData.navSecondary} className="mt-auto" />
       </SidebarContent>
-      
-      <SidebarFooter className="bg-neutral-900">
+
+      <SidebarFooter className="bg-sidebar">
         <NavUser user={sidebarData.user} userType={userType} />
       </SidebarFooter>
     </Sidebar>

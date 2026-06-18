@@ -146,7 +146,7 @@ export const WeeklyAvailability: React.FC<WeeklyAvailabilityProps> = ({
           variant="outline"
           className={`w-full justify-between h-auto p-3 ${
             readOnly || !isEditMode ? "cursor-default" : "cursor-pointer"
-          } bg-[#0a0a0a] border-[#1f1f23] hover:bg-[#1a1a1a] ${
+          } bg-card border-border hover:bg-muted ${
             isToday ? "border-blue-500/50" : ""
           }`}
           disabled={readOnly || !isEditMode}
@@ -154,31 +154,31 @@ export const WeeklyAvailability: React.FC<WeeklyAvailabilityProps> = ({
         >
           <div className="flex flex-col items-start space-y-1">
             <div className="flex items-center space-x-2">
-              <span className="text-white text-sm font-medium">
+              <span className="text-foreground text-sm font-medium">
                 {format(day, isMobile ? "EEE" : "EEEE")}
               </span>
               {isToday && (
                 <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
               )}
             </div>
-            <div className="text-xs text-gray-400">{format(day, "MMM d")}</div>
+            <div className="text-xs text-muted-foreground">{format(day, "MMM d")}</div>
             <div className="flex items-center space-x-1">
-              <Clock className="h-3 w-3 text-gray-500" />
-              <span className="text-xs text-gray-500">
+              <Clock className="h-3 w-3 text-muted-foreground" />
+              <span className="text-xs text-muted-foreground">
                 {availableCount} slot{availableCount !== 1 ? "s" : ""}
               </span>
             </div>
           </div>
-          {!readOnly && isEditMode && <ChevronDown className="h-4 w-4 text-gray-400" />}
+          {!readOnly && isEditMode && <ChevronDown className="h-4 w-4 text-muted-foreground" />}
         </Button>
 
         {!readOnly && isEditMode && isOpen && (
-          <div className="absolute top-full left-0 right-0 z-50 mt-1 bg-[#111111] border border-[#1f1f23] rounded-md shadow-lg">
-            <div className="p-3 border-b border-[#1f1f23]">
-              <h4 className="text-sm font-medium text-white">
+          <div className="absolute top-full left-0 right-0 z-50 mt-1 bg-popover border border-border rounded-md shadow-lg">
+            <div className="p-3 border-b border-border">
+              <h4 className="text-sm font-medium text-foreground">
                 {format(day, "EEEE, MMM d")}
               </h4>
-              <p className="text-xs text-gray-400 mt-1">
+              <p className="text-xs text-muted-foreground mt-1">
                 Click time slots to toggle availability
               </p>
             </div>
@@ -196,7 +196,7 @@ export const WeeklyAvailability: React.FC<WeeklyAvailabilityProps> = ({
                     className={`text-xs h-8 ${
                       available
                         ? "bg-blue-500 hover:bg-blue-600 text-white"
-                        : "bg-[#1a1a1a] border-[#333] text-gray-400 hover:bg-[#1f1f23] hover:text-gray-300"
+                        : "bg-card border-border text-muted-foreground hover:bg-accent hover:text-accent-foreground"
                     }`}
                     onClick={() => handleTimeSlotToggle(dayKey, timeSlot)}
                     onMouseMove={() => resetInactivityTimer(dayKey)}
@@ -218,7 +218,7 @@ export const WeeklyAvailability: React.FC<WeeklyAvailabilityProps> = ({
       <div className="w-full">
         <div className="flex flex-col items-center space-y-2 ">
           {!readOnly && (
-            <p className="text-gray-400 text-center text-xs">
+            <p className="text-muted-foreground text-center text-xs">
               Tap days to manage time slots
             </p>
           )}
@@ -227,7 +227,7 @@ export const WeeklyAvailability: React.FC<WeeklyAvailabilityProps> = ({
               onClick={() =>
                 navigate(`/dashboard/${userType}/weekly-timetable`)
               }
-              className="w-full bg-neutral-50 hover:bg-[#d6d6d6] text-neutral-950 px-4 py-2 rounded-lg font-medium transition-colors flex items-center space-x-2"
+              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2 rounded-lg font-medium transition-colors flex items-center space-x-2"
             >
               <span>{t("view_full_timetable")}</span>
               <ExternalLink className="h-4 w-4" />
@@ -242,16 +242,16 @@ export const WeeklyAvailability: React.FC<WeeklyAvailabilityProps> = ({
   return (
     <div className="w-full">
       <div className="flex items-center justify-between">
-        <div className="flex items-center justify-between p-4 border border-[#1f1f23] rounded-lg bg-[#0a0a0a] w-full">
+        <div className="flex items-center justify-between p-4 border border-border rounded-lg bg-card w-full">
           <div>
-            <h4 className="text-white font-medium mb-1">{t("weekly_timetable")}</h4>
-            <p className="text-gray-400 text-sm">
+            <h4 className="text-foreground font-medium mb-1">{t("weekly_timetable")}</h4>
+            <p className="text-muted-foreground text-sm">
               {t("manage_weekly_schedule")}
             </p>
           </div>
           <Button
             onClick={() => navigate(`/dashboard/${userType}/weekly-timetable`)}
-            className="bg-neutral-50 hover:bg-[#d6d6d6] text-neutral-950 px-4 py-2 rounded-lg font-medium transition-colors flex items-center space-x-2"
+            className="bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2 rounded-lg font-medium transition-colors flex items-center space-x-2"
           >
             <span>{t("view_full_timetable")}</span>
             <ExternalLink className="h-4 w-4" />

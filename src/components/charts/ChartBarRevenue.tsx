@@ -100,10 +100,10 @@ export function ChartBarRevenue({ period = "month" }: ChartBarRevenueProps) {
   const labels = getPeriodLabels(period);
 
   return (
-    <Card className="bg-[#111111] border-[#1f1f23] h-full">
+    <Card className="bg-card border-border h-full">
       <CardHeader>
-        <CardTitle className="text-white">{labels.title}</CardTitle>
-        <CardDescription className="text-gray-400">{labels.description}</CardDescription>
+        <CardTitle className="text-foreground">{labels.title}</CardTitle>
+        <CardDescription className="text-muted-foreground">{labels.description}</CardDescription>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig} className="w-full max-h-[200px]">
@@ -114,20 +114,20 @@ export function ChartBarRevenue({ period = "month" }: ChartBarRevenueProps) {
               top: 20,
             }}
           >
-            <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="#2a2a2a" />
+            <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="hsl(var(--border))" />
             <XAxis
               dataKey="period"
               tickLine={false}
               tickMargin={10}
               axisLine={false}
-              tick={{ fill: "#9ca3af", fontSize: 12 }}
+              tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }}
             />
             <ChartTooltip
               cursor={false}
               content={
-                <ChartTooltipContent 
-                  hideLabel 
-                  className="bg-[#1a1a1a] border-[#2a2a2a] text-white"
+                <ChartTooltipContent
+                  hideLabel
+                  className="bg-card border-border text-foreground"
                   formatter={(value) => [`$${Number(value).toLocaleString()}`, ` ${t("revenue")}`]}
                 />
               }
@@ -136,7 +136,7 @@ export function ChartBarRevenue({ period = "month" }: ChartBarRevenueProps) {
               <LabelList
                 position="top"
                 offset={12}
-                className="fill-white"
+                className="fill-foreground"
                 fontSize={12}
                 formatter={(value: number) => `$${(value / 1000).toFixed(0)}k`}
               />
@@ -145,10 +145,10 @@ export function ChartBarRevenue({ period = "month" }: ChartBarRevenueProps) {
         </ChartContainer>
       </CardContent>
       <CardFooter className="flex-col items-start gap-2 text-sm">
-        <div className="flex gap-2 leading-none font-medium text-white">
+        <div className="flex gap-2 leading-none font-medium text-foreground">
           {t("trending_up_by", { change: labels.change })} <TrendingUp className="h-4 w-4 text-green-500" />
         </div>
-        <div className="text-gray-400 leading-none">
+        <div className="text-muted-foreground leading-none">
           {labels.footer}
         </div>
       </CardFooter>

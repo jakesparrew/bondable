@@ -287,9 +287,9 @@ const ScheduleSessionDialog = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-[#111111] border-[#1f1f23] text-white sm:max-w-[500px]">
+      <DialogContent className="bg-card border-border text-foreground sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle className="text-white mb-4">
+          <DialogTitle className="text-foreground mb-4">
             {editingSession
               ? userType === "client"
                 ? t("edit_session_request")
@@ -305,7 +305,7 @@ const ScheduleSessionDialog = ({
           {/* Therapist Selection for Clients */}
           {userType === "client" && (
             <div className="space-y-2">
-              <Label className="text-sm font-medium text-gray-300">
+              <Label className="text-sm font-medium text-muted-foreground">
                 {t("select_therapist")} <span className="text-red-400">*</span>
               </Label>
               <Select
@@ -313,15 +313,15 @@ const ScheduleSessionDialog = ({
                 onValueChange={handleTherapistSelect}
                 required
               >
-                <SelectTrigger className="bg-[#0a0a0a] border-[#1f1f23] text-white">
+                <SelectTrigger className="bg-background border-border text-foreground">
                   <SelectValue placeholder={t("select_a_therapist")} />
                 </SelectTrigger>
-                <SelectContent className="bg-[#0a0a0a] border-[#1f1f23]">
+                <SelectContent className="bg-card border-border">
                   {clientTherapists.map((therapist) => (
                     <SelectItem
                       key={therapist.id}
                       value={therapist.id}
-                      className="text-gray-300 hover:bg-[#2a2a2a]"
+                      className="text-muted-foreground hover:bg-muted"
                     >
                       {therapist.name}
                     </SelectItem>
@@ -334,20 +334,20 @@ const ScheduleSessionDialog = ({
           {/* Client Selection for Therapists */}
           {preselectedClient ? (
             <div className="space-y-2">
-              <Label className="text-sm font-medium text-gray-300">
+              <Label className="text-sm font-medium text-muted-foreground">
                 {t("client")}
               </Label>
-              <div className="bg-[#0a0a0a] border border-[#1f1f23] rounded-md px-3 py-2 text-white">
+              <div className="bg-background border border-border rounded-md px-3 py-2 text-foreground">
                 {preselectedClient.name}
               </div>
             </div>
           ) : userType === "therapist" ? (
             <div className="space-y-2">
-              <Label className="text-sm font-medium text-gray-300">
+              <Label className="text-sm font-medium text-muted-foreground">
                 {t("select_client")} <span className="text-red-400">*</span>
               </Label>
               {shouldShowClientReadOnly ? (
-                <div className="bg-[#0a0a0a] border border-[#1f1f23] rounded-md px-3 py-2 text-white">
+                <div className="bg-background border border-border rounded-md px-3 py-2 text-foreground">
                   {formData.clientName || "Unknown Client"}
                 </div>
               ) : (
@@ -356,15 +356,15 @@ const ScheduleSessionDialog = ({
                   onValueChange={handleClientSelect}
                   required
                 >
-                  <SelectTrigger className="bg-[#0a0a0a] border-[#1f1f23] text-white">
+                  <SelectTrigger className="bg-background border-border text-foreground">
                     <SelectValue placeholder={t("select_a_client")} />
                   </SelectTrigger>
-                  <SelectContent className="bg-[#0a0a0a] border-[#1f1f23]">
+                  <SelectContent className="bg-background border-border">
                     {therapistClients.map((client) => (
                       <SelectItem
                         key={client.id}
                         value={client.id}
-                        className="text-gray-300 hover:bg-[#2a2a2a]"
+                        className="text-muted-foreground hover:bg-muted"
                       >
                         {client.name}
                       </SelectItem>
@@ -375,7 +375,7 @@ const ScheduleSessionDialog = ({
             </div>
           ) : null}
 
-          <div className="bg-neutral-900 border border-[#1f1f23] p-4 rounded-xl space-y-4">
+          <div className="bg-card border border-border p-4 rounded-xl space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <SimpleDatePicker
@@ -400,32 +400,32 @@ const ScheduleSessionDialog = ({
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label className="text-gray-300 text-sm">{t("duration_minutes")}<span className="text-red-400">&nbsp;*</span></Label>
+                <Label className="text-muted-foreground text-sm">{t("duration_minutes")}<span className="text-red-400">&nbsp;*</span></Label>
                 <Select
                   value={formData.duration}
                   onValueChange={handleDurationChange}
                   required
                 >
-                  <SelectTrigger className="bg-[#0a0a0a] border-[#1f1f23] text-white">
+                  <SelectTrigger className="bg-background border-border text-foreground">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="bg-[#111111] border-[#1f1f23]">
-                    <SelectItem value="30" className="text-gray-300">
+                  <SelectContent className="bg-card border-border">
+                    <SelectItem value="30" className="text-muted-foreground">
                       30 {t("min")}
                     </SelectItem>
-                    <SelectItem value="45" className="text-gray-300">
+                    <SelectItem value="45" className="text-muted-foreground">
                       45 {t("min")}
                     </SelectItem>
-                    <SelectItem value="50" className="text-gray-300">
+                    <SelectItem value="50" className="text-muted-foreground">
                       {t("50_min")}
                     </SelectItem>
-                    <SelectItem value="60" className="text-gray-300">
+                    <SelectItem value="60" className="text-muted-foreground">
                       60 {t("min")}
                     </SelectItem>
-                    <SelectItem value="90" className="text-gray-300">
+                    <SelectItem value="90" className="text-muted-foreground">
                       90 {t("min")}
                     </SelectItem>
-                    <SelectItem value="custom" className="text-gray-300">
+                    <SelectItem value="custom" className="text-muted-foreground">
                       {t("custom")}
                     </SelectItem>
                   </SelectContent>
@@ -441,13 +441,13 @@ const ScheduleSessionDialog = ({
                       }))
                     }
                     placeholder={t("enter_duration_minutes")}
-                    className="bg-[#0a0a0a] border-[#1f1f23] text-white placeholder:text-gray-500 mt-2"
+                    className="bg-background border-border text-foreground placeholder:text-muted-foreground mt-2"
                   />
                 )}
               </div>
 
               <div className="space-y-2">
-                <Label className="text-gray-300 text-sm">{t('session_format')}<span className="text-red-400">&nbsp;*</span></Label>
+                <Label className="text-muted-foreground text-sm">{t('session_format')}<span className="text-red-400">&nbsp;*</span></Label>
                 <Select
                   value={formData.sessionType}
                   onValueChange={(value: "In-Person" | "Video") =>
@@ -455,14 +455,14 @@ const ScheduleSessionDialog = ({
                   }
                   required
                 >
-                  <SelectTrigger className="bg-[#0a0a0a] border-[#1f1f23] text-white">
+                  <SelectTrigger className="bg-background border-border text-foreground">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="bg-[#111111] border-[#1f1f23]">
-                    <SelectItem value="In-Person" className="text-gray-300">
+                  <SelectContent className="bg-card border-border">
+                    <SelectItem value="In-Person" className="text-muted-foreground">
                       {t("in_person")}
                     </SelectItem>
-                    <SelectItem value="Video" className="text-gray-300">
+                    <SelectItem value="Video" className="text-muted-foreground">
                       {t("video_call")}
                     </SelectItem>
                   </SelectContent>
@@ -472,7 +472,7 @@ const ScheduleSessionDialog = ({
           </div>
 
           <div className="space-y-2">
-            <Label className="text-gray-300 text-sm">{t('therapy_type')}<span className="text-red-400">&nbsp;*</span></Label>
+            <Label className="text-muted-foreground text-sm">{t('therapy_type')}<span className="text-red-400">&nbsp;*</span></Label>
             <Select
               value={formData.type}
               onValueChange={(value) =>
@@ -480,23 +480,23 @@ const ScheduleSessionDialog = ({
               }
               required
             >
-              <SelectTrigger className="bg-[#0a0a0a] border-[#1f1f23] text-white">
+              <SelectTrigger className="bg-background border-border text-foreground">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="bg-[#111111] border-[#1f1f23]">
+              <SelectContent className="bg-card border-border">
                 <SelectItem
                   value="Individual Therapy"
-                  className="text-gray-300"
+                  className="text-muted-foreground"
                 >
                   {t("individual_therapy")}
                 </SelectItem>
-                <SelectItem value="Couples Therapy" className="text-gray-300">
+                <SelectItem value="Couples Therapy" className="text-muted-foreground">
                   {t("couples_therapy")}
                 </SelectItem>
-                <SelectItem value="Group Therapy" className="text-gray-300">
+                <SelectItem value="Group Therapy" className="text-muted-foreground">
                   {t("group_therapy")}
                 </SelectItem>
-                <SelectItem value="Family Therapy" className="text-gray-300">
+                <SelectItem value="Family Therapy" className="text-muted-foreground">
                   {t("family_therapy")}
                 </SelectItem>
               </SelectContent>
@@ -504,7 +504,7 @@ const ScheduleSessionDialog = ({
           </div>
 
           <div className="space-y-2">
-            <Label className="text-gray-300 text-sm">{t('location')}</Label>
+            <Label className="text-muted-foreground text-sm">{t('location')}</Label>
             <AddressAutoComplete
               address={address}
               setAddress={setAddress}
@@ -516,19 +516,19 @@ const ScheduleSessionDialog = ({
                   ? t("video_call")
                   : t("enter_office_address")
               }
-              className="bg-[#0a0a0a] border-[#1f1f23] text-white"
+              className="bg-background border-border text-foreground"
             />
           </div>
 
           <div className="space-y-2">
-            <Label className="text-gray-300 text-sm">{t('notes')}</Label>
+            <Label className="text-muted-foreground text-sm">{t('notes')}</Label>
             <Textarea
               value={formData.notes}
               onChange={(e) =>
                 setFormData((prev) => ({ ...prev, notes: e.target.value }))
               }
               placeholder={t("session_notes_instructions")}
-              className="bg-[#0a0a0a] border-[#1f1f23] text-white placeholder:text-gray-500 resize-none"
+              className="bg-background border-border text-foreground placeholder:text-muted-foreground resize-none"
               rows={3}
             />
           </div>
@@ -538,7 +538,7 @@ const ScheduleSessionDialog = ({
               <Button
                 type="button"
                 variant="outline"
-                className="border-[#333] bg-[#1a1a1a] hover:bg-[#2a2a2a] text-gray-300"
+                className="border-border bg-card hover:bg-muted text-muted-foreground"
                 onClick={() => {
                   if (editingSession) {
                     // Convert to pending with current user as requester
@@ -559,7 +559,7 @@ const ScheduleSessionDialog = ({
                 type="button"
                 variant="outline"
                 onClick={onClose}
-                className="border-[#333] bg-[#1a1a1a] hover:bg-[#2a2a2a] text-gray-300 hover:text-white"
+                className="border-border bg-card hover:bg-muted text-muted-foreground hover:text-foreground"
               >
                 {t("cancel")}
               </Button>
@@ -567,7 +567,7 @@ const ScheduleSessionDialog = ({
               {(!editingSession || editingSession.status === "Pending") && (
                 <Button
                   type="submit"
-                  className="bg-neutral-50 hover:bg-[#d6d6d6] text-neutral-950"
+                  className="bg-primary text-primary-foreground hover:bg-primary/90"
                 >
                   {editingSession
                     ? t("update")

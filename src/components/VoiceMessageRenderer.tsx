@@ -164,9 +164,9 @@ const VoiceMessageRenderer = ({ attachment, isCurrentUser, disabled = false }: V
         <div
           key={i}
           className={`w-0.5 rounded transition-colors duration-150 ${
-            isActive 
-              ? (isCurrentUser ? 'bg-neutral-700' : 'bg-neutral-300')
-              : (isCurrentUser ? 'bg-neutral-300' : 'bg-neutral-600')
+            isActive
+              ? (isCurrentUser ? 'bg-primary-foreground' : 'bg-primary')
+              : (isCurrentUser ? 'bg-primary-foreground/40' : 'bg-muted-foreground')
           }`}
           style={{ height: `${height}px` }}
         />
@@ -179,9 +179,9 @@ const VoiceMessageRenderer = ({ attachment, isCurrentUser, disabled = false }: V
   return (
     <div
       className={`rounded-lg overflow-hidden border transition-all duration-200 ${
-        isCurrentUser 
-          ? "bg-white border-transparent text-neutral-900" 
-          : "bg-[#27272a] border-transparent text-white"
+        isCurrentUser
+          ? "bg-primary border-transparent text-primary-foreground"
+          : "bg-muted border-transparent text-foreground"
       } ${isExpanded ? 'pb-2' : ''}`}
     >
       {/* Minimal View */}
@@ -193,8 +193,8 @@ const VoiceMessageRenderer = ({ attachment, isCurrentUser, disabled = false }: V
           aria-disabled={disabled}
           className={` rounded-full flex items-center justify-center transition-colors ${
             isCurrentUser
-              ? " text-neutral-700 hover:text-neutral-900"
-              : " text-neutral-300 hover:text-neutral-100"
+              ? " text-primary-foreground hover:text-primary-foreground"
+              : " text-muted-foreground hover:text-foreground"
           } ${disabled ? 'opacity-50 cursor-not-allowed pointer-events-none' : ''}`}
         >
           {isPlaying ? <Pause className="w-4 h-4" fill="currentColor"/> : <Play className="w-4 h-4 ml-0.5" fill="currentColor"/>}
@@ -211,7 +211,7 @@ const VoiceMessageRenderer = ({ attachment, isCurrentUser, disabled = false }: V
           
           {/* Time Display */}
           <div className={`text-xs font-mono min-w-[4rem] text-right ${
-            isCurrentUser ? 'text-neutral-500' : 'text-neutral-400'
+            isCurrentUser ? 'text-primary-foreground/70' : 'text-muted-foreground'
           }`}>
             {formatTime(currentTime)} / {formatTime(totalDuration)}
           </div>
@@ -221,9 +221,9 @@ const VoiceMessageRenderer = ({ attachment, isCurrentUser, disabled = false }: V
         <button
           onClick={() => setIsExpanded(!isExpanded)}
           className={`w-6 h-6 rounded flex items-center justify-center transition-colors ${
-            isCurrentUser 
-              ? 'text-neutral-400 hover:text-neutral-600' 
-              : 'text-neutral-500 hover:text-neutral-300'
+            isCurrentUser
+              ? 'text-primary-foreground/70 hover:text-primary-foreground'
+              : 'text-muted-foreground hover:text-foreground'
           }`}
         >
           {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
@@ -237,13 +237,13 @@ const VoiceMessageRenderer = ({ attachment, isCurrentUser, disabled = false }: V
           <div className="space-y-1">
             <div 
               className={`w-full h-1 rounded-full cursor-pointer ${
-                isCurrentUser ? 'bg-neutral-200' : 'bg-neutral-700'
+                isCurrentUser ? 'bg-primary-foreground/30' : 'bg-muted-foreground/30'
               } ${disabled ? 'pointer-events-none opacity-70' : ''}`}
               onClick={handleProgressClick}
             >
-              <div 
+              <div
                 className={`h-full rounded-full transition-all duration-100 ${
-                  isCurrentUser ? 'bg-neutral-700' : 'bg-white'
+                  isCurrentUser ? 'bg-primary-foreground' : 'bg-primary'
                 }`}
                 style={{ width: `${progress}%` }}
               />
@@ -255,9 +255,9 @@ const VoiceMessageRenderer = ({ attachment, isCurrentUser, disabled = false }: V
             <button
               onClick={() => handleSeek('backward')}
               className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${
-                isCurrentUser 
-                  ? 'text-neutral-500 hover:text-neutral-700 hover:bg-neutral-100' 
-                  : 'text-neutral-400 hover:text-neutral-200 hover:bg-neutral-600'
+                isCurrentUser
+                  ? 'text-primary-foreground/70 hover:text-primary-foreground hover:bg-primary-foreground/10'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-background'
               }`}
               title={t("rewind_10s")}
             >
@@ -268,8 +268,8 @@ const VoiceMessageRenderer = ({ attachment, isCurrentUser, disabled = false }: V
               onClick={handlePlayPause}
               className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors ${
                 isCurrentUser
-                  ? "bg-neutral-800 text-white hover:bg-neutral-700"
-                  : "bg-white text-neutral-900 hover:bg-neutral-100"
+                  ? "bg-primary-foreground text-primary hover:bg-primary-foreground/90"
+                  : "bg-primary text-primary-foreground hover:bg-primary/90"
               }`}
             >
               {isPlaying ? <Pause className="w-5 h-5" fill="currentColor"/> : <Play className="w-5 h-5 ml-0.5" fill="currentColor"/>}
@@ -278,9 +278,9 @@ const VoiceMessageRenderer = ({ attachment, isCurrentUser, disabled = false }: V
             <button
               onClick={() => handleSeek('forward')}
               className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${
-                isCurrentUser 
-                  ? 'text-neutral-500 hover:text-neutral-700 hover:bg-neutral-100' 
-                  : 'text-neutral-400 hover:text-neutral-200 hover:bg-neutral-600'
+                isCurrentUser
+                  ? 'text-primary-foreground/70 hover:text-primary-foreground hover:bg-primary-foreground/10'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-background'
               }`}
               title={t("forward_10s")}
             >

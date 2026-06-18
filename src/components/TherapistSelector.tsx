@@ -261,9 +261,9 @@ const loadLastActivityMap = async (clientId: string) => {
 
   if (loading) {
     return (
-      <div className="w-full md:w-80 bg-[#111111] border-r border-[#1f1f23] flex flex-col h-full">
+      <div className="w-full md:w-80 bg-card border-r border-border flex flex-col h-full">
         <div className="p-4 text-center">
-          <p className="text-gray-400 text-sm">{t("loading_therapists")}</p>
+          <p className="text-muted-foreground text-sm">{t("loading_therapists")}</p>
         </div>
       </div>
     );
@@ -271,34 +271,34 @@ const loadLastActivityMap = async (clientId: string) => {
 
   if (allTherapists.length === 0) {
     return (
-      <div className="w-full md:w-80 bg-[#111111] border-r border-[#1f1f23] flex flex-col h-full">
+      <div className="w-full md:w-80 bg-card border-r border-border flex flex-col h-full">
         <div className="p-4 text-center">
-          <p className="text-gray-400 text-sm">{t("no_connected_therapists_found")}</p>
-          <p className="text-gray-500 text-xs mt-2">{t("connect_with_therapist")}</p>
+          <p className="text-muted-foreground text-sm">{t("no_connected_therapists_found")}</p>
+          <p className="text-muted-foreground text-xs mt-2">{t("connect_with_therapist")}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="w-full md:w-80 bg-[#111111] border-r border-[#1f1f23] flex flex-col h-full">
+    <div className="w-full md:w-80 bg-card border-r border-border flex flex-col h-full">
       {/* Header */}
-      <div className="p-4 border-b border-[#1f1f23]">
+      <div className="p-4 border-b border-border">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-white font-medium">{t("your_therapists")}</h2>
+          <h2 className="text-foreground font-medium">{t("your_therapists")}</h2>
           {availableTherapists.length > 0 && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
                   size="sm"
-                  className="bg-white hover:bg-gray-200 text-black h-8 w-8 p-0"
+                  className="bg-primary text-primary-foreground hover:bg-primary/90 h-8 w-8 p-0"
                 >
                   <Plus className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 align="end"
-                className="w-64 bg-[#1a1a1a] border-[#1f1f23] text-white"
+                className="w-64 bg-card border-border text-foreground"
               >
                 {availableTherapists.map((therapist) => {
                   const therapistProfile = getTherapistProfile(therapist.id);
@@ -307,20 +307,20 @@ const loadLastActivityMap = async (clientId: string) => {
                     <DropdownMenuItem
                       key={`${therapist.id}-${therapist.email}`}
                       onClick={() => handleAddTherapist(therapist)}
-                      className="p-3 cursor-pointer hover:bg-[#2a2a2a] focus:bg-[#2a2a2a] text-white"
+                      className="p-3 cursor-pointer hover:bg-muted focus:bg-muted text-foreground"
                     >
                       <div className="flex items-center space-x-3 w-full">
                         <Avatar className="w-8 h-8">
                           {therapistProfile?.avatar_url && (
                             <AvatarImage src={therapistProfile.avatar_url} alt={therapist.name} />
                           )}
-                          <AvatarFallback className="bg-[#27272a] text-white text-xs">
+                          <AvatarFallback className="bg-muted text-foreground text-xs">
                               {therapist.name.split(" ").map((n) => n[0]).join("")}
                           </AvatarFallback>
                         </Avatar>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between">
-                            <h3 className="text-white font-medium text-sm truncate">
+                            <h3 className="text-foreground font-medium text-sm truncate">
                               {therapist.name}
                             </h3>
                             <Badge
@@ -332,7 +332,7 @@ const loadLastActivityMap = async (clientId: string) => {
                               {getStatusTranslation(therapist.status)}
                             </Badge>
                           </div>
-                          <p className="text-gray-400 text-xs truncate">
+                          <p className="text-muted-foreground text-xs truncate">
                             {therapist.email}
                           </p>
                         </div>
@@ -347,12 +347,12 @@ const loadLastActivityMap = async (clientId: string) => {
 
         {/* Search */}
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder={t("search_therapists")}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 bg-[#1a1a1a] border-[#1f1f23] text-white placeholder:text-gray-500 focus:border-gray-400"
+            className="pl-10 bg-background border-border text-foreground placeholder:text-muted-foreground focus:border-ring"
           />
         </div>
       </div>
@@ -361,7 +361,7 @@ const loadLastActivityMap = async (clientId: string) => {
       <div className="flex-1 overflow-y-auto">
         {filteredTherapists.length === 0 ? (
           <div className="p-4 text-center">
-            <p className="text-gray-400 text-sm">{t("no_therapists_found")}</p>
+            <p className="text-muted-foreground text-sm">{t("no_therapists_found")}</p>
           </div>
         ) : (
           <div className="space-y-1 p-2">
@@ -372,8 +372,8 @@ const loadLastActivityMap = async (clientId: string) => {
                 <div
                   key={`${therapist.id}-${therapist.email}`}
                   onClick={() => onSelectTherapist(therapist)}
-                  className={`p-3 rounded-lg cursor-pointer transition-colors hover:bg-[#1a1a1a] ${
-                    selectedTherapist?.id === therapist.id ? "bg-[#1a1a1a]" : ""
+                  className={`p-3 rounded-lg cursor-pointer transition-colors hover:bg-muted ${
+                    selectedTherapist?.id === therapist.id ? "bg-muted" : ""
                   }`}
                 >
                   <div className="flex items-center space-x-3">
@@ -381,13 +381,13 @@ const loadLastActivityMap = async (clientId: string) => {
                       {therapistProfile?.avatar_url && (
                         <AvatarImage src={therapistProfile.avatar_url} alt={therapist.name} />
                       )}
-                      <AvatarFallback className="bg-[#27272a] text-white text-sm">
+                      <AvatarFallback className="bg-muted text-foreground text-sm">
                         {therapist.name.split(" ").map((n) => n[0]).join("")}
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between">
-                        <h3 className="text-white font-medium text-sm truncate">
+                        <h3 className="text-foreground font-medium text-sm truncate">
                           {therapist.name}
                         </h3>
                         <Badge
@@ -399,7 +399,7 @@ const loadLastActivityMap = async (clientId: string) => {
                             {getStatusTranslation(therapist.status)}
                         </Badge>
                       </div>
-                      <p className="text-gray-400 text-xs truncate">
+                      <p className="text-muted-foreground text-xs truncate">
                         {therapist.email}
                       </p>
                     </div>

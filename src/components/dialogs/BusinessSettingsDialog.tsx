@@ -111,15 +111,15 @@ export default function BusinessSettingsDialog() {
         <DialogTrigger asChild>
           <Button
             variant="outline"
-            className="bg-neutral-50 hover:bg-[#d6d6d6] text-neutral-950"
+            className="bg-primary text-primary-foreground hover:bg-primary/90"
           >
             <ReceiptEuro />
             {t("billing_information")}
           </Button>
         </DialogTrigger>
-        <DialogContent className="max-w-3xl overflow-y-auto bg-[#111111] border-[#1f1f23]">
+        <DialogContent className="max-w-3xl overflow-y-auto bg-card border-border">
           <DialogHeader>
-            <DialogTitle className="text-white">
+            <DialogTitle className="text-foreground">
               {t("billing_information")}
             </DialogTitle>
           </DialogHeader>
@@ -135,7 +135,7 @@ export default function BusinessSettingsDialog() {
                   handleInputChange("businessName", e.target.value)
                 }
                 placeholder={t("your_therapy_practice_name")}
-                className="bg-[#0a0a0a] border-[#1f1f23] text-white placeholder:text-gray-500 focus:border-gray-400"
+                className="bg-background border-border text-foreground placeholder:text-muted-foreground focus:border-ring"
               />
 
               <OptionalInput
@@ -143,11 +143,11 @@ export default function BusinessSettingsDialog() {
                 value={settings.taxId}
                 onChange={(e) => handleInputChange("taxId", e.target.value)}
                 placeholder="123456789"
-                className="bg-[#0a0a0a] border-[#1f1f23] text-white placeholder:text-gray-500 focus:border-gray-400"
+                className="bg-background border-border text-foreground placeholder:text-muted-foreground focus:border-ring"
               />
             </div>
             <div className="space-y-2">
-              <Label className="text-sm font-medium text-gray-300">
+              <Label className="text-sm font-medium text-muted-foreground">
                 {t("address")} <span className="text-red-400">*</span>
               </Label>
               <AddressAutoComplete
@@ -158,7 +158,7 @@ export default function BusinessSettingsDialog() {
                 dialogTitle="Address"
                 placeholder="123 Main St, City, State, ZIP"
                 showInlineError={false}
-                className="bg-[#0a0a0a] border-[#1f1f23] text-white placeholder:text-gray-500 focus:border-gray-400"
+                className="bg-background border-border text-foreground placeholder:text-muted-foreground focus:border-ring"
               />
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -172,21 +172,21 @@ export default function BusinessSettingsDialog() {
                 onChange={(e) => handleInputChange("email", e.target.value)}
                 placeholder={t("contact_yourpractice_com")}
                 required
-                className="bg-[#0a0a0a] border-[#1f1f23] text-white placeholder:text-gray-500 focus:border-gray-400"
+                className="bg-background border-border text-foreground placeholder:text-muted-foreground focus:border-ring"
               />
             </div>
 
             {/* Banking Information */}
-            <Card className="bg-[#0a0a0a] border-[#1f1f23]">
+            <Card className="bg-background border-border">
               <CardHeader className="pb-4">
-                <CardTitle className="text-white text-lg">
+                <CardTitle className="text-foreground text-lg">
                   {t("banking_information")}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label className="text-sm font-medium text-gray-300">
+                    <Label className="text-sm font-medium text-muted-foreground">
                       {t("bank_name")}{" "}
                       <span className="text-destructive">&nbsp;*</span>
                     </Label>
@@ -196,15 +196,15 @@ export default function BusinessSettingsDialog() {
                         handleInputChange("bankName", val)
                       }
                     >
-                      <SelectTrigger className="w-full bg-[#1a1a1a] border-[#1f1f23] text-white">
+                      <SelectTrigger className="w-full bg-background border-border text-foreground">
                         <SelectValue placeholder={t("choose_a_bank")} />
                       </SelectTrigger>
-                      <SelectContent className="bg-[#111111] border-[#1f1f23]">
+                      <SelectContent className="bg-card border-border">
                         {belgianBanks.map((bank) => (
                           <SelectItem
                             key={bank}
                             value={bank}
-                            className="text-neutral-400 hover:!text-neutral-950 data-[state=checked]:text-neutral-50 data-[highlighted]:!text-neutral-950"
+                            className="text-muted-foreground hover:!text-neutral-950 data-[state=checked]:text-neutral-50 data-[highlighted]:!text-neutral-950"
                           >
                             {bank}
                           </SelectItem>
@@ -219,7 +219,7 @@ export default function BusinessSettingsDialog() {
                       handleInputChange("accountName", e.target.value)
                     }
                     placeholder={t("bondable_therapy_services_llc")}
-                    className="bg-[#1a1a1a] border-[#1f1f23] text-white placeholder:text-gray-500 focus:border-gray-400"
+                    className="bg-background border-border text-foreground placeholder:text-muted-foreground focus:border-ring"
                   />
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -228,7 +228,7 @@ export default function BusinessSettingsDialog() {
                     value={settings.iban}
                     onChange={(e) => handleInputChange("iban", e.target.value)}
                     placeholder="US64 SVBK US6S 3300 0000 0000 0000 00"
-                    className="bg-[#1a1a1a] border-[#1f1f23] text-white placeholder:text-gray-500 focus:border-gray-400"
+                    className="bg-background border-border text-foreground placeholder:text-muted-foreground focus:border-ring"
                   />
                   <OptionalInput
                     label={t("swift_bic_code")}
@@ -237,7 +237,7 @@ export default function BusinessSettingsDialog() {
                       handleInputChange("swiftCode", e.target.value)
                     }
                     placeholder="CHASUS33"
-                    className="bg-[#1a1a1a] border-[#1f1f23] text-white placeholder:text-gray-500 focus:border-gray-400"
+                    className="bg-background border-border text-foreground placeholder:text-muted-foreground focus:border-ring"
                   />
                 </div>
               </CardContent>
@@ -248,13 +248,13 @@ export default function BusinessSettingsDialog() {
             <Button
               variant="outline"
               onClick={() => setIsOpen(false)}
-              className="bg-neutral-950 hover:bg-neutral-800 text-neutral-50 border border-neutral-900 hover:text-neutral-300"
+              className="bg-background hover:bg-muted text-foreground border border-border hover:text-muted-foreground"
             >
               {t("cancel")}
             </Button>
             <Button
               onClick={saveSettings}
-              className="bg-neutral-50 hover:bg-neutral-300 text-neutral-950 h-auto"
+              className="bg-primary text-primary-foreground hover:bg-primary/90 h-auto"
             >
               {t("save")}
             </Button>

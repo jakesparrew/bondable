@@ -506,7 +506,7 @@ const AudioRecorder = ({ onRecordingComplete, onCancel }: AudioRecorderProps) =>
             {audioLevels.map((level, i) => (
               <div
                 key={i}
-                className="bg-white rounded-sm transition-all duration-100 flex-1 min-w-[1px]"
+                className="bg-primary rounded-sm transition-all duration-100 flex-1 min-w-[1px]"
                 style={{
                   height: `${Math.max(2, level * 32)}px`,
                   opacity: Math.max(0.3, 0.5 + (level * 0.5))
@@ -531,7 +531,7 @@ const AudioRecorder = ({ onRecordingComplete, onCancel }: AudioRecorderProps) =>
               <div
                 key={i}
                 className={`rounded-sm transition-all duration-75 flex-1 min-w-[1px] ${
-                  !isPlaying || i < playedBars ? 'bg-neutral-100' : 'bg-neutral-500'
+                  !isPlaying || i < playedBars ? 'bg-primary' : 'bg-muted-foreground'
                 }`}
                 style={{
                   height: `${Math.max(2, level * 32)}px`
@@ -549,7 +549,7 @@ const AudioRecorder = ({ onRecordingComplete, onCancel }: AudioRecorderProps) =>
             {Array.from({ length: NUM_BARS }).map((_, i) => (
               <div
                 key={i}
-                className="bg-neutral-500 rounded-sm flex-1 min-w-[1px] h-1"
+                className="bg-muted-foreground rounded-sm flex-1 min-w-[1px] h-1"
               />
             ))}
           </div>
@@ -563,7 +563,7 @@ const AudioRecorder = ({ onRecordingComplete, onCancel }: AudioRecorderProps) =>
       <Button
         onClick={handleMicClick}
         className={`h-10 w-10 p-0 ${
-          isRecording ? 'bg-white text-black hover:bg-gray-200 hover:text-neutral-800' : 'bg-[#1a1a1a] text-gray-400 hover:text-white hover:bg-neutral-800'
+          isRecording ? 'bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground' : 'bg-card text-muted-foreground hover:text-foreground hover:bg-muted'
         }`}
         variant="ghost"
       >
@@ -573,13 +573,13 @@ const AudioRecorder = ({ onRecordingComplete, onCancel }: AudioRecorderProps) =>
       {/* Always show X button next to record button */}
       <Button
         onClick={handleCancel}
-        className="h-10 w-10 p-0 bg-[#1a1a1a] text-gray-400 hover:text-white hover:bg-neutral-800"
+        className="h-10 w-10 p-0 bg-card text-muted-foreground hover:text-foreground hover:bg-muted"
         variant="ghost"
       >
         <X className="h-4 w-4" />
       </Button>
 
-      <div className="flex-1 bg-[#1a1a1a] border border-[#1f1f23] rounded-md h-10 flex items-center justify-center overflow-hidden">
+      <div className="flex-1 bg-card border border-border rounded-md h-10 flex items-center justify-center overflow-hidden">
         {renderVisualizer()}
       </div>
 
@@ -589,7 +589,7 @@ const AudioRecorder = ({ onRecordingComplete, onCancel }: AudioRecorderProps) =>
             onClick={playRecording}
             variant="ghost"
             size="sm"
-            className="bg-[#1a1a1a] text-gray-400 hover:text-white hover:bg-neutral-800 h-10 w-10 p-0"
+            className="bg-card text-muted-foreground hover:text-foreground hover:bg-muted h-10 w-10 p-0"
           >
             {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
           </Button>
@@ -597,7 +597,7 @@ const AudioRecorder = ({ onRecordingComplete, onCancel }: AudioRecorderProps) =>
             onClick={handleSendRecording}
             variant="ghost"
             size="sm"
-            className="bg-neutral-100 hover:bg-neutral-200 text-neutral-950 hover:text-neutral-800 h-10 w-10 p-0"
+            className="bg-primary hover:bg-primary/90 text-primary-foreground hover:text-primary-foreground h-10 w-10 p-0"
           >
             <ArrowUp className="h-4 w-4" />
           </Button>

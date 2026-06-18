@@ -21,10 +21,10 @@ export const RoleSelectionDialog: React.FC<RoleSelectionDialogProps> = ({
 }) => {
   return (
     <AlertDialog open={open}>
-      <AlertDialogContent className="bg-[#1a1a1a] border-[#2a2a2a]">
+      <AlertDialogContent className="bg-card border-border">
         <AlertDialogHeader>
-          <AlertDialogTitle className="text-white text-xl">Welcome! Please select your role</AlertDialogTitle>
-          <AlertDialogDescription className="text-gray-400">
+          <AlertDialogTitle className="text-foreground text-xl">Welcome! Please select your role</AlertDialogTitle>
+          <AlertDialogDescription className="text-muted-foreground">
             To provide you with the best experience, we need to know if you're a therapist or a client. 
             This will determine which dashboard and features you'll have access to.
           </AlertDialogDescription>
@@ -32,13 +32,13 @@ export const RoleSelectionDialog: React.FC<RoleSelectionDialogProps> = ({
         <AlertDialogFooter className="flex gap-2 sm:gap-2">
           <Button
             onClick={() => onRoleSelect("therapist")}
-            className="flex-1 bg-white text-black hover:bg-gray-100"
+            className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90"
           >
             I'm a Therapist
           </Button>
           <Button
             onClick={() => onRoleSelect("client")}
-            className="flex-1 bg-white text-black hover:bg-gray-100"
+            className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90"
           >
             I'm a Client
           </Button>

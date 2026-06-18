@@ -155,7 +155,7 @@ const FileUploadModal = ({ isOpen, onClose, onFilesSelect }: FileUploadModalProp
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-[#111111] border-[#1f1f23] text-white max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="bg-card border-border text-foreground max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{t("upload_files")}</DialogTitle>
         </DialogHeader>
@@ -181,11 +181,11 @@ const FileUploadModal = ({ isOpen, onClose, onFilesSelect }: FileUploadModalProp
                 }}
               />
               {files.length > 0 && (
-                <div className="flex justify-end space-x-2 pt-4 border-t border-[#1f1f23]">
+                <div className="flex justify-end space-x-2 pt-4 border-t border-border">
                   <Button
                     variant="outline"
                     onClick={onClose}
-                    className="bg-transparent border-gray-600 text-gray-300 hover:bg-gray-800 touch-manipulation"
+                    className="bg-transparent border-gray-600 text-muted-foreground hover:bg-gray-800 touch-manipulation"
                     style={{ touchAction: 'manipulation' }}
                   >
                     {t("cancel")}
@@ -193,7 +193,7 @@ const FileUploadModal = ({ isOpen, onClose, onFilesSelect }: FileUploadModalProp
                   <Button
                     onClick={handleSendFiles}
                     disabled={files.length === 0}
-                    className="bg-white text-black hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
+                    className="bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
                     style={{ touchAction: 'manipulation' }}
                   >
                     {t("send_files", { count: files.length, plural: files.length !== 1 ? 's' : '' })}
@@ -227,11 +227,11 @@ const FileUploadModal = ({ isOpen, onClose, onFilesSelect }: FileUploadModalProp
                   }}
                 />
                 {files.length > 0 && (
-                  <div className="flex justify-end space-x-2 pt-4 border-t border-[#1f1f23]">
+                  <div className="flex justify-end space-x-2 pt-4 border-t border-border">
                     <Button
                       variant="outline"
                       onClick={onClose}
-                      className="bg-transparent border-gray-600 text-gray-300 hover:bg-gray-800 touch-manipulation"
+                      className="bg-transparent border-gray-600 text-muted-foreground hover:bg-gray-800 touch-manipulation"
                       style={{ touchAction: 'manipulation' }}
                     >
                       {t("cancel")}
@@ -239,7 +239,7 @@ const FileUploadModal = ({ isOpen, onClose, onFilesSelect }: FileUploadModalProp
                     <Button
                       onClick={handleSendFiles}
                       disabled={files.length === 0}
-                      className="bg-white text-black hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
+                      className="bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
                       style={{ touchAction: 'manipulation' }}
                     >
                       {t("send_files", { count: files.length, plural: files.length !== 1 ? 's' : '' })}
@@ -250,11 +250,11 @@ const FileUploadModal = ({ isOpen, onClose, onFilesSelect }: FileUploadModalProp
 
               <TabsContent value="local" className="mt-4">
                 {loadingLocal ? (
-                  <div className="text-gray-400 text-sm">{t('loading') || 'Loading...'}</div>
+                  <div className="text-muted-foreground text-sm">{t('loading') || 'Loading...'}</div>
                 ) : (
                   <>
                     {localDocs.length === 0 ? (
-                      <div className="text-sm text-gray-500">{t('no_documents_found') || 'No documents'}</div>
+                      <div className="text-sm text-muted-foreground">{t('no_documents_found') || 'No documents'}</div>
                     ) : (
                       <div className="space-y-3">
                         {(() => {
@@ -273,15 +273,15 @@ const FileUploadModal = ({ isOpen, onClose, onFilesSelect }: FileUploadModalProp
                                     tabIndex={0}
                                     onClick={() => toggleLocal(doc.id)}
                                     onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') toggleLocal(doc.id); }}
-                                    className={`flex items-center justify-between w-full bg-[#0a0a0a] border border-[#1f1f23] rounded-lg p-3 hover:bg-[#121212] transition text-left ${selectedLocal[doc.id] ? 'ring-1 ring-white/20' : ''}`}
+                                    className={`flex items-center justify-between w-full bg-card border border-border rounded-lg p-3 hover:bg-muted transition text-left ${selectedLocal[doc.id] ? 'ring-1 ring-white/20' : ''}`}
                                   >
                                     <div className="flex items-center space-x-3 min-w-0 pr-2">
-                                      {doc.file_type === 'image' && <ImageIcon className="h-5 w-5 text-gray-400 shrink-0" />}
-                                      {doc.file_type === 'video' && <VideoIcon className="h-5 w-5 text-gray-400 shrink-0" />}
-                                      {(doc.file_type === 'pdf' || doc.file_type === 'other') && <FileText className="h-5 w-5 text-gray-400 shrink-0" />}
+                                      {doc.file_type === 'image' && <ImageIcon className="h-5 w-5 text-muted-foreground shrink-0" />}
+                                      {doc.file_type === 'video' && <VideoIcon className="h-5 w-5 text-muted-foreground shrink-0" />}
+                                      {(doc.file_type === 'pdf' || doc.file_type === 'other') && <FileText className="h-5 w-5 text-muted-foreground shrink-0" />}
                                       <div className="min-w-0">
-                                        <p className="text-white text-sm truncate">{doc.file_name}</p>
-                                        <p className="text-xs text-gray-500 truncate">{doc.mime_type}</p>
+                                        <p className="text-foreground text-sm truncate">{doc.file_name}</p>
+                                        <p className="text-xs text-muted-foreground truncate">{doc.mime_type}</p>
                                       </div>
                                     </div>
                                     <div className="shrink-0 ml-3" onClick={(e) => e.stopPropagation()}>
@@ -297,18 +297,18 @@ const FileUploadModal = ({ isOpen, onClose, onFilesSelect }: FileUploadModalProp
                     )}
 
                     {Object.values(selectedLocal).some(Boolean) && (
-                      <div className="flex justify-end space-x-2 pt-4 border-t border-[#1f1f23] mt-4">
+                      <div className="flex justify-end space-x-2 pt-4 border-t border-border mt-4">
                         <Button
                           variant="outline"
                           onClick={onClose}
-                          className="bg-transparent border-gray-600 text-gray-300 hover:bg-gray-800"
+                          className="bg-transparent border-gray-600 text-muted-foreground hover:bg-gray-800"
                         >
                           {t('cancel')}
                         </Button>
                         <Button
                           onClick={handleAddSelected}
                           disabled={addingLocal}
-                          className="bg-white text-black hover:bg-gray-200 disabled:opacity-50"
+                          className="bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
                         >
                           {addingLocal ? (t('adding')) : (t('add_selected'))}
                         </Button>

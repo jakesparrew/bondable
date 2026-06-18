@@ -69,9 +69,9 @@ export default function ProfileEditDialog({ userType, children }: ProfileEditDia
       <DialogTrigger asChild>
         {children}
       </DialogTrigger>
-      <DialogContent className="flex flex-col gap-0 overflow-y-visible p-0 sm:max-w-lg bg-[#111111] border-[#1f1f23] [&>button:last-child]:top-3.5">
+      <DialogContent className="flex flex-col gap-0 overflow-y-visible p-0 sm:max-w-lg bg-card border-border [&>button:last-child]:top-3.5">
         <DialogHeader className="contents space-y-0 text-left">
-          <DialogTitle className="border-b border-[#1f1f23] px-6 py-4 text-base text-white">
+          <DialogTitle className="border-b border-border px-6 py-4 text-base text-foreground">
             {t("edit_profile")}
           </DialogTitle>
         </DialogHeader>
@@ -85,25 +85,25 @@ export default function ProfileEditDialog({ userType, children }: ProfileEditDia
             <form className="space-y-4">
               <div className="flex flex-col gap-4 sm:flex-row">
                 <div className="flex-1 space-y-2">
-                  <Label htmlFor={`${id}-first-name`} className="text-gray-300">{t("first_name")}</Label> <span className="text-red-400">*</span>
+                  <Label htmlFor={`${id}-first-name`} className="text-muted-foreground">{t("first_name")}</Label> <span className="text-red-400">*</span>
                   <Input
                     id={`${id}-first-name`}
                     placeholder={t("john")}
                     defaultValue=""
                     type="text"
                     required
-                    className="bg-[#0a0a0a] border-[#1f1f23] text-white rounded-md"
+                    className="bg-background border-border text-foreground rounded-md"
                   />
                 </div>
                 <div className="flex-1 space-y-2">
-                  <Label htmlFor={`${id}-last-name`} className="text-gray-300">{t("last_name")}</Label> <span className="text-red-400">*</span>
+                  <Label htmlFor={`${id}-last-name`} className="text-muted-foreground">{t("last_name")}</Label> <span className="text-red-400">*</span>
                   <Input
                     id={`${id}-last-name`}
                     placeholder={t("doe")}
                     defaultValue=""
                     type="text"
                     required
-                    className="bg-[#0a0a0a] border-[#1f1f23] text-white rounded-md"
+                    className="bg-background border-border text-foreground rounded-md"
                   />
                 </div>
               </div>
@@ -111,28 +111,28 @@ export default function ProfileEditDialog({ userType, children }: ProfileEditDia
               {userType === "therapist" && (
                 <>
                   <div className="space-y-2">
-                    <Label htmlFor={`${id}-specialization`} className="text-gray-300">{t("specialization")}</Label>
+                    <Label htmlFor={`${id}-specialization`} className="text-muted-foreground">{t("specialization")}</Label>
                     <Input
                       id={`${id}-specialization`}
                       placeholder={t("cbt_family_therapy")}
                       type="text"
-                      className="bg-[#0a0a0a] border-[#1f1f23] text-white rounded-md"
+                      className="bg-background border-border text-foreground rounded-md"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor={`${id}-credentials`} className="text-gray-300">{t("credentials")}</Label>
+                    <Label htmlFor={`${id}-credentials`} className="text-muted-foreground">{t("credentials")}</Label>
                     <Input
                       id={`${id}-credentials`}
                       placeholder={t("lcsw_phd")}
                       type="text"
-                      className="bg-[#0a0a0a] border-[#1f1f23] text-white rounded-md"
+                      className="bg-background border-border text-foreground rounded-md"
                     />
                   </div>
                 </>
               )}
 
               <div className="space-y-2">
-                <Label htmlFor={`${id}-bio`} className="text-gray-300">
+                <Label htmlFor={`${id}-bio`} className="text-muted-foreground">
                   {userType === "therapist" ? t("professional_bio") : t("about_me")}
                 </Label>
                 <Textarea
@@ -145,11 +145,11 @@ export default function ProfileEditDialog({ userType, children }: ProfileEditDia
                   maxLength={maxLength}
                   onChange={handleChange}
                   aria-describedby={`${id}-description`}
-                  className="bg-[#0a0a0a] border-[#1f1f23] text-white rounded-md"
+                  className="bg-background border-border text-foreground rounded-md"
                 />
                 <p
                   id={`${id}-description`}
-                  className="text-gray-400 mt-2 text-right text-xs"
+                  className="text-muted-foreground mt-2 text-right text-xs"
                   role="status"
                   aria-live="polite"
                 >
@@ -160,14 +160,14 @@ export default function ProfileEditDialog({ userType, children }: ProfileEditDia
             </form>
           </div>
         </div>
-        <DialogFooter className="border-t border-[#1f1f23] px-6 py-4">
+        <DialogFooter className="border-t border-border px-6 py-4">
           <DialogClose asChild>
-            <Button type="button" variant="outline" className="bg-transparent border-[#1f1f23] text-gray-300 hover:bg-[#1a1a1a] hover:text-neutral-300 rounded-md">
+            <Button type="button" variant="outline" className="bg-transparent border-border text-muted-foreground hover:bg-muted hover:text-muted-foreground rounded-md">
               {t("cancel")}
             </Button>
           </DialogClose>
           <DialogClose asChild>
-            <Button type="button" className="bg-white text-black hover:bg-gray-200 rounded-md">
+            <Button type="button" className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-md">
               {t("save_changes")}
             </Button>
           </DialogClose>
@@ -189,7 +189,7 @@ function ProfileBg() {
 
   return (
     <div className="h-32">
-      <div className="bg-[#1a1a1a] relative flex size-full items-center justify-center overflow-hidden rounded-t-lg">
+      <div className="bg-card relative flex size-full items-center justify-center overflow-hidden rounded-t-lg">
         {currentImage && (
           <img
             className="size-full object-cover"
@@ -240,7 +240,7 @@ function Avatar() {
 
   return (
     <div className="-mt-10 px-6">
-      <div className="border-[#0a0a0a] bg-[#1a1a1a] relative flex size-20 items-center justify-center overflow-hidden rounded-full border-4 shadow-xs shadow-black/10">
+      <div className="border-border bg-card relative flex size-20 items-center justify-center overflow-hidden rounded-full border-4 shadow-xs shadow-black/10">
         {currentImage && (
           <img
             src={currentImage}

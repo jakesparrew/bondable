@@ -37,8 +37,8 @@ export function PriceInput({ price, onChange }: PriceInputProps) {
         value={price.toString()}
         onChange={handleRawChange}
         placeholder="120.00"
-        className="bg-[#1a1a1a] border-[#1f1f23] text-white 
-                   placeholder:text-gray-500 focus:border-gray-400 
+        className="bg-background border-border text-foreground
+                   placeholder:text-muted-foreground focus:border-ring
                    pr-12"
       />
 
@@ -50,7 +50,7 @@ export function PriceInput({ price, onChange }: PriceInputProps) {
           onClick={handleIncrement}
           className="p-0 h-4 w-4 flex items-center justify-center"
         >
-          <Plus className="h-4 w-4 text-gray-400 hover:text-white" />
+          <Plus className="h-4 w-4 text-muted-foreground hover:text-foreground" />
         </button>
         {/* down */}
         <button
@@ -58,7 +58,7 @@ export function PriceInput({ price, onChange }: PriceInputProps) {
           onClick={handleDecrement}
           className="p-0 h-4 w-4 flex items-center justify-center"
         >
-          <Minus className="h-4 w-4 text-gray-400 hover:text-white" />
+          <Minus className="h-4 w-4 text-muted-foreground hover:text-foreground" />
         </button>
       </div>
     </div>

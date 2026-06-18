@@ -139,7 +139,7 @@ const NotificationCenter = () => {
     return (
       <Avatar className="size-9">
         <AvatarImage src={avatarUrl || ''} alt={notification.title || notification.type} className="non-invertable"/>
-        <AvatarFallback className="bg-[#2a2a2a] text-gray-300 text-xs">
+        <AvatarFallback className="bg-muted text-muted-foreground text-xs">
           {getNotificationIcon(notification.type)}
         </AvatarFallback>
       </Avatar>
@@ -151,18 +151,18 @@ const NotificationCenter = () => {
         <Button
           size="icon"
           variant="ghost"
-          className="relative text-[#71717a] hover:text-white hover:bg-[#1f1f23] h-9 w-9 p-0"
+          className="relative text-[#71717a] hover:text-foreground hover:bg-muted h-9 w-9 p-0"
           aria-label="Open notifications"
         >
           <Bell size={16} aria-hidden="true" className={`${unreadCount > 0 ? "text-red-500" : ""}`}/>
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-80 p-1 bg-[#111111] border-[#1f1f23] mr-6">
+      <PopoverContent className="w-80 p-1 bg-card border-border mr-6">
         <div className="flex items-baseline justify-between gap-4 px-3 py-2">
-          <div className="text-sm font-semibold text-white">{t("notifications")}</div>
+          <div className="text-sm font-semibold text-foreground">{t("notifications")}</div>
           {unreadCount > 0 && (
             <button
-              className="text-xs font-medium text-gray-400 hover:text-white hover:underline"
+              className="text-xs font-medium text-muted-foreground hover:text-foreground hover:underline"
               onClick={markAllAsRead}
             >
               {t("mark_all_as_read")}
@@ -172,39 +172,39 @@ const NotificationCenter = () => {
         <div
           role="separator"
           aria-orientation="horizontal"
-          className="bg-[#1f1f23] -mx-1 my-1 h-px"
+          className="bg-border -mx-1 my-1 h-px"
         ></div>
         <div className="max-h-80 overflow-y-auto scrollbar-hide">
           {isLoading ? (
             <div className="text-center py-8">
-              <p className="text-gray-400 text-sm">{t("loading_notifications")}</p>
+              <p className="text-muted-foreground text-sm">{t("loading_notifications")}</p>
             </div>
           ) : unreadCount === 0 ? (
             <div className="text-center py-8">
-              <Bell className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-              <p className="text-gray-400 text-sm">{t("no_notifications")}</p>
+              <Bell className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
+              <p className="text-muted-foreground text-sm">{t("no_notifications")}</p>
             </div>
           ) : (
             notifications.filter((n) => !n.is_read).map((notification) => (
               <div
                 key={notification.id}
-                className="hover:bg-[#1a1a1a] rounded-md px-3 py-2 text-sm transition-colors"
+                className="hover:bg-muted rounded-md px-3 py-2 text-sm transition-colors"
               >
                 <div className="relative flex items-start gap-3 pe-3">
                   <NotificationAvatar notification={notification} />
                   <div className="flex-1 space-y-1">
                     <button
-                      className="text-gray-300 text-left after:absolute after:inset-0"
+                      className="text-muted-foreground text-left after:absolute after:inset-0"
                       onClick={() => handleNotificationClick(notification.id, notification.is_read)}
                     >
-                      <span className="text-white font-medium hover:underline">
+                      <span className="text-foreground font-medium hover:underline">
                         {notification.title}
                       </span>
-                      <p className="text-gray-400 text-xs mt-1">
+                      <p className="text-muted-foreground text-xs mt-1">
                         {notification.message}
                       </p>
                     </button>
-                    <div className="text-gray-400 text-xs">
+                    <div className="text-muted-foreground text-xs">
                       {notificationService.formatTimeAgo(notification.created_at)}
                     </div>
                   </div>

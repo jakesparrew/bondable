@@ -193,7 +193,7 @@ const SessionDetail = () => {
             </Button>
             <div>
               <h1 className="text-2xl font-semibold">{session.title}</h1>
-              <p className="text-sm text-neutral-400">
+              <p className="text-sm text-muted-foreground">
                 {formatDate(session.date)} • {session.startTime} -{" "}
                 {session.endTime}
               </p>
@@ -209,16 +209,16 @@ const SessionDetail = () => {
         </div>
 
         {/* Session Details Card */}
-        <Card className="overflow-visible bg-neutral-900 border border-neutral-800">
+        <Card className="overflow-visible bg-card border border-border">
           <CardContent className="p-0">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 md:divide-y-0 md:divide-x divide-neutral-700 ">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 md:divide-y-0 md:divide-x divide-border ">
               {/* Date */}
-              <div className="p-4 hover:bg-neutral-800 rounded-tl-lg group transition-colors">
+              <div className="p-4 hover:bg-muted rounded-tl-lg group transition-colors">
                 <div className="flex items-center gap-3 mb-3 ">
-                  <div className="p-2 rounded-lg bg-neutral-800 text-neutral-50 transition-colors group-hover:bg-neutral-700">
+                  <div className="p-2 rounded-lg bg-muted text-foreground transition-colors group-hover:bg-muted">
                     <Calendar className="h-4 w-4" />
                   </div>
-                  <span className="text-sm font-medium text-neutral-50">
+                  <span className="text-sm font-medium text-foreground">
                     {t("date")}
                   </span>
                 </div>
@@ -227,22 +227,22 @@ const SessionDetail = () => {
                     label=""
                     defaultValue={session.date}
                     onChange={(date) => setSession({ ...session, date })}
-                    className="bg-neutral-800 border-neutral-700 text-neutral-50 !mt-0"
+                    className="bg-background border-border text-foreground !mt-0"
                   />
                 ) : (
-                  <p className="font-semibold text-sm leading-tight text-neutral-400">
+                  <p className="font-semibold text-sm leading-tight text-muted-foreground">
                     {formatDate(session.date)}
                   </p>
                 )}
               </div>
 
               {/* Time */}
-              <div className="p-4 hover:bg-neutral-800 group transition-colors">
+              <div className="p-4 hover:bg-muted group transition-colors">
                 <div className="flex items-center gap-3 mb-1 ">
-                  <div className="p-2 rounded-lg bg-neutral-800 text-neutral-50 transition-colors group-hover:bg-neutral-700">
+                  <div className="p-2 rounded-lg bg-muted text-foreground transition-colors group-hover:bg-muted">
                     <Clock className="h-4 w-4" />
                   </div>
-                  <span className="text-sm font-medium text-neutral-50">
+                  <span className="text-sm font-medium text-foreground">
                     {t("time")}
                   </span>
                 </div>
@@ -255,11 +255,11 @@ const SessionDetail = () => {
                         onChange={(time) =>
                           setSession({ ...session, startTime: time })
                         }
-                        className="w-full bg-neutral-800 border-neutral-700 text-neutral-50"
+                        className="w-full bg-background border-border text-foreground"
                       />
                     </div>
 
-                    <span className="text-xs text-neutral-400 whitespace-nowrap">
+                    <span className="text-xs text-muted-foreground whitespace-nowrap">
                       {t("to")}
                     </span>
 
@@ -270,24 +270,24 @@ const SessionDetail = () => {
                         onChange={(time) =>
                           setSession({ ...session, endTime: time })
                         }
-                        className="w-full bg-neutral-800 border-neutral-700 text-neutral-50"
+                        className="w-full bg-background border-border text-foreground"
                       />
                     </div>
                   </div>
                 ) : (
-                  <p className="font-semibold text-sm text-neutral-400 pt-2">
+                  <p className="font-semibold text-sm text-muted-foreground pt-2">
                     {session.startTime} - {session.endTime}
                   </p>
                 )}
               </div>
 
               {/* Type */}
-              <div className="p-4 hover:bg-neutral-800 group transition-colors">
+              <div className="p-4 hover:bg-muted group transition-colors">
                 <div className="flex items-center gap-3 mb-3 ">
-                  <div className="p-2 rounded-lg bg-neutral-800 text-neutral-50 transition-colors group-hover:bg-neutral-700">
+                  <div className="p-2 rounded-lg bg-muted text-foreground transition-colors group-hover:bg-muted">
                     {getSessionIcon(session.type)}
                   </div>
-                  <span className="text-sm font-medium text-neutral-50">
+                  <span className="text-sm font-medium text-foreground">
                     {t("type")}
                   </span>
                 </div>
@@ -298,44 +298,44 @@ const SessionDetail = () => {
                       setSession({ ...session, type: value })
                     }
                   >
-                    <SelectTrigger className="w-full bg-neutral-800 border-neutral-700 text-neutral-50">
+                    <SelectTrigger className="w-full bg-background border-border text-foreground">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="bg-neutral-800 border-neutral-700">
+                    <SelectContent className="bg-card border-border">
                       <SelectItem
                         value="in-person"
-                        className="text-neutral-400 hover:!text-neutral-950 data-[state=checked]:text-neutral-50 data-[highlighted]:!text-neutral-950"
+                        className="text-muted-foreground hover:!text-foreground data-[state=checked]:text-foreground data-[highlighted]:!text-foreground"
                       >
                         {t("in_person")}
                       </SelectItem>
                       <SelectItem
                         value="video"
-                        className="text-neutral-400 hover:!text-neutral-950 data-[state=checked]:text-neutral-50 data-[highlighted]:!text-neutral-950"
+                        className="text-muted-foreground hover:!text-foreground data-[state=checked]:text-foreground data-[highlighted]:!text-foreground"
                       >
                         {t("video_call")}
                       </SelectItem>
                       <SelectItem
                         value="phone"
-                        className="text-neutral-400 hover:!text-neutral-950 data-[state=checked]:text-neutral-50 data-[highlighted]:!text-neutral-950"
+                        className="text-muted-foreground hover:!text-foreground data-[state=checked]:text-foreground data-[highlighted]:!text-foreground"
                       >
                         {t("phone_call")}
                       </SelectItem>
                     </SelectContent>
                   </Select>
                 ) : (
-                  <p className="font-semibold text-sm capitalize text-neutral-400">
+                  <p className="font-semibold text-sm capitalize text-muted-foreground">
                     {session.type.replace("-", " ")}
                   </p>
                 )}
               </div>
 
               {/* Location */}
-              <div className="p-4 group hover:bg-neutral-800 rounded-tr-lg transition-colors">
+              <div className="p-4 group hover:bg-muted rounded-tr-lg transition-colors">
                 <div className="flex items-center gap-3 mb-3 ">
-                  <div className="p-2 rounded-lg bg-neutral-800 text-neutral-50 transition-colors group-hover:bg-neutral-700">
+                  <div className="p-2 rounded-lg bg-muted text-foreground transition-colors group-hover:bg-muted">
                     <MapPin className="h-4 w-4 " />
                   </div>
-                  <span className="text-sm font-medium text-neutral-50">
+                  <span className="text-sm font-medium text-foreground">
                     {t("location")}
                   </span>
                 </div>
@@ -360,11 +360,11 @@ const SessionDetail = () => {
                       setSearchInput={setSearchInput}
                       dialogTitle={t("edit_session_location")}
                       placeholder={t("enter_session_location")}
-                      className="bg-neutral-800 border-neutral-700 text-neutral-50"
+                      className="bg-background border-border text-foreground"
                     />
                   </div>
                 ) : (
-                  <p className="font-semibold text-sm text-neutral-400">
+                  <p className="font-semibold text-sm text-muted-foreground">
                     {session.location || t("not_specified")}
                   </p>
                 )}
@@ -373,16 +373,16 @@ const SessionDetail = () => {
 
             {/* Client/Therapist Info */}
             {(session.clientName || session.therapistName) && (
-              <div className="px-4 py-3 border-t border-neutral-700">
+              <div className="px-4 py-3 border-t border-border">
                 <div className="flex items-center gap-3">
-                  <div className="p-3 rounded-lg bg-neutral-800 text-neutral-50">
+                  <div className="p-3 rounded-lg bg-muted text-foreground">
                     <User className="h-4 w-4" />
                   </div>
                   <div>
-                    <span className="text-sm font-medium text-neutral-50">
+                    <span className="text-sm font-medium text-foreground">
                       {userType === "therapist" ? t("client") : t("therapist")}
                     </span>
-                    <p className="font-semibold text-sm text-neutral-400">
+                    <p className="font-semibold text-sm text-muted-foreground">
                       {session.clientName || session.therapistName}
                     </p>
                   </div>
@@ -394,11 +394,11 @@ const SessionDetail = () => {
 
         {/* Session Information - Therapist Only */}
         {isTherapist && hideForNow && (
-          <Card className="overflow-hidden bg-neutral-900 border border-neutral-800 shadow-lg">
-            <CardHeader className="pb-6 bg-gradient-to-r from-neutral-900 via-neutral-800 to-neutral-900 border-b border-neutral-700">
+          <Card className="overflow-hidden bg-card border border-border shadow-lg">
+            <CardHeader className="pb-6 bg-card border-b border-border">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <CardTitle className="text-xl text-neutral-50 font-semibold">
+                  <CardTitle className="text-xl text-foreground font-semibold">
               {t("session_information")}
                   </CardTitle>
                 </div>
@@ -408,7 +408,7 @@ const SessionDetail = () => {
                       variant="outline"
                       size="sm"
                       onClick={addObjective}
-                      className="h-8 hover:text-neutral-900 hover:bg-neutral-200"
+                      className="h-8 hover:text-foreground hover:bg-muted"
                     >
                       <Plus className="h-4 w-4 mr-1" />
                       {t("add_objective")}
@@ -417,7 +417,7 @@ const SessionDetail = () => {
                       variant="outline"
                       size="sm"
                       onClick={() => setShowNotes(true)}
-                      className="h-8 hover:text-neutral-900 hover:bg-neutral-200"
+                      className="h-8 hover:text-foreground hover:bg-muted"
                     >
                       <Plus className="h-4 w-4 mr-1" />
                       {t("add_notes")}
@@ -426,7 +426,7 @@ const SessionDetail = () => {
                       variant="outline"
                       size="sm"
                       onClick={() => setShowNextSteps(true)}
-                      className="h-8 hover:text-neutral-900 hover:bg-neutral-200"
+                      className="h-8 hover:text-foreground hover:bg-muted"
                     >
                       <Plus className="h-4 w-4 mr-1" />
                       {t("add_next_steps")}
@@ -438,7 +438,7 @@ const SessionDetail = () => {
             <CardContent className="space-y-6">
               {!hasAnyContent ? (
                 <div className="text-center py-12">
-                  <div className="text-neutral-50 mb-4">
+                  <div className="text-foreground mb-4">
                     <FileText className="h-12 w-12 mx-auto mb-3 opacity-50 " />
                     <p>No session information added yet</p>
                     {isEditing ? (
@@ -461,8 +461,8 @@ const SessionDetail = () => {
                     <div className="space-y-3 mt-4">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                          <Target className="h-4 w-4 text-neutral-300" />
-                          <h4 className="font-medium text-neutral-300">
+                          <Target className="h-4 w-4 text-muted-foreground" />
+                          <h4 className="font-medium text-muted-foreground">
                             {t("session_objectives")}
                           </h4>
                         </div>
@@ -473,7 +473,7 @@ const SessionDetail = () => {
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => setShowNotes(true)}
-                                className="h-8 text-xs hover:text-neutral-900 hover:bg-neutral-200 text-neutral-950 bg-neutral-50"
+                                className="h-8 text-xs hover:text-primary-foreground hover:bg-primary/90 text-primary-foreground bg-primary"
                               >
                                 <Plus className="h-3 w-3 mr-1" />
                                 Notes
@@ -484,7 +484,7 @@ const SessionDetail = () => {
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => setShowNextSteps(true)}
-                                className="h-8 text-xs hover:text-neutral-900 hover:bg-neutral-200 text-neutral-950 bg-neutral-50"
+                                className="h-8 text-xs hover:text-primary-foreground hover:bg-primary/90 text-primary-foreground bg-primary"
                               >
                                 <Plus className="h-3 w-3 mr-1" />
                                 Next Steps
@@ -494,7 +494,7 @@ const SessionDetail = () => {
                               variant="ghost"
                               size="sm"
                               onClick={addObjective}
-                              className="h-8 text-xs hover:text-neutral-900 hover:bg-neutral-200 text-neutral-950 bg-neutral-50"
+                              className="h-8 text-xs hover:text-primary-foreground hover:bg-primary/90 text-primary-foreground bg-primary"
                             >
                               <Plus className="h-4 w-4" />
                             </Button>
@@ -504,14 +504,14 @@ const SessionDetail = () => {
                       <div className="space-y-2">
                         {session.objectives?.map((objective, index) => (
                           <div key={index} className="flex items-stretch gap-2">
-                            <div className="w-2 h-2 bg-neutral-300 rounded-full flex-shrink-0 mt-4" />
+                            <div className="w-2 h-2 bg-muted-foreground rounded-full flex-shrink-0 mt-4" />
                             <Input
                               value={objective}
                               onChange={(e) =>
                                 updateObjective(index, e.target.value)
                               }
                               placeholder={t("enter_objective")}
-                              className="flex-1 bg-neutral-800 border border-neutral-700 text-neutral-50"
+                              className="flex-1 bg-background border border-border text-foreground"
                               readOnly={!isEditing}
                             />
                             {isEditing && (
@@ -520,7 +520,7 @@ const SessionDetail = () => {
                                   variant="outline"
                                   size="sm"
                                   onClick={() => removeObjective(index)}
-                                  className="h-full text-xs bg-neutral-800 border-neutral-600 text-neutral-300 hover:bg-neutral-700 hover:border-neutral-500 hover:text-neutral-200"
+                                  className="h-full text-xs bg-muted border-border text-muted-foreground hover:bg-muted hover:border-border hover:text-foreground"
                                 >
                                   <MinusIcon />
                                 </Button>
@@ -538,12 +538,12 @@ const SessionDetail = () => {
                       {(showObjectives ||
                         (session.objectives &&
                           session.objectives.length > 0)) && (
-                        <hr className="-mx-6 w-[calc(100%+3rem)] border-t border-neutral-800 pb-1" />
+                        <hr className="-mx-6 w-[calc(100%+3rem)] border-t border-border pb-1" />
                       )}
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                          <FileText className="h-4 w-4 text-neutral-300" />
-                          <h4 className="font-medium text-neutral-300">
+                          <FileText className="h-4 w-4 text-muted-foreground" />
+                          <h4 className="font-medium text-muted-foreground">
                             {t("session_notes")}
                           </h4>
                         </div>
@@ -556,7 +556,7 @@ const SessionDetail = () => {
                                   variant="ghost"
                                   size="sm"
                                   onClick={addObjective}
-                                  className="h-8 text-xs hover:text-neutral-900 hover:bg-neutral-200 text-neutral-950 bg-neutral-50"
+                                  className="h-8 text-xs hover:text-primary-foreground hover:bg-primary/90 text-primary-foreground bg-primary"
                                 >
                                   <Plus className="h-3 w-3 mr-1" />
                                   Objective
@@ -567,7 +567,7 @@ const SessionDetail = () => {
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => setShowNextSteps(true)}
-                                className="h-8 text-xs hover:text-neutral-900 hover:bg-neutral-200 text-neutral-950 bg-neutral-50"
+                                className="h-8 text-xs hover:text-primary-foreground hover:bg-primary/90 text-primary-foreground bg-primary"
                               >
                                 <Plus className="h-3 w-3 mr-1" />
                                 Next Steps
@@ -585,7 +585,7 @@ const SessionDetail = () => {
                             }
                             placeholder={t("enter_session_notes")}
                             rows={4}
-                            className="w-full bg-neutral-800 border border-neutral-600 text-neutral-50 "
+                            className="w-full bg-background border border-border text-foreground "
                             readOnly={!isEditing}
                           />
                         </div>
@@ -598,7 +598,7 @@ const SessionDetail = () => {
                                 setSession({ ...session, notes: "" });
                                 setShowNotes(false);
                               }}
-                              className="h-full text-xs bg-neutral-800 border-neutral-600 text-neutral-300 hover:bg-neutral-700 hover:border-neutral-500 hover:text-neutral-200"
+                              className="h-full text-xs bg-muted border-border text-muted-foreground hover:bg-muted hover:border-border hover:text-foreground"
                             >
                               <MinusIcon />
                             </Button>
@@ -612,12 +612,12 @@ const SessionDetail = () => {
                   {(showNextSteps || session.nextSteps) && (
                     <div className="space-y-3 mt-4">
                       {(showNotes || session.notes) && (
-                        <hr className="-mx-6 w-[calc(100%+3rem)] border-t border-neutral-800 pb-1" />
+                        <hr className="-mx-6 w-[calc(100%+3rem)] border-t border-border pb-1" />
                       )}
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                          <ArrowRight className="h-4 w-4 text-neutral-300" />
-                          <h4 className="font-medium text-neutral-300">
+                          <ArrowRight className="h-4 w-4 text-muted-foreground" />
+                          <h4 className="font-medium text-muted-foreground">
                             {t("next_steps")}
                           </h4>
                         </div>
@@ -630,7 +630,7 @@ const SessionDetail = () => {
                                   variant="ghost"
                                   size="sm"
                                   onClick={addObjective}
-                                  className="h-8 text-xs hover:text-neutral-900 hover:bg-neutral-200 text-neutral-950 bg-neutral-50"
+                                  className="h-8 text-xs hover:text-primary-foreground hover:bg-primary/90 text-primary-foreground bg-primary"
                                 >
                                   <Plus className="h-3 w-3 mr-1" />
                                   Objective
@@ -641,7 +641,7 @@ const SessionDetail = () => {
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => setShowNotes(true)}
-                                className="h-8 text-xs hover:text-neutral-900 hover:bg-neutral-200 text-neutral-950 bg-neutral-50"
+                                className="h-8 text-xs hover:text-primary-foreground hover:bg-primary/90 text-primary-foreground bg-primary"
                               >
                                 <Plus className="h-3 w-3 mr-1" />
                                 Notes
@@ -661,7 +661,7 @@ const SessionDetail = () => {
                           }
                           placeholder={t("enter_next_steps")}
                           rows={3}
-                          className="w-full bg-neutral-800 border border-neutral-600 text-neutral-50 "
+                          className="w-full bg-background border border-border text-foreground "
                           readOnly={!isEditing}
                         />
                         {isEditing && (
@@ -673,7 +673,7 @@ const SessionDetail = () => {
                                 setSession({ ...session, nextSteps: "" });
                                 setShowNextSteps(false);
                               }}
-                              className="h-full text-xs bg-neutral-800 border-neutral-600 text-neutral-300 hover:bg-neutral-700 hover:border-neutral-500 hover:text-neutral-200"
+                              className="h-full text-xs bg-muted border-border text-muted-foreground hover:bg-muted hover:border-border hover:text-foreground"
                             >
                               <MinusIcon />
                             </Button>
@@ -696,7 +696,7 @@ const SessionDetail = () => {
               <Button
                 variant="outline"
                 onClick={() => setIsEditing(false)}
-                className="px-6 py-2 bg-neutral-800 border-neutral-600 text-neutral-300 hover:bg-neutral-700 hover:border-neutral-500 hover:text-neutral-200 transition-all duration-200"
+                className="px-6 py-2 bg-muted border-border text-muted-foreground hover:bg-muted hover:border-border hover:text-foreground transition-all duration-200"
               >
                 {t("cancel")}
               </Button>
@@ -706,7 +706,7 @@ const SessionDetail = () => {
                   setIsEditing(false);
                   console.log("Saving session changes:", session);
                 }}
-                className="hover:text-neutral-900 hover:bg-neutral-200 text-neutral-950 bg-neutral-50"
+                className="hover:text-primary-foreground hover:bg-primary/90 text-primary-foreground bg-primary"
               >
                 {t("save_changes")}
               </Button>
@@ -716,7 +716,7 @@ const SessionDetail = () => {
               <Button
                 variant="outline"
                 onClick={() => setIsEditing(true)}
-                className="px-6 py-2 bg-neutral-800 border-neutral-600 text-neutral-300 hover:bg-neutral-700 hover:border-neutral-500 hover:text-neutral-200 transition-all duration-200"
+                className="px-6 py-2 bg-muted border-border text-muted-foreground hover:bg-muted hover:border-border hover:text-foreground transition-all duration-200"
               >
                 <Edit className="h-4 w-4 mr-2" />
                 {t("edit")}

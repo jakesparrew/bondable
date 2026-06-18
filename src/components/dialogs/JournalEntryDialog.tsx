@@ -115,15 +115,15 @@ export const JournalEntryDialog = ({
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
           {trigger || (
-            <Button className="bg-neutral-50 hover:bg-[#d6d6d6] text-neutral-950">
+            <Button className="bg-primary text-primary-foreground hover:bg-primary/90">
               <Plus className="w-4 h-4 mr-2" />
               New Entry
             </Button>
           )}
         </DialogTrigger>
-        <DialogContent className="bg-[#111111] border-[#1f1f23] text-white max-w-2xl">
+        <DialogContent className="bg-card border-border text-foreground max-w-2xl">
           <DialogHeader>
-            <DialogTitle className="text-white flex items-center gap-2">
+            <DialogTitle className="text-foreground flex items-center gap-2">
               {t("new_journal_entry")}
             </DialogTitle>
           </DialogHeader>
@@ -131,19 +131,19 @@ export const JournalEntryDialog = ({
 
           <div className="space-y-6">
             <div className="space-y-2">
-              <Label className="text-gray-300">
+              <Label className="text-muted-foreground">
                 {t("how_are_you_feeling_today")}
               </Label>
               <Textarea
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 placeholder={t("write_about_your_day")}
-                className="bg-[#0a0a0a] border-[#1f1f23] text-white placeholder:text-gray-500 min-h-32 focus:border-gray-400 resize-none"
+                className="bg-background border-border text-foreground placeholder:text-muted-foreground min-h-32 focus:border-ring resize-none"
               />
             </div>
 
             <div className="space-y-3">
-              <Label className="text-gray-300">
+              <Label className="text-muted-foreground">
                 {t("attach_files_optional")}
                 {files.length > 0 && (
                   <span className="text-sm text-blue-400">
@@ -160,7 +160,7 @@ export const JournalEntryDialog = ({
             </div>
 
             <div className="space-y-3">
-              <Label className="text-gray-300">{t('sharing_preferences')}</Label>
+              <Label className="text-muted-foreground">{t('sharing_preferences')}</Label>
               <TherapistSharingSelector
                 selectedTherapists={selectedTherapists}
                 onSelectTherapists={setSelectedTherapists}
@@ -173,13 +173,13 @@ export const JournalEntryDialog = ({
               <Button
                 variant="outline"
                 onClick={() => setOpen(false)}
-                className="border-[#333] bg-[#1a1a1a] hover:bg-[#2a2a2a] text-gray-300 hover:text-white"
+                className="border-border bg-card hover:bg-muted text-muted-foreground hover:text-foreground"
               >
                 {t("cancel")}
               </Button>
               <Button
                 onClick={handleSave}
-                className="bg-neutral-50 hover:bg-[#d6d6d6] text-neutral-950"
+                className="bg-primary text-primary-foreground hover:bg-primary/90"
               >
                 {t("save_entry")}
               </Button>

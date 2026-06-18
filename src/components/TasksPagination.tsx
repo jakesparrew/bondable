@@ -21,16 +21,16 @@ export default function TasksPagination({
   const { t } = useTranslation();
   return (
     <div className="flex items-center justify-between gap-3 w-full -my-4 -mb-0">
-      <p className="text-neutral-400 grow text-sm" aria-live="polite">
-        {t("page")} <span className="text-neutral-50">{currentPage}</span> {t("of")}{" "}
-        <span className="text-neutral-400">{totalPages}</span>
+      <p className="text-muted-foreground grow text-sm" aria-live="polite">
+        {t("page")} <span className="text-foreground">{currentPage}</span> {t("of")}{" "}
+        <span className="text-muted-foreground">{totalPages}</span>
       </p>
       <Pagination className="w-auto ">
         <PaginationContent className="gap-3">
           <PaginationItem>
             <Button
               variant="outline"
-              className="aria-disabled:pointer-events-none aria-disabled:opacity-50 border-neutral-800 bg-neutral-900 text-neutral-50 hover:bg-neutral-300 hover:text-neutral-900 max-h-8 max-w-8"
+              className="aria-disabled:pointer-events-none aria-disabled:opacity-50 border-border bg-card text-foreground hover:bg-muted hover:text-foreground max-h-8 max-w-8"
               aria-disabled={currentPage === 1 ? true : undefined}
               onClick={() => currentPage > 1 && onPageChange(currentPage - 1)}
               disabled={currentPage === 1}
@@ -42,7 +42,7 @@ export default function TasksPagination({
           <PaginationItem>
             <Button
               variant="outline"
-              className="aria-disabled:pointer-events-none aria-disabled:opacity-50 border-neutral-800 bg-neutral-900 text-neutral-50 hover:bg-neutral-300 hover:text-neutral-900 max-h-8 max-w-8"
+              className="aria-disabled:pointer-events-none aria-disabled:opacity-50 border-border bg-card text-foreground hover:bg-muted hover:text-foreground max-h-8 max-w-8"
               aria-disabled={currentPage === totalPages ? true : undefined}
               onClick={() =>
                 currentPage < totalPages && onPageChange(currentPage + 1)

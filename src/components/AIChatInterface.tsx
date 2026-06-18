@@ -157,10 +157,10 @@ useOptimizedEffect(() => {
   return (
     <div className={
       isMobile
-        ? `flex flex-col h-screen overflow-hidden bg-[#111111] ${
+        ? `flex flex-col h-screen overflow-hidden bg-card ${
             isNative ? "pt-14" : ""
           }`
-        : "flex-1 flex flex-col bg-[#111111] h-full relative"
+        : "flex-1 flex flex-col bg-card h-full relative"
     }>
       {/* Header */}
       <ChatHeader type="ai" onBackClick={onBack} />
@@ -184,7 +184,7 @@ useOptimizedEffect(() => {
             <div className="flex items-start space-x-2 max-w-xs lg:max-w-md">
               {message.sender === "ai" && (
                 <Avatar className="w-8 h-8 mt-1">
-                  <AvatarFallback className="bg-neutral-700 text-white text-xs">
+                  <AvatarFallback className="bg-muted text-foreground text-xs">
                     <Bot className="h-4 w-4" />
                   </AvatarFallback>
                 </Avatar>
@@ -192,8 +192,8 @@ useOptimizedEffect(() => {
               <div
                 className={`px-4 py-2 rounded-lg ${
                   message.sender === "user"
-                    ? "bg-white text-black"
-                    : "bg-[#27272a] text-white"
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-muted text-foreground"
                 }`}
               >
                 <p className="text-sm [overflow-wrap:anywhere]">{message.text}</p>
@@ -203,7 +203,7 @@ useOptimizedEffect(() => {
                   {userAvatar && (
                     <AvatarImage src={userAvatar} alt="Your profile picture" />
                   )}
-                  <AvatarFallback className="bg-[#27272a] text-white text-xs">
+                  <AvatarFallback className="bg-muted text-foreground text-xs">
                     <User className="h-4 w-4" />
                   </AvatarFallback>
                 </Avatar>
@@ -215,19 +215,19 @@ useOptimizedEffect(() => {
           <div className="flex justify-start">
             <div className="flex items-start space-x-2">
               <Avatar className="w-8 h-8 mt-1">
-                <AvatarFallback className="bg-neutral-700 text-white text-xs">
+                <AvatarFallback className="bg-muted text-foreground text-xs">
                   <Bot className="h-4 w-4" />
                 </AvatarFallback>
               </Avatar>
-              <div className="bg-[#27272a] text-white px-4 py-2 rounded-lg">
+              <div className="bg-muted text-foreground px-4 py-2 rounded-lg">
                 <div className="flex space-x-1">
-                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+                  <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce"></div>
                   <div
-                    className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                    className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce"
                     style={{ animationDelay: "0.1s" }}
                   ></div>
                   <div
-                    className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                    className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce"
                     style={{ animationDelay: "0.2s" }}
                   ></div>
                 </div>
@@ -252,7 +252,7 @@ useOptimizedEffect(() => {
 
       {/* Input */}
       <div
-        className={`p-3 border-t border-[#1f1f23] ${
+        className={`p-3 border-t border-border ${
           isMobile && isNative ? "pb-7" : ""
         }`}
       >
@@ -263,12 +263,12 @@ useOptimizedEffect(() => {
             onChange={(e) => setNewMessage(e.target.value)}
             onKeyPress={handleKeyPress}
             disabled={isLoading}
-            className="bg-[#1a1a1a] border-[#1f1f23] text-white placeholder:text-gray-500 focus:border-gray-400"
+            className="bg-background border-border text-foreground placeholder:text-muted-foreground focus:border-ring"
           />
           <Button
             onClick={handleSendMessage}
             disabled={!newMessage.trim() || isLoading}
-            className="bg-neutral-100 hover:bg-neutral-200 text-neutral-950 hover:text-neutral-800 h-10 w-10 p-0"
+            className="bg-primary hover:bg-primary/90 text-primary-foreground hover:text-primary-foreground h-10 w-10 p-0"
           >
             <Send className="h-4 w-4" />
           </Button>

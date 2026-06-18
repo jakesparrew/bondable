@@ -24,7 +24,7 @@ const DataCard = ({
   actions,
 }: DataCardProps) => {
   const { t } = useTranslation();
-  const baseClassName = "bg-[#111111] border-[#1f1f23]";
+  const baseClassName = "bg-card border-border";
 
   if (isLoading) {
     return (
@@ -32,18 +32,18 @@ const DataCard = ({
         {(title || description) && (
           <CardHeader className={headerClassName}>
             {title && (
-              <div className="h-6 w-32 bg-[#1a1a1a] rounded animate-pulse mb-2" />
+              <div className="h-6 w-32 bg-muted rounded animate-pulse mb-2" />
             )}
             {description && (
-              <div className="h-4 w-48 bg-[#1a1a1a] rounded animate-pulse" />
+              <div className="h-4 w-48 bg-muted rounded animate-pulse" />
             )}
           </CardHeader>
         )}
         <CardContent className={contentClassName}>
           <div className="space-y-3">
-            <div className="h-4 w-full bg-[#1a1a1a] rounded animate-pulse" />
-            <div className="h-4 w-3/4 bg-[#1a1a1a] rounded animate-pulse" />
-            <div className="h-4 w-1/2 bg-[#1a1a1a] rounded animate-pulse" />
+            <div className="h-4 w-full bg-muted rounded animate-pulse" />
+            <div className="h-4 w-3/4 bg-muted rounded animate-pulse" />
+            <div className="h-4 w-1/2 bg-muted rounded animate-pulse" />
           </div>
         </CardContent>
       </Card>
@@ -57,12 +57,12 @@ const DataCard = ({
           <div className="flex items-center justify-between">
             <div>
               {title && (
-                <CardTitle className="text-white text-lg">
+                <CardTitle className="text-foreground text-lg">
                   {t(title)}
                 </CardTitle>
               )}
               {description && (
-                <CardDescription className="text-gray-400 text-sm">
+                <CardDescription className="text-muted-foreground text-sm">
                   {t(description)}
                 </CardDescription>
               )}

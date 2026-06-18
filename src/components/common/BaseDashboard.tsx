@@ -273,10 +273,10 @@ const BaseDashboard = ({ userType, config, headerSlot }: BaseDashboardProps) => 
         {headerSlot}
         {/* Welcome Section */}
         <div>
-          <h2 className="text-2xl font-semibold text-white mb-1">
+          <h2 className="text-2xl font-semibold text-foreground mb-1">
             {getPossessiveDashboardTitle(firstName)}
           </h2>
-          <p className="text-gray-400 text-sm">
+          <p className="text-muted-foreground text-sm">
             {t(config.welcomeMessage)}
           </p>
         </div>
@@ -321,7 +321,7 @@ const BaseDashboard = ({ userType, config, headerSlot }: BaseDashboardProps) => 
 
             {filteredActivities.length === 0 ? (
               <div className="text-center py-8">
-                <p className="text-gray-400">
+                <p className="text-muted-foreground">
                   {t("no_activities_match_filters")}
                 </p>
               </div>
@@ -329,17 +329,17 @@ const BaseDashboard = ({ userType, config, headerSlot }: BaseDashboardProps) => 
               <div className="overflow-x-auto">
                 <Table>
                   <TableHeader>
-                    <TableRow className="border-[#1f1f23] hover:bg-transparent">
-                      <TableHead className="text-gray-400 font-medium">
+                    <TableRow className="border-border hover:bg-transparent">
+                      <TableHead className="text-muted-foreground font-medium">
                         {t("activity")}
                       </TableHead>
                       {!isMobile && (
-                        <TableHead className="text-gray-400 font-medium">
+                        <TableHead className="text-muted-foreground font-medium">
                           {t(config.relationFilterLabel)}
                         </TableHead>
                       )}
                       {!isMobile && (
-                        <TableHead className="text-gray-400 font-medium text-right">
+                        <TableHead className="text-muted-foreground font-medium text-right">
                           {t("time")}
                         </TableHead>
                       )}
@@ -351,14 +351,14 @@ const BaseDashboard = ({ userType, config, headerSlot }: BaseDashboardProps) => 
                       return (
                         <TableRow
                           key={activity.id}
-                          className={`border-[#1f1f23] ${
-                            isMobile ? "" : "hover:bg-[#1a1a1a]"
+                          className={`border-border ${
+                            isMobile ? "" : "hover:bg-muted"
                           }`}
                         >
-                          <TableCell className="text-white">
+                          <TableCell className="text-foreground">
                             <div className="flex items-center space-x-3">
-                              <div className="w-8 h-8 bg-[#1a1a1a] rounded-lg flex items-center justify-center flex-shrink-0">
-                                <Icon className="h-4 w-4 text-gray-400" />
+                              <div className="w-8 h-8 bg-muted rounded-lg flex items-center justify-center flex-shrink-0">
+                                <Icon className="h-4 w-4 text-muted-foreground" />
                               </div>
                               <div className="min-w-0 flex-1">
                                  <span className="text-sm block truncate">
@@ -372,12 +372,12 @@ const BaseDashboard = ({ userType, config, headerSlot }: BaseDashboardProps) => 
                                    }
                                  </span>
                                  {isMobile && activity[config.relationKey] && (
-                                   <div className="text-xs text-gray-400 mt-1 truncate">
+                                   <div className="text-xs text-muted-foreground mt-1 truncate">
                                      {activity[config.relationKey] === 'private_no_therapist' ? t('private_no_therapist') : t(activity[config.relationKey])}
                                    </div>
                                  )}
                                 {isMobile && (
-                                  <div className="text-xs text-gray-500 mt-0.5">
+                                  <div className="text-xs text-muted-foreground mt-0.5">
                                     {activity.time}
                                   </div>
                                 )}
@@ -385,14 +385,14 @@ const BaseDashboard = ({ userType, config, headerSlot }: BaseDashboardProps) => 
                             </div>
                           </TableCell>
                            {!isMobile && (
-                             <TableCell className="text-gray-300 text-sm">
+                             <TableCell className="text-muted-foreground text-sm">
                                {activity[config.relationKey] ? 
                                   activity[config.relationKey] === 'private_no_therapist' ? t('private_no_therapist') : t(activity[config.relationKey])
                                  : t("n_a")}
                             </TableCell>
                           )}
                           {!isMobile && (
-                            <TableCell className="text-gray-400 text-sm text-right whitespace-nowrap">
+                            <TableCell className="text-muted-foreground text-sm text-right whitespace-nowrap">
                               {activity.time}
                             </TableCell>
                           )}

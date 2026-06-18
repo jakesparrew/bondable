@@ -38,7 +38,7 @@ const VideoPreviewDialog = ({ isOpen, onClose, videoUrl, fileName }: VideoPrevie
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent 
-        className="bg-[#111111] border-[#1f1f23] p-4 rounded shadow-lg max-w-4xl w-full"
+        className="bg-card border-border p-4 rounded shadow-lg max-w-4xl w-full"
         disableCloseButton
       >
         <VisuallyHidden>
@@ -47,7 +47,7 @@ const VideoPreviewDialog = ({ isOpen, onClose, videoUrl, fileName }: VideoPrevie
         <div className="flex justify-end ">
           <DialogClose asChild>
             <button
-              className="text-neutral-400 hover:text-white"
+              className="text-muted-foreground hover:text-foreground"
               aria-label="Close"
             >
               <X className="w-5 h-5" />
@@ -71,7 +71,7 @@ const VideoPreviewDialog = ({ isOpen, onClose, videoUrl, fileName }: VideoPrevie
           </div>
 
           {/* Video info */}
-          <p className="text-gray-300 text-sm mt-3 flex flex-col items-center">{fileName}</p>
+          <p className="text-muted-foreground text-sm mt-3 flex flex-col items-center">{fileName}</p>
         </div>
       </DialogContent>
     </Dialog>

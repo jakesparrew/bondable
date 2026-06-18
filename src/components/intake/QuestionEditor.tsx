@@ -18,7 +18,7 @@ export function QuestionEditor({ q, onChange }: { q: QuestionRow; onChange: (pat
       <Textarea value={q.help_text ?? ""}       onChange={(e) => setHelp(e.target.value)}    placeholder={t("intake:help_text")} />
       <div className="flex items-center gap-2">
         <Switch checked={q.is_required} onCheckedChange={setRequired} />
-        <span className="text-xs text-gray-300">{t("intake:required")}</span>
+        <span className="text-xs text-muted-foreground">{t("intake:required")}</span>
       </div>
 
       {q.question_type === "number"   && <NumberConfig q={q} onChange={onChange} />}

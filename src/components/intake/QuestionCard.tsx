@@ -25,12 +25,12 @@ export function QuestionCard({
   const [open, setOpen] = useState(false);
 
   return (
-    <Card className="bg-[#141418] border-[#1f1f23]">
+    <Card className="bg-card border-border">
       <CardContent className="p-3">
         <div className="flex items-center gap-2">
-          <span className="text-gray-600 text-xs">{q.position + 1}.</span>
-          <div className="flex-1 text-sm text-gray-200 cursor-pointer truncate" onClick={() => setOpen(!open)}>
-            {q.question_text || <span className="text-gray-500">({t("intake:question_text")})</span>}
+          <span className="text-muted-foreground text-xs">{q.position + 1}.</span>
+          <div className="flex-1 text-sm text-foreground cursor-pointer truncate" onClick={() => setOpen(!open)}>
+            {q.question_text || <span className="text-muted-foreground">({t("intake:question_text")})</span>}
           </div>
           <Badge variant="outline">{t(`intake:type_${q.question_type}`)}</Badge>
           {q.is_required && <Badge>{t("intake:required")}</Badge>}
@@ -42,7 +42,7 @@ export function QuestionCard({
           </div>
         </div>
         {open && (
-          <div className="mt-3 border-t border-[#1f1f23] pt-3">
+          <div className="mt-3 border-t border-border pt-3">
             <QuestionEditor q={q} onChange={onChange} />
           </div>
         )}

@@ -86,14 +86,14 @@ const PDFViewer = ({
   // Upload mode
   if (isUploadMode) {
     return (
-      <div className="bg-[#1a1a1a] border border-[#1f1f23] rounded-lg p-4 space-y-4">
+      <div className="bg-card border border-border rounded-lg p-4 space-y-4">
         <div className="flex items-center justify-between">
-          <h3 className="text-white font-medium">{t("share_pdf")}</h3>
+          <h3 className="text-foreground font-medium">{t("share_pdf")}</h3>
           <Button
             variant="ghost"
             size="sm"
             onClick={onCancel}
-            className="text-gray-400 hover:text-white"
+            className="text-muted-foreground hover:text-foreground"
           >
             ×
           </Button>
@@ -109,9 +109,9 @@ const PDFViewer = ({
 
         {!selectedPDF ? (
           <div className="text-center space-y-4">
-            <div className="border-2 border-dashed border-gray-600 rounded-lg p-8">
-              <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-400 mb-4">{t("select_pdf_to_share")}</p>
+            <div className="border-2 border-dashed border-border rounded-lg p-8">
+              <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+              <p className="text-muted-foreground mb-4">{t("select_pdf_to_share")}</p>
               <Button
                 onClick={handleUploadClick}
                 className="bg-blue-600 hover:bg-blue-700 text-white"
@@ -120,13 +120,13 @@ const PDFViewer = ({
                 {t("choose_pdf")}
               </Button>
             </div>
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-muted-foreground">
               {t("pdf_files_only_max_50mb")}
             </p>
           </div>
         ) : (
           <div className="space-y-4">
-            <div className="border border-gray-600 rounded-lg p-4">
+            <div className="border border-border rounded-lg p-4">
               <iframe
                 src={pdfPreview || undefined}
                 className="w-full h-64 rounded"
@@ -135,7 +135,7 @@ const PDFViewer = ({
             </div>
 
             <div className="flex items-center justify-between">
-              <div className="text-sm text-gray-400">
+              <div className="text-sm text-muted-foreground">
                 <p>{selectedPDF.name}</p>
                 <p>{formatFileSize(selectedPDF.size)}</p>
               </div>
@@ -143,7 +143,7 @@ const PDFViewer = ({
                 variant="outline"
                 size="sm"
                 onClick={handleDelete}
-                className="bg-transparent border-gray-600 text-gray-300 hover:bg-gray-800"
+                className="bg-transparent border-border text-muted-foreground hover:bg-muted"
               >
                 <Trash2 className="h-4 w-4" />
               </Button>
@@ -153,13 +153,13 @@ const PDFViewer = ({
               <Button
                 variant="outline"
                 onClick={onCancel}
-                className="bg-transparent border-gray-600 text-gray-300 hover:bg-gray-800"
+                className="bg-transparent border-border text-muted-foreground hover:bg-muted"
               >
                 {t("cancel")}
               </Button>
               <Button
                 onClick={handleSend}
-                className="bg-white text-black hover:bg-gray-200"
+                className="bg-primary text-primary-foreground hover:bg-primary/90"
               >
                 {t("send_pdf")}
               </Button>
@@ -209,9 +209,9 @@ const PDFViewer = ({
       className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-2 md:p-4"
       onClick={handleBackdropClick}
     >
-      <div className="bg-[#1a1a1a] border border-[#1f1f23] rounded-lg w-full max-w-4xl h-full max-h-[85vh] md:max-h-none flex flex-col">
-        <div className="flex items-center justify-between p-3 md:p-4 border-b border-[#1f1f23]">
-          <h3 className="text-white font-medium flex items-center text-sm md:text-base truncate pr-2">
+      <div className="bg-card border border-border rounded-lg w-full max-w-4xl h-full max-h-[85vh] md:max-h-none flex flex-col">
+        <div className="flex items-center justify-between p-3 md:p-4 border-b border-border">
+          <h3 className="text-foreground font-medium flex items-center text-sm md:text-base truncate pr-2">
             {getShortenedFileName(fileName || t("pdf_document"))}
           </h3>
           <div className="flex items-center space-x-1 flex-shrink-0">
@@ -219,7 +219,7 @@ const PDFViewer = ({
               variant="ghost"
               size="sm"
               onClick={onCancel}
-              className="text-gray-400 hover:text-white"
+              className="text-muted-foreground hover:text-foreground"
             >
               <X className="h-4 w-4" />
             </Button>

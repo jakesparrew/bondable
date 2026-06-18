@@ -139,11 +139,11 @@ const AdminNotificationSettings = () => {
 
   if (loading) {
     return (
-      <Card className="bg-[#111111] border-[#1f1f23]">
+      <Card className="bg-card border-border">
         <CardHeader>
           <div className="flex items-center space-x-2">
-            <Settings className="h-5 w-5 text-gray-400" />
-            <CardTitle className="text-white text-lg">
+            <Settings className="h-5 w-5 text-muted-foreground" />
+            <CardTitle className="text-foreground text-lg">
               {t('email_notification_settings')}
             </CardTitle>
           </div>
@@ -151,7 +151,7 @@ const AdminNotificationSettings = () => {
         <CardContent>
           <div className="text-center py-8">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto mb-4"></div>
-            <p className="text-gray-400">{t('loading_notification_settings')}</p>
+            <p className="text-muted-foreground">{t('loading_notification_settings')}</p>
           </div>
         </CardContent>
       </Card>
@@ -159,27 +159,27 @@ const AdminNotificationSettings = () => {
   }
 
   return (
-    <Card className="bg-[#111111] border-[#1f1f23]">
+    <Card className="bg-card border-border">
       <CardHeader>
         <div className="flex items-center space-x-2">
-          <Settings className="h-5 w-5 text-gray-400" />
-          <CardTitle className="text-white text-lg">
+          <Settings className="h-5 w-5 text-muted-foreground" />
+          <CardTitle className="text-foreground text-lg">
             {t('email_notification_settings')}
           </CardTitle>
         </div>
-        <CardDescription className="text-gray-400 text-sm">
+        <CardDescription className="text-muted-foreground text-sm">
           {t('configure_email_notifications')}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         {settings.map((setting) => (
-          <div key={setting.id} className="space-y-4 p-4 border border-[#1f1f23] rounded-lg bg-[#0a0a0a]">
+          <div key={setting.id} className="space-y-4 p-4 border border-border rounded-lg bg-card">
             <div className="flex items-center justify-between">
               <div>
-                <Label className="text-white font-medium">
+                <Label className="text-foreground font-medium">
                   {formatNotificationType(setting.notification_type)}
                 </Label>
-                <p className="text-sm text-gray-400 mt-1">
+                <p className="text-sm text-muted-foreground mt-1">
                   {t('get_notified_when', { type: setting.notification_type.replace(/_/g, ' ') })}
                 </p>
               </div>
@@ -190,7 +190,7 @@ const AdminNotificationSettings = () => {
             </div>
 
             <div className="space-y-3">
-              <Label className="text-white text-sm">{t('email_addresses')}</Label>
+              <Label className="text-foreground text-sm">{t('email_addresses')}</Label>
               
               {setting.email_addresses.length > 0 && (
                 <div className="flex flex-wrap gap-2">
@@ -198,14 +198,14 @@ const AdminNotificationSettings = () => {
                     <Badge
                       key={email}
                       variant="secondary"
-                      className="bg-[#1f1f23] text-gray-300 hover:bg-[#2a2a2a] border-[#333]"
+                      className="bg-card text-muted-foreground hover:bg-muted border-border"
                     >
                       <Mail className="h-3 w-3 mr-1" />
                       {email}
                       <Button
                         size="sm"
                         variant="ghost"
-                        className="h-4 w-4 p-0 ml-2 hover:bg-red-600 text-gray-400 hover:text-white"
+                        className="h-4 w-4 p-0 ml-2 hover:bg-red-600 text-muted-foreground hover:text-foreground"
                         onClick={() => handleRemoveEmail(setting.id, email)}
                       >
                         <X className="h-3 w-3" />
@@ -228,12 +228,12 @@ const AdminNotificationSettings = () => {
                       handleAddEmail(setting.id);
                     }
                   }}
-                  className="bg-[#0a0a0a] border-[#1f1f23] text-white placeholder:text-gray-500 focus:border-gray-400"
+                  className="bg-background border-border text-foreground placeholder:text-muted-foreground focus:border-ring"
                 />
                 <Button
                   size="sm"
                   onClick={() => handleAddEmail(setting.id)}
-                  className="bg-neutral-50 hover:bg-[#d6d6d6] text-neutral-950 px-4 py-2 rounded-lg font-medium transition-colors"
+                  className="bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2 rounded-lg font-medium transition-colors"
                 >
                   <Plus className="h-4 w-4" />
                 </Button>
@@ -244,8 +244,8 @@ const AdminNotificationSettings = () => {
 
         {settings.length === 0 && (
           <div className="text-center py-8">
-            <Mail className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-400">{t('no_notification_settings')}</p>
+            <Mail className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+            <p className="text-muted-foreground">{t('no_notification_settings')}</p>
           </div>
         )}
       </CardContent>

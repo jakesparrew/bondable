@@ -27,13 +27,13 @@ export function ClientIntakeTab({ clientId }: { clientId: string }) {
       </div>
 
       {assignments.length === 0 ? (
-        <Card className="bg-[#111] border-[#1f1f23]"><CardContent className="p-6 text-center text-gray-400">{t("intake:no_assignments_client_provider")}</CardContent></Card>
+        <Card className="bg-card border-border"><CardContent className="p-6 text-center text-muted-foreground">{t("intake:no_assignments_client_provider")}</CardContent></Card>
       ) : assignments.map((a) => (
-        <Card key={a.id} className="bg-[#111] border-[#1f1f23]">
+        <Card key={a.id} className="bg-card border-border">
           <CardContent className="p-4 flex items-center justify-between">
             <div>
-              <div className="text-sm text-white">{a.title_snapshot}</div>
-              <div className="text-xs text-gray-400 flex items-center gap-2 mt-1">
+              <div className="text-sm text-foreground">{a.title_snapshot}</div>
+              <div className="text-xs text-muted-foreground flex items-center gap-2 mt-1">
                 <Badge>{t(`intake:status_${a.status}`)}</Badge>
                 <span>{t("intake:assigned_at", { date: format(new Date(a.assigned_at), "PP") })}</span>
                 {a.completed_at && <span>· {t("intake:completed_at", { date: format(new Date(a.completed_at), "PP") })}</span>}

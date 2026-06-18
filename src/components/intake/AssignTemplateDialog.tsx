@@ -28,13 +28,13 @@ export function AssignTemplateDialog({ clientId, open, onOpenChange }: { clientI
         <DialogHeader><DialogTitle>{t("intake:assign_to_client")}</DialogTitle></DialogHeader>
         <div className="space-y-1 max-h-72 overflow-y-auto">
           {published.length === 0 ? (
-            <p className="text-sm text-gray-400">{t("intake:no_templates")}</p>
+            <p className="text-sm text-muted-foreground">{t("intake:no_templates")}</p>
           ) : published.map((tpl) => (
             <button key={tpl.id}
-              className={`w-full text-left p-3 rounded border ${selected === tpl.id ? "border-white" : "border-[#1f1f23]"} hover:border-[#2a2a2a]`}
+              className={`w-full text-left p-3 rounded border ${selected === tpl.id ? "border-primary" : "border-border"} hover:border-border`}
               onClick={() => setSelected(tpl.id)}>
-              <div className="text-sm text-white">{tpl.title}</div>
-              {tpl.category && <div className="text-xs text-gray-400">{tpl.category}</div>}
+              <div className="text-sm text-foreground">{tpl.title}</div>
+              {tpl.category && <div className="text-xs text-muted-foreground">{tpl.category}</div>}
             </button>
           ))}
         </div>

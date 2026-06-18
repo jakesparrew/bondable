@@ -120,7 +120,7 @@ export function NavUser({ user, userType }: NavUserProps) {
           <DropdownMenuTrigger asChild>
             <SidebarMenuButton
               size="lg"
-              className="data-[state=open]:bg-neutral-900 data-[state=open]:text-neutral-50"
+              className="data-[state=open]:bg-muted data-[state=open]:text-foreground"
             >
               <Avatar className="h-8 w-8 rounded-lg">
                 <AvatarImage
@@ -134,7 +134,7 @@ export function NavUser({ user, userType }: NavUserProps) {
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-medium">{displayName}</span>
-                <span className="truncate text-xs text-neutral-400">
+                <span className="truncate text-xs text-muted-foreground">
                   {displayEmail}
                 </span>
               </div>
@@ -142,7 +142,7 @@ export function NavUser({ user, userType }: NavUserProps) {
             </SidebarMenuButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent
-            className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-xl border !border-neutral-800 !bg-neutral-900 !text-neutral-50 shadow-xl"
+            className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-xl border !border-border !bg-card !text-foreground shadow-xl"
             side={isMobile ? "bottom" : "right"}
             align="end"
             sideOffset={8}
@@ -156,57 +156,57 @@ export function NavUser({ user, userType }: NavUserProps) {
                 />
                 <div className="flex flex-col truncate">
                   <span className="font-medium truncate">{displayName}</span>
-                  <span className="text-xs text-neutral-400 truncate">
+                  <span className="text-xs text-muted-foreground truncate">
                     {displayEmail}
                   </span>
                 </div>
               </div>
             </DropdownMenuLabel>
 
-            <DropdownMenuSeparator className="bg-neutral-800" />
+            <DropdownMenuSeparator className="bg-border" />
 
             {userType !== "admin" && (
               <>
                 <DropdownMenuGroup>
                   <DropdownMenuItem
                     onClick={() => navigate(`/dashboard/${userType}/profile`)}
-                    className="gap-2 px-3 py-2 hover:!bg-neutral-800 hover:!text-neutral-300 group cursor-pointer"
+                    className="gap-2 px-3 py-2 hover:!bg-muted hover:!text-muted-foreground group cursor-pointer"
                   >
                     <ArrowUpRight
                       strokeWidth={1}
-                      className="h-5 w-5 text-neutral-50 group-hover:text-neutral-300"
+                      className="h-5 w-5 text-foreground group-hover:text-muted-foreground"
                     />
                     <span>{t("upgrade_to_pro")}</span>
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
 
-                <DropdownMenuSeparator className="bg-neutral-800" />
+                <DropdownMenuSeparator className="bg-border" />
 
                 <DropdownMenuGroup>
                   <DropdownMenuItem
                     onClick={() => navigate(`/dashboard/${userType}/settings`)}
-                    className="gap-2 px-3 py-2 hover:!bg-neutral-800 hover:!text-neutral-300 group cursor-pointer"
+                    className="gap-2 px-3 py-2 hover:!bg-muted hover:!text-muted-foreground group cursor-pointer"
                   >
                     <CircleUser
                       strokeWidth={1}
-                      className="h-5 w-5 text-neutral-50 group-hover:text-neutral-300"
+                      className="h-5 w-5 text-foreground group-hover:text-muted-foreground"
                     />
                     <span>{t("account")}</span>
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={() => navigate(`/dashboard/${userType}/payments`)}
-                    className="gap-2 px-3 py-2 hover:!bg-neutral-800 hover:!text-neutral-300 group cursor-pointer"
+                    className="gap-2 px-3 py-2 hover:!bg-muted hover:!text-muted-foreground group cursor-pointer"
                   >
                     <CreditCard
                       strokeWidth={1}
-                      className="h-5 w-5 text-neutral-50 group-hover:text-neutral-300"
+                      className="h-5 w-5 text-foreground group-hover:text-muted-foreground"
                     />
                     <span>{t("billing")}</span>
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="gap-2 px-3 py-2 hover:!bg-neutral-800 hover:!text-neutral-300 group cursor-pointer">
+                  <DropdownMenuItem className="gap-2 px-3 py-2 hover:!bg-muted hover:!text-muted-foreground group cursor-pointer">
                     <Bell
                       strokeWidth={1}
-                      className="h-5 w-5 text-neutral-50 group-hover:text-neutral-300"
+                      className="h-5 w-5 text-foreground group-hover:text-muted-foreground"
                     />
                     <span>{t("notifications")}</span>
                   </DropdownMenuItem>
@@ -214,11 +214,11 @@ export function NavUser({ user, userType }: NavUserProps) {
               </>
             )}
 
-            <DropdownMenuSeparator className="bg-neutral-800" />
+            <DropdownMenuSeparator className="bg-border" />
 
             <DropdownMenuItem
               onClick={handleSignOut}
-              className="gap-2 px-3 py-2 hover:!bg-neutral-800 hover:!text-red-500 group cursor-pointer rounded-b-lg"
+              className="gap-2 px-3 py-2 hover:!bg-muted hover:!text-red-500 group cursor-pointer rounded-b-lg"
             >
               <LogOut
                 strokeWidth={1}

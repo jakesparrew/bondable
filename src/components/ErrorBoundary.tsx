@@ -54,15 +54,15 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
 
       return (
         <div className="min-h-screen flex items-center justify-center bg-background p-4">
-          <Card className="max-w-md w-full bg-[#111111] border-[#1f1f23]">
+          <Card className="max-w-md w-full bg-card border-border">
             <CardHeader className="text-center">
               <div className="mx-auto w-12 h-12 bg-red-500/20 rounded-full flex items-center justify-center mb-4">
                 <AlertTriangle className="w-6 h-6 text-red-400" />
               </div>
-              <CardTitle className="text-white">Something went wrong</CardTitle>
+              <CardTitle className="text-foreground">Something went wrong</CardTitle>
             </CardHeader>
             <CardContent className="text-center space-y-4">
-              <p className="text-gray-400 text-sm">
+              <p className="text-muted-foreground text-sm">
                 An unexpected error occurred. Please try refreshing the page or contact support if the problem persists.
               </p>
               
@@ -71,7 +71,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
                   <summary className="text-red-400 cursor-pointer text-sm">
                     Error Details (Development)
                   </summary>
-                  <pre className="mt-2 p-2 bg-[#0a0a0a] border border-[#1f1f23] rounded text-xs text-red-300 overflow-auto">
+                  <pre className="mt-2 p-2 bg-background border border-border rounded text-xs text-red-300 overflow-auto">
                     {this.state.error.toString()}
                     {this.state.errorInfo}
                   </pre>
@@ -83,7 +83,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
                   onClick={this.handleReset}
                   variant="outline"
                   size="sm"
-                  className="border-[#333] bg-[#1a1a1a] hover:bg-[#2a2a2a] text-gray-300"
+                  className="border-border bg-card hover:bg-muted text-muted-foreground"
                 >
                   <RefreshCw className="w-4 h-4 mr-2" />
                   Try Again
@@ -91,7 +91,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
                 <Button
                   onClick={() => window.location.href = '/'}
                   size="sm"
-                  className="bg-neutral-50 hover:bg-[#d6d6d6] text-neutral-950"
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground"
                 >
                   Go Home
                 </Button>

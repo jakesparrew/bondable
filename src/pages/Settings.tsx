@@ -100,34 +100,34 @@ const Settings = () => {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-semibold text-white mb-1">{t("settings")}</h2>
-            <p className="text-gray-400 text-sm">
+            <h2 className="text-2xl font-semibold text-foreground mb-1">{t("settings")}</h2>
+            <p className="text-muted-foreground text-sm">
               {t("manage_account_preferences_notifications")}
             </p>
           </div>
         </div>
 
         {/* Profile Management */}
-        <Card className="bg-[#111111] border-[#1f1f23]">
+        <Card className="bg-card border-border">
           <CardHeader>
             <div className="flex items-center space-x-2">
-              <User className="h-5 w-5 text-gray-400" />
-              <CardTitle className="text-white text-lg">
+              <User className="h-5 w-5 text-muted-foreground" />
+              <CardTitle className="text-foreground text-lg">
                 {t("profile_management")}
               </CardTitle>
             </div>
-            <CardDescription className="text-gray-400 text-sm">
+            <CardDescription className="text-muted-foreground text-sm">
               {t("manage_personal_therapy_emergency_info")}
             </CardDescription>
           </CardHeader>
           <CardContent>
             {!isMobile ? (
-              <div className="flex items-center justify-between p-4 border border-[#1f1f23] rounded-lg bg-[#0a0a0a]">
+              <div className="flex items-center justify-between p-4 border border-border rounded-lg bg-background">
                 <div>
-                  <h4 className="text-white font-medium mb-1">
+                  <h4 className="text-foreground font-medium mb-1">
                     {t("edit_profile_information")}
                   </h4>
-                  <p className="text-gray-400 text-sm">
+                  <p className="text-muted-foreground text-sm">
                     {t("update_personal_therapy_emergency_details")}
                   </p>
                 </div>
@@ -139,7 +139,7 @@ const Settings = () => {
                         : `/dashboard/${userType}/profile`
                     )
                   }
-                  className="bg-neutral-50 hover:bg-[#d6d6d6] text-neutral-950 px-4 py-2 rounded-lg font-medium transition-colors flex items-center space-x-2"
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2 rounded-lg font-medium transition-colors flex items-center space-x-2"
                 >
                   <span>{t("edit_profile")}</span>
                   <ExternalLink className="h-4 w-4" />
@@ -154,7 +154,7 @@ const Settings = () => {
                       : `/dashboard/${userType}/profile`
                   )
                 }
-                className="w-full bg-neutral-50 hover:bg-[#d6d6d6] text-neutral-950 px-4 py-2 rounded-lg font-medium transition-colors flex items-center space-x-2"
+                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2 rounded-lg font-medium transition-colors flex items-center space-x-2"
               >
                 <span>{t("edit_profile")}</span>
                 <ExternalLink className="h-4 w-4" />
@@ -164,13 +164,13 @@ const Settings = () => {
         </Card>
 
         {/* Theme Selection */}
-        <Card className="bg-[#111111] border-[#1f1f23]">
+        <Card className="bg-card border-border">
           <CardHeader>
             <div className="flex items-center space-x-2">
-              <Palette className="h-5 w-5 text-gray-400" />
-              <CardTitle className="text-white text-lg">{t("theme")}</CardTitle>
+              <Palette className="h-5 w-5 text-muted-foreground" />
+              <CardTitle className="text-foreground text-lg">{t("theme")}</CardTitle>
             </div>
-            <CardDescription className="text-gray-400 text-sm">
+            <CardDescription className="text-muted-foreground text-sm">
               {t("customize_dashboard_appearance")}
             </CardDescription>
           </CardHeader>
@@ -180,15 +180,15 @@ const Settings = () => {
         </Card>
 
         {/* Notification Settings */}
-        <Card className="bg-[#111111] border-[#1f1f23]">
+        <Card className="bg-card border-border">
           <CardHeader>
             <div className="flex items-center space-x-2">
-              <Bell className="h-5 w-5 text-gray-400" />
-              <CardTitle className="text-white text-lg">
+              <Bell className="h-5 w-5 text-muted-foreground" />
+              <CardTitle className="text-foreground text-lg">
                 {t("notification_preferences")}
               </CardTitle>
             </div>
-            <CardDescription className="text-gray-400 text-sm">
+            <CardDescription className="text-muted-foreground text-sm">
               {t("choose_notification_method_important_events")}
             </CardDescription>
           </CardHeader>
@@ -196,38 +196,38 @@ const Settings = () => {
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label className="text-gray-300">{t("email_notifications")}</Label>
-                  <p className="text-sm text-gray-400">
+                  <Label className="text-muted-foreground">{t("email_notifications")}</Label>
+                  <p className="text-sm text-muted-foreground">
                     {t("receive_notifications_via_email")}
                   </p>
                 </div>
                 <Switch />
               </div>
-              <Separator className="bg-[#1f1f23]" />
+              <Separator className="bg-border" />
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label className="text-gray-300">{t("push_notifications")}</Label>
-                  <p className="text-sm text-gray-400">
+                  <Label className="text-muted-foreground">{t("push_notifications")}</Label>
+                  <p className="text-sm text-muted-foreground">
                     {t("receive_push_notifications_browser")}
                   </p>
                 </div>
                 <Switch />
               </div>
-              <Separator className="bg-[#1f1f23]" />
+              <Separator className="bg-border" />
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label className="text-gray-300">{t("appointment_reminders")}</Label>
-                  <p className="text-sm text-gray-400">
+                  <Label className="text-muted-foreground">{t("appointment_reminders")}</Label>
+                  <p className="text-sm text-muted-foreground">
                     {t("get_notified_before_appointments")}
                   </p>
                 </div>
                 <Switch />
               </div>
-              <Separator className="bg-[#1f1f23]" />
+              <Separator className="bg-border" />
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label className="text-gray-300">{t("new_client_messages")}</Label>
-                  <p className="text-sm text-gray-400">
+                  <Label className="text-muted-foreground">{t("new_client_messages")}</Label>
+                  <p className="text-sm text-muted-foreground">
                     {t("receive_notifications_new_messages")}
                   </p>
                 </div>
@@ -242,7 +242,7 @@ const Settings = () => {
           <DropdownMenuTrigger asChild>
             <Button
               variant="outline"
-              className="flex items-center gap-2 w-48 justify-between ml-auto !mt-3 bg-[#111111] border-[#1f1f23]"
+              className="flex items-center gap-2 w-48 justify-between ml-auto !mt-3 bg-card border-border"
             >
               <span>
                 {
@@ -251,21 +251,21 @@ const Settings = () => {
                 }{" "}
                 {i18n.language.toUpperCase()}
               </span>
-              <Globe className="h-5 w-5 text-gray-400" />
+              <Globe className="h-5 w-5 text-muted-foreground" />
             </Button>
           </DropdownMenuTrigger>
 
           {/* Dropdown content with full width and space between items */}
           <DropdownMenuContent
-            className="bg-[#111111] border-[#1f1f23] w-48 space-y-1"
+            className="bg-card border-border w-48 space-y-1"
             align="start"
           >
             {languageOptions.map(({ code, label, icon }) => (
               <DropdownMenuItem
                 key={code}
                 onClick={() => handleLanguageChange(code)}
-                className={`flex items-center p-2 rounded-md hover:bg-[#333333] cursor-pointer ${
-                  i18n.language === code ? "bg-[#333333]" : ""
+                className={`flex items-center p-2 rounded-md hover:bg-muted cursor-pointer ${
+                  i18n.language === code ? "bg-muted" : ""
                 }`}
               >
                 <span className="flex items-center gap-2">

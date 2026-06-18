@@ -29,7 +29,7 @@ const DashboardSkeleton = ({ userType }: DashboardSkeletonProps) => {
         {/* Stats Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {[1, 2, 3, 4].map((i) => (
-            <Card key={i} className="bg-[#111111] border-[#1f1f23]">
+            <Card key={i} className="bg-muted border-border">
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
                   <Skeleton className="h-4 w-20" />
@@ -45,11 +45,11 @@ const DashboardSkeleton = ({ userType }: DashboardSkeletonProps) => {
         </div>
 
         {/* Recent Activity */}
-        <Card className="bg-[#111111] border-[#1f1f23]">
+        <Card className="bg-muted border-border">
           <CardHeader>
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div>
-                <CardTitle className="text-white">
+                <CardTitle className="text-foreground">
                   <Skeleton className="h-6 w-40" />
                 </CardTitle>
                 <div className="mt-1">
@@ -71,7 +71,7 @@ const DashboardSkeleton = ({ userType }: DashboardSkeletonProps) => {
             <div className="hidden sm:block overflow-x-auto">
               <Table>
                 <TableHeader>
-                  <TableRow className="border-[#1f1f23] hover:bg-transparent">
+                  <TableRow className="border-border hover:bg-transparent">
                     <TableHead>
                       <Skeleton className="h-4 w-16" />
                     </TableHead>
@@ -85,10 +85,10 @@ const DashboardSkeleton = ({ userType }: DashboardSkeletonProps) => {
                 </TableHeader>
                 <TableBody>
                   {[1, 2, 3, 4, 5, 6].map((i) => (
-                    <TableRow key={i} className="border-[#1f1f23]">
+                    <TableRow key={i} className="border-border">
                       <TableCell>
                         <div className="flex items-center space-x-3">
-                          <div className="w-8 h-8 bg-[#1a1a1a] rounded-lg flex items-center justify-center">
+                          <div className="w-8 h-8 bg-muted rounded-lg flex items-center justify-center">
                             <Skeleton className="h-4 w-4" />
                           </div>
                           <Skeleton className="h-4 w-32" />
@@ -109,9 +109,9 @@ const DashboardSkeleton = ({ userType }: DashboardSkeletonProps) => {
             {/* Mobile Cards */}
             <div className="block sm:hidden space-y-3">
               {[1, 2, 3, 4, 5, 6].map((i) => (
-                <div key={i} className="bg-[#0a0a0a] border border-[#1f1f23] rounded-lg p-4 space-y-3">
+                <div key={i} className="bg-background border border-border rounded-lg p-4 space-y-3">
                   <div className="flex items-center space-x-3">
-                    <div className="w-8 h-8 bg-[#1a1a1a] rounded-lg flex items-center justify-center">
+                    <div className="w-8 h-8 bg-muted rounded-lg flex items-center justify-center">
                       <Skeleton className="h-4 w-4" />
                     </div>
                     <Skeleton className="h-4 w-32" />

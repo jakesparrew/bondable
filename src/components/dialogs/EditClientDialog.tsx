@@ -89,7 +89,7 @@ const EditClientDialog = ({
       open={open}
       onOpenChange={onOpenChange}
       title={t("edit_client")}
-      className="bg-[#111111] border-[#1f1f23] text-white sm:max-w-[425px]"
+      className="bg-card border-border text-foreground sm:max-w-[425px]"
     >
         <div className="space-y-4 pt-0">
           <div className="flex gap-2">
@@ -105,7 +105,7 @@ const EditClientDialog = ({
                   }))
                 }
                 readOnly
-                className="bg-[#0a0a0a] border-[#1f1f23] text-white placeholder:text-gray-500 focus:border-gray-400"
+                className="bg-background border-border text-foreground placeholder:text-muted-foreground focus:border-ring"
               />
             </div>
             <div className="space-y-2">
@@ -120,11 +120,11 @@ const EditClientDialog = ({
                   }))
                 }
                 readOnly
-                className="bg-[#0a0a0a] border-[#1f1f23] text-white placeholder:text-gray-500 focus:border-gray-400"
+                className="bg-background border-border text-foreground placeholder:text-muted-foreground focus:border-ring"
               />
             </div>
           </div>
-          <div className="bg-neutral-900 border border-[#1f1f23] p-4 rounded-xl">
+          <div className="bg-card border border-border p-4 rounded-xl">
             <div className="space-y-2">
               <EmailInput
                 label={t("email")}
@@ -135,7 +135,7 @@ const EditClientDialog = ({
                 }
                 readOnly
                 required
-                className="bg-[#0a0a0a] border-[#1f1f23] text-white placeholder:text-gray-500 focus:border-gray-400"
+                className="bg-background border-border text-foreground placeholder:text-muted-foreground focus:border-ring"
               />
             </div>
             <div className="space-y-2 pt-2">
@@ -151,7 +151,7 @@ const EditClientDialog = ({
             </div>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="status" className="text-gray-300">
+            <Label htmlFor="status" className="text-muted-foreground">
               {t("status")}
             </Label>
             <Select
@@ -160,25 +160,25 @@ const EditClientDialog = ({
                 setFormData({ ...formData, status: value })
               }
             >
-              <SelectTrigger className="bg-[#0a0a0a] border-[#1f1f23] text-white">
+              <SelectTrigger className="bg-background border-border text-foreground">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="bg-[#0a0a0a] border-[#1f1f23]">
+              <SelectContent className="bg-card border-border">
                 <SelectItem
                   value="Active"
-                  className="text-gray-300 hover:bg-[#2a2a2a]"
+                  className="text-muted-foreground hover:bg-muted"
                 >
                   {t("active")}
                 </SelectItem>
                 <SelectItem
                   value="Inactive"
-                  className="text-gray-300 hover:bg-[#2a2a2a]"
+                  className="text-muted-foreground hover:bg-muted"
                 >
                   {t("inactive")}
                 </SelectItem>
                 <SelectItem
                   value="Pending"
-                  className="text-gray-300 hover:bg-[#2a2a2a]"
+                  className="text-muted-foreground hover:bg-muted"
                 >
                   {t("pending")}
                 </SelectItem>
@@ -188,7 +188,7 @@ const EditClientDialog = ({
           <div className="flex flex-col gap-3 ">
             <Button
               onClick={handleViewProfile}
-              className="bg-[#0a0a0a] border-[#1f1f23] text-white w-full mb-1 border hover:bg-neutral-950/50 hover:text-neutral-300"
+              className="bg-background border-border text-foreground w-full mb-1 border hover:bg-muted hover:text-muted-foreground"
             >
               <User className="w-4 h-4 mr-2" />
               {t("view_full_profile")}
@@ -197,13 +197,13 @@ const EditClientDialog = ({
               <Button
                 variant="outline"
                 onClick={() => onOpenChange(false)}
-                className="border-[#333] bg-[#1a1a1a] hover:bg-[#2a2a2a] text-gray-300 hover:text-white"
+                className="border-border bg-card hover:bg-muted text-muted-foreground hover:text-foreground"
                 >
                   {t("cancel")}
                 </Button>
                 <Button
                   onClick={handleSave}
-                  className="bg-neutral-50 hover:bg-[#d6d6d6] text-neutral-950"
+                  className="bg-primary text-primary-foreground hover:bg-primary/90"
                 >
                   {t("save_changes")}
               </Button>

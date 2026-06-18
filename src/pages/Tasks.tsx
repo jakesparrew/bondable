@@ -183,7 +183,7 @@ const Tasks = () => {
     return (
       <Avatar className="w-7 h-7">
         <AvatarImage src={avatarUrl} alt={name} className="non-invertable" />
-        <AvatarFallback className="bg-[#27272a] text-white text-xs">
+        <AvatarFallback className="bg-muted text-foreground text-xs">
           {name
             .split(" ")
             .map((n) => n[0])
@@ -257,7 +257,7 @@ const Tasks = () => {
   const getPriorityBadge = (priority: TaskPriority | null) => {
     if (!priority) {
       return (
-        <span className="flex items-center gap-1 text-xs text-gray-400">
+        <span className="flex items-center gap-1 text-xs text-muted-foreground">
           <span>—</span>
           {t("none")}
         </span>
@@ -449,13 +449,13 @@ const Tasks = () => {
     return (
       <DashboardLayout userType={userType as "therapist" | "client"}>
         <div className="flex items-center justify-center h-64">
-          <Card className="bg-[#111111] border-[#1f1f23] max-w-md">
+          <Card className="bg-card border-border max-w-md">
             <CardContent className="p-6 text-center">
               <AlertTriangle className="h-12 w-12 text-red-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-white mb-2">
+              <h3 className="text-lg font-medium text-foreground mb-2">
                 Access Denied
               </h3>
-              <p className="text-gray-400 text-sm">
+              <p className="text-muted-foreground text-sm">
                 You don't have permission to access this page. You will be
                 redirected shortly.
               </p>
@@ -474,16 +474,16 @@ const Tasks = () => {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h2 className="text-2xl md:text-3xl font-bold text-white mb-1 md:mb-2">
+            <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-1 md:mb-2">
               {userType === "client" ? t("your_tasks") : t("client_tasks")}
             </h2>
-            <p className="text-gray-400 text-sm">{userType === "client" ? t("track_assigned_tasks_progress") : t("assign_track_tasks_clients")}</p>
+            <p className="text-muted-foreground text-sm">{userType === "client" ? t("track_assigned_tasks_progress") : t("assign_track_tasks_clients")}</p>
           </div>
           {userType === "therapist" && (
             <Button
               onClick={() => openDialog("add")}
               disabled={clients.length === 0}
-              className="bg-white text-black hover:bg-gray-200 font-medium w-full sm:w-auto disabled:opacity-50 disabled:cursor-not-allowed"
+              className="bg-primary text-primary-foreground hover:bg-primary/90 font-medium w-full sm:w-auto disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Plus className="w-4 h-4 mr-2" />
               {t("assign_task")}
@@ -493,13 +493,13 @@ const Tasks = () => {
 
         {/* Show message if no clients available for therapist */}
         {userType === "therapist" && clients.length === 0 && (
-          <Card className="bg-[#111111] border-[#1f1f23]">
+          <Card className="bg-card border-border">
             <CardContent className="p-6 text-center">
-              <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-white mb-2">
+              <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-foreground mb-2">
                 {t("no_clients_available")}
               </h3>
-              <p className="text-gray-400 text-sm">
+              <p className="text-muted-foreground text-sm">
                 {t("need_clients_before_assign_tasks")}
                 create tasks for them.
               </p>
@@ -508,52 +508,52 @@ const Tasks = () => {
         )}
 
         {/* Stats Bar */}
-        <Card className="bg-[#111111] border-[#1f1f23]">
+        <Card className="bg-card border-border">
           <CardContent className="p-3 md:p-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4 md:gap-8 w-full justify-evenly text-xs md:text-sm">
                 <div className="flex items-center gap-1 md:gap-2">
-                  <SquareLibrary className="h-3 w-3 md:h-4 md:w-4 text-neutral-400" />
-                  <span className="text-neutral-400">{t("tasks_total")}</span>
-                  <span className="font-semibold text-white">
+                  <SquareLibrary className="h-3 w-3 md:h-4 md:w-4 text-muted-foreground" />
+                  <span className="text-muted-foreground">{t("tasks_total")}</span>
+                  <span className="font-semibold text-foreground">
                     {tasks.length}
                   </span>
                 </div>
-                <div className="w-px h-3 md:h-4 bg-neutral-400 mx-1 md:mx-2" />
+                <div className="w-px h-3 md:h-4 bg-border mx-1 md:mx-2" />
                 <div className="flex items-center gap-1 md:gap-2">
-                  <Clock className="h-3 w-3 md:h-4 md:w-4 text-neutral-400" />
-                  <span className="text-gray-400 hidden sm:inline">
+                  <Clock className="h-3 w-3 md:h-4 md:w-4 text-muted-foreground" />
+                  <span className="text-muted-foreground hidden sm:inline">
                     {t("tasks_in_progress")}
                   </span>
-                  <span className="text-gray-400 sm:hidden">{t("tasks_progress_short")}</span>
-                  <span className="font-semibold text-white">
+                  <span className="text-muted-foreground sm:hidden">{t("tasks_progress_short")}</span>
+                  <span className="font-semibold text-foreground">
                     {tasks.filter((t) => t.status === "in_progress").length}
                   </span>
                 </div>
-                <div className="w-px h-3 md:h-4 bg-neutral-400 mx-1 md:mx-2" />
+                <div className="w-px h-3 md:h-4 bg-border mx-1 md:mx-2" />
                 <div className="flex items-center gap-1 md:gap-2">
-                  <CheckSquare className="h-3 w-3 md:h-4 md:w-4 text-neutral-400" />
-                  <span className="text-gray-400 hidden sm:inline">
+                  <CheckSquare className="h-3 w-3 md:h-4 md:w-4 text-muted-foreground" />
+                  <span className="text-muted-foreground hidden sm:inline">
                     {t("tasks_completed")}
                   </span>
-                  <span className="text-gray-400 sm:hidden">{t("tasks_done_short")}</span>
-                  <span className="font-semibold text-white">
+                  <span className="text-muted-foreground sm:hidden">{t("tasks_done_short")}</span>
+                  <span className="font-semibold text-foreground">
                     {tasks.filter((t) => t.status === "completed").length}
                   </span>
                 </div>
-                <div className="w-px h-3 md:h-4 bg-neutral-400 mx-1 md:mx-2 hidden sm:block" />
+                <div className="w-px h-3 md:h-4 bg-border mx-1 md:mx-2 hidden sm:block" />
                 <div className="items-center gap-1 md:gap-2 hidden sm:flex">
-                  <Calendar className="h-3 w-3 md:h-4 md:w-4 text-neutral-400" />
-                  <span className="text-gray-400">{t("tasks_overdue")}</span>
-                  <span className="font-semibold text-white">
+                  <Calendar className="h-3 w-3 md:h-4 md:w-4 text-muted-foreground" />
+                  <span className="text-muted-foreground">{t("tasks_overdue")}</span>
+                  <span className="font-semibold text-foreground">
                     {tasks.filter((t) => t.status === "overdue").length}
                   </span>
                 </div>
-                <div className="w-px h-3 md:h-4 bg-neutral-400 mx-1 md:mx-2 hidden sm:block" />
+                <div className="w-px h-3 md:h-4 bg-border mx-1 md:mx-2 hidden sm:block" />
                 <div className="items-center gap-1 md:gap-2 hidden sm:flex">
-                  <Ban className="h-3 w-3 md:h-4 md:w-4 text-neutral-400" />
-                  <span className="text-gray-400">{t("tasks_declined")}</span>
-                  <span className="font-semibold text-white">
+                  <Ban className="h-3 w-3 md:h-4 md:w-4 text-muted-foreground" />
+                  <span className="text-muted-foreground">{t("tasks_declined")}</span>
+                  <span className="font-semibold text-foreground">
                     {tasks.filter((t) => t.status === "denied").length}
                   </span>
                 </div>
@@ -566,7 +566,7 @@ const Tasks = () => {
         {(tasks.length > 0 || clients.length > 0) && (
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 md:gap-4">
             <div className="relative flex-1 min-w-0 order-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
               <Input
                 placeholder={
                   userType === "client"
@@ -575,19 +575,19 @@ const Tasks = () => {
                 }
                 value={searchFilter}
                 onChange={(e) => setSearchFilter(e.target.value)}
-                className="pl-10 bg-[#111111] border-[#1f1f23] text-white placeholder:text-gray-400"
+                className="pl-10 bg-card border-border text-foreground placeholder:text-muted-foreground"
               />
             </div>
 
             <div className="flex flex-col sm:flex-row gap-3 md:gap-4 order-2">
               {userType === "therapist" && clients.length > 0 && (
                 <Select value={clientFilter} onValueChange={setClientFilter}>
-                  <SelectTrigger className="w-full sm:w-48 bg-[#111111] border-[#1f1f23] text-white">
+                  <SelectTrigger className="w-full sm:w-48 bg-card border-border text-foreground">
                     <SelectValue placeholder={t("all_clients")} />
                   </SelectTrigger>
-                  <SelectContent className="bg-[#111111] border-[#1f1f23] z-50">
+                  <SelectContent className="bg-card border-border z-50">
                     <SelectItem
-                      className="text-gray-300 hover:bg-[#2a2a2a]"
+                      className="text-muted-foreground hover:bg-muted"
                       value="all"
                     >
                       {t("all_clients")}
@@ -596,7 +596,7 @@ const Tasks = () => {
                       <SelectItem
                         key={client.id}
                         value={client.id}
-                        className="text-gray-300 hover:bg-[#2a2a2a]"
+                        className="text-muted-foreground hover:bg-muted"
                       >
                         {client.name}
                       </SelectItem>
@@ -607,42 +607,42 @@ const Tasks = () => {
 
               <div className="flex gap-3 md:gap-4">
                 <Select value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger className="w-full sm:w-36 bg-[#111111] border-[#1f1f23] text-white">
+                  <SelectTrigger className="w-full sm:w-36 bg-card border-border text-foreground">
                     <SelectValue placeholder={t("status")} />
                   </SelectTrigger>
-                  <SelectContent className="bg-[#111111] border-[#1f1f23] z-50">
+                  <SelectContent className="bg-card border-border z-50">
                     <SelectItem
-                      className="text-gray-300 hover:bg-[#2a2a2a]"
+                      className="text-muted-foreground hover:bg-muted"
                       value="all"
                     >
                       {t("all_status")}
                     </SelectItem>
                     <SelectItem
-                      className="text-gray-300 hover:bg-[#2a2a2a]"
+                      className="text-muted-foreground hover:bg-muted"
                       value="assigned"
                     >
                       {t("assigned")}
                     </SelectItem>
                     <SelectItem
-                      className="text-gray-300 hover:bg-[#2a2a2a]"
+                      className="text-muted-foreground hover:bg-muted"
                       value="in_progress"
                     >
                       {t("in_progress")}
                     </SelectItem>
                     <SelectItem
-                      className="text-gray-300 hover:bg-[#2a2a2a]"
+                      className="text-muted-foreground hover:bg-muted"
                       value="completed"
                     >
                       {t("completed")}
                     </SelectItem>
                     <SelectItem
-                      className="text-gray-300 hover:bg-[#2a2a2a]"
+                      className="text-muted-foreground hover:bg-muted"
                       value="overdue"
                     >
                       {t("overdue")}
                     </SelectItem>
                     <SelectItem
-                      className="text-gray-300 hover:bg-[#2a2a2a]"
+                      className="text-muted-foreground hover:bg-muted"
                       value="denied"
                     >
                       {t("declined")}
@@ -653,30 +653,30 @@ const Tasks = () => {
                   value={priorityFilter}
                   onValueChange={setPriorityFilter}
                 >
-                  <SelectTrigger className="w-full sm:w-36 bg-[#111111] border-[#1f1f23] text-white">
+                  <SelectTrigger className="w-full sm:w-36 bg-card border-border text-foreground">
                     <SelectValue placeholder={t("priority")} />
                   </SelectTrigger>
-                  <SelectContent className="bg-[#111111] border-[#1f1f23] z-50">
+                  <SelectContent className="bg-card border-border z-50">
                     <SelectItem
-                      className="text-gray-300 hover:bg-[#2a2a2a]"
+                      className="text-muted-foreground hover:bg-muted"
                       value="all"
                     >
                       {t("all_priority")}
                     </SelectItem>
                     <SelectItem
-                      className="text-gray-300 hover:bg-[#2a2a2a]"
+                      className="text-muted-foreground hover:bg-muted"
                       value="low"
                     >
                       {t("low")}
                     </SelectItem>
                     <SelectItem
-                      className="text-gray-300 hover:bg-[#2a2a2a]"
+                      className="text-muted-foreground hover:bg-muted"
                       value="medium"
                     >
                       {t("medium")}
                     </SelectItem>
                     <SelectItem
-                      className="text-gray-300 hover:bg-[#2a2a2a]"
+                      className="text-muted-foreground hover:bg-muted"
                       value="high"
                     >
                       {t("high")}
@@ -690,26 +690,26 @@ const Tasks = () => {
 
         {/* Tasks Table - Desktop */}
         {tasks.length > 0 && (
-          <Card className="bg-[#111111] border-[#1f1f23] hidden md:block">
+          <Card className="bg-card border-border hidden md:block">
             <CardContent className="p-0">
               <Table>
                 <TableHeader>
-                  <TableRow className="border-[#1f1f23] hover:bg-transparent">
+                  <TableRow className="border-border hover:bg-transparent">
                     <TableHead
-                      className="text-gray-400 font-medium w-auto cursor-pointer hover:text-white"
+                      className="text-muted-foreground font-medium w-auto cursor-pointer hover:text-foreground"
                       onClick={() => handleSort("id")}
                     >
                       ID{getSortIcon("id")}
                     </TableHead>
                     <TableHead
-                      className="text-gray-400 font-medium cursor-pointer hover:text-white"
+                      className="text-muted-foreground font-medium cursor-pointer hover:text-foreground"
                       onClick={() => handleSort("title")}
                     >
                       {t("task_details")}{getSortIcon("title")}
                     </TableHead>
                     {userType === "therapist" && (
                       <TableHead
-                        className="text-gray-400 font-medium cursor-pointer hover:text-white"
+                        className="text-muted-foreground font-medium cursor-pointer hover:text-foreground"
                         onClick={() => handleSort("client_name")}
                       >
                         {t("client")}{getSortIcon("client_name")}
@@ -717,26 +717,26 @@ const Tasks = () => {
                     )}
                     {userType === "client" && (
                       <TableHead
-                        className="text-gray-400 font-medium cursor-pointer hover:text-white"
+                        className="text-muted-foreground font-medium cursor-pointer hover:text-foreground"
                         onClick={() => handleSort("therapist_name")}
                       >
                         {t("assigned_by")}{getSortIcon("therapist_name")}
                       </TableHead>
                     )}
                     <TableHead
-                      className="text-gray-400 font-medium cursor-pointer hover:text-white"
+                      className="text-muted-foreground font-medium cursor-pointer hover:text-foreground"
                       onClick={() => handleSort("status")}
                     >
                       {t("status")}{getSortIcon("status")}
                     </TableHead>
                     <TableHead
-                      className="text-gray-400 font-medium cursor-pointer hover:text-white"
+                      className="text-muted-foreground font-medium cursor-pointer hover:text-foreground"
                       onClick={() => handleSort("priority")}
                     >
                       {t("priority")}{getSortIcon("priority")}
                     </TableHead>
                     <TableHead
-                      className="text-gray-400 font-medium cursor-pointer hover:text-white"
+                      className="text-muted-foreground font-medium cursor-pointer hover:text-foreground"
                       onClick={() => handleSort("due_date")}
                     >
                       {t("due_date")}{getSortIcon("due_date")}
@@ -748,19 +748,19 @@ const Tasks = () => {
                   {paginatedTasks.map((task) => (
                     <TableRow
                       key={task.id}
-                      className="border-[#1f1f23] hover:bg-[#1a1a1a] transition-colors"
+                      className="border-border hover:bg-muted transition-colors"
                     >
                       <TableCell>
-                        <span className="font-mono text-xs text-gray-500">
+                        <span className="font-mono text-xs text-muted-foreground">
                           {task.id.slice(-8)}
                         </span>
                       </TableCell>
                       <TableCell className="max-w-md">
                         <div className="space-y-1">
-                          <p className="text-white font-medium text-sm">
+                          <p className="text-foreground font-medium text-sm">
                             {task.title}
                           </p>
-                          <p className="text-gray-400 text-xs line-clamp-2">
+                          <p className="text-muted-foreground text-xs line-clamp-2">
                             {task.description}
                           </p>
                         </div>
@@ -769,7 +769,7 @@ const Tasks = () => {
                         <TableCell>
                           <div className="flex items-center space-x-2">
                             <ProfileAvatar userId={task.clientId} name={task.clientName} />
-                            <span className="text-white text-sm">
+                            <span className="text-foreground text-sm">
                               {task.clientName || t("unknown_client")}
                             </span>
                           </div>
@@ -779,7 +779,7 @@ const Tasks = () => {
                         <TableCell>
                           <div className="flex items-center space-x-2">
                             <ProfileAvatar userId={task.therapistId} name={task.therapistName} />
-                            <span className="text-white text-sm">
+                            <span className="text-foreground text-sm">
                               {task.therapistName || t("therapist")}
                             </span>
                           </div>
@@ -788,7 +788,7 @@ const Tasks = () => {
                       <TableCell>{getStatusBadge(task.status)}</TableCell>
                       <TableCell>{getPriorityBadge(task.priority)}</TableCell>
                       <TableCell>
-                        <span className="text-gray-300 text-sm">
+                        <span className="text-muted-foreground text-sm">
                           {task.dueDate 
                             ? new Date(task.dueDate).toLocaleDateString()
                             : t("not_specified")
@@ -829,12 +829,12 @@ const Tasks = () => {
         {tasks.length > 0 && (
           <div className="md:hidden space-y-3">
             {paginatedTasks.map((task) => (
-              <Card key={task.id} className="bg-[#111111] border-[#1f1f23]">
+              <Card key={task.id} className="bg-card border-border">
                 <CardContent className="p-4">
                   <div className="space-y-3">
                     {/* Header with ID and Status */}
                     <div className="flex items-center justify-between">
-                      <span className="font-mono text-xs text-gray-500">
+                      <span className="font-mono text-xs text-muted-foreground">
                         {task.id.slice(-8)}
                       </span>
                       {getStatusBadge(task.status)}
@@ -842,10 +842,10 @@ const Tasks = () => {
 
                     {/* Title and Description */}
                     <div className="space-y-1">
-                      <h3 className="text-white font-medium text-sm leading-tight">
+                      <h3 className="text-foreground font-medium text-sm leading-tight">
                         {task.title}
                       </h3>
-                      <p className="text-gray-400 text-xs line-clamp-2">
+                      <p className="text-muted-foreground text-xs line-clamp-2">
                         {task.description}
                       </p>
                     </div>
@@ -858,7 +858,7 @@ const Tasks = () => {
                         ) : (
                           <ProfileAvatar userId={task.therapistId} name={task.therapistName} />
                         )}
-                        <span className="text-white text-sm truncate">
+                        <span className="text-foreground text-sm truncate">
                           {userType === "therapist"
                             ? task.clientName || t("unknown_client")
                             : task.therapistName || t("therapist")}
@@ -870,8 +870,8 @@ const Tasks = () => {
                     </div>
 
                     {/* Due Date and Actions */}
-                    <div className="flex items-center justify-between pt-2 border-t border-[#1f1f23]">
-                      <span className="text-gray-300 text-xs">
+                    <div className="flex items-center justify-between pt-2 border-t border-border">
+                      <span className="text-muted-foreground text-xs">
                         {t("due")}: {task.dueDate 
                           ? new Date(task.dueDate).toLocaleDateString()
                           : t("not_specified")
@@ -939,14 +939,14 @@ const Tasks = () => {
 
         {/* Decline Reason Dialog */}
         <Dialog open={declineDialogOpen} onOpenChange={setDeclineDialogOpen}>
-          <DialogContent className="bg-[#0a0a0a] border border-[#1f1f23] text-white max-w-md mx-4">
+          <DialogContent className="bg-background border border-border text-foreground max-w-md mx-4">
             <DialogHeader>
-              <DialogTitle className="text-white">{t('decline_task')}</DialogTitle>
+              <DialogTitle className="text-foreground">{t('decline_task')}</DialogTitle>
             </DialogHeader>
-            <div className="mt-2 h-px w-full bg-gradient-to-r from-transparent via-[#3f3f3f] to-transparent" />
+            <div className="mt-2 h-px w-full bg-gradient-to-r from-transparent via-border to-transparent" />
             <div className="space-y-4">
               <div>
-                <Label className="text-gray-300">
+                <Label className="text-muted-foreground">
                   {t("decline_task_reason")}{" "}
                   <span className="text-red-400">*</span>
                 </Label>
@@ -954,7 +954,7 @@ const Tasks = () => {
                   value={declineReason}
                   onChange={(e) => setDeclineReason(e.target.value)}
                   placeholder={t("decline_task_placeholder")}
-                  className="bg-[#111111] border-[#1f1f23] text-white mt-2"
+                  className="bg-card border-border text-foreground mt-2"
                   rows={4}
                 />
               </div>
@@ -962,7 +962,7 @@ const Tasks = () => {
                 <Button
                   variant="outline"
                   onClick={handleDeclineCancel}
-                  className="border-[#333] bg-transparent hover:bg-[#1a1a1a] text-gray-300 w-full sm:w-auto"
+                  className="border-border bg-transparent hover:bg-muted text-muted-foreground w-full sm:w-auto"
                 >
                   {t("cancel")}
                 </Button>

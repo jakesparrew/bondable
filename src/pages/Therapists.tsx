@@ -32,13 +32,13 @@ const Therapists = () => {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h2 className="text-xl sm:text-2xl font-semibold text-white mb-1">{t("therapists")}</h2>
-            <p className="text-gray-400 text-sm">{t("connect_with_therapist")}</p>
+            <h2 className="text-xl sm:text-2xl font-semibold text-foreground mb-1">{t("therapists")}</h2>
+            <p className="text-muted-foreground text-sm">{t("connect_with_therapist")}</p>
           </div>
 
           {/* Join therapist button */}
           <JoinTherapistDialog onTherapistConnected={handleTherapistConnected}>
-            <Button className="bg-neutral-50 hover:bg-[#d6d6d6] text-neutral-950 px-4 py-2 rounded-lg font-medium transition-colors w-full sm:w-auto">
+            <Button className="bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2 rounded-lg font-medium transition-colors w-full sm:w-auto">
               <PlusIcon className="-ms-1 opacity-60" size={16} aria-hidden="true" />
               {isMobile ? t("join_therapist") : t("join_therapist")}
             </Button>
@@ -46,9 +46,9 @@ const Therapists = () => {
         </div>
 
         {/* Therapists Table */}
-        <Card className="bg-[#111111] border-[#1f1f23]">
+        <Card className="bg-card border-border">
           <CardHeader className="pb-4">
-            <CardTitle className="text-white text-base sm:text-lg">{t("my_therapists")}</CardTitle>
+            <CardTitle className="text-foreground text-base sm:text-lg">{t("my_therapists")}</CardTitle>
           </CardHeader>
           <CardContent className="px-3 sm:px-6">
             {isLoading ? (

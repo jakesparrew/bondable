@@ -43,7 +43,7 @@ const TherapistsTable = ({ therapists }: TherapistsTableProps) => {
           <div className="flex items-center gap-3">
             <Avatar className="h-8 w-8">
               <AvatarImage src={therapist.avatarUrl} alt={therapist.name} />
-              <AvatarFallback className="bg-[#2a2a2a] text-white text-sm">
+              <AvatarFallback className="bg-muted text-foreground text-sm">
                 {therapist.name
                   .split(" ")
                   .map((n) => n[0])
@@ -51,15 +51,15 @@ const TherapistsTable = ({ therapists }: TherapistsTableProps) => {
                   .toUpperCase()}
               </AvatarFallback>
             </Avatar>
-            <span className="text-white font-medium">{therapist.name}</span>
+            <span className="text-foreground font-medium">{therapist.name}</span>
           </div>
         );
       case "email":
-        return <span className="text-gray-300">{therapist.email}</span>;
+        return <span className="text-muted-foreground">{therapist.email}</span>;
       case "phone":
-        return <span className="text-gray-300">{therapist.phone || t("n_a")}</span>;
+        return <span className="text-muted-foreground">{therapist.phone || t("n_a")}</span>;
       case "specialization":
-        return <span className="text-gray-300">{therapist.specialization}</span>;
+        return <span className="text-muted-foreground">{therapist.specialization}</span>;
       case "status":
         return (
           <Badge className="bg-green-900/30 text-green-400 border border-green-800 hover:bg-green-900/40">
