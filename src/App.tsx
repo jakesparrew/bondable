@@ -264,7 +264,7 @@ const App = () => {
                   } 
                 />
                 <Route 
-                  path="/dashboard/:userType/sessions/session-details" 
+                  path="/dashboard/:userType/sessions/:sessionId"
                   element={
                     <RouteProtection>
                       <SessionDetail />

@@ -458,8 +458,7 @@ const Sessions = () => {
   };
 
   const handleViewDetails = (session: Session) => {
-    setEditingSession(session);
-    setShowScheduleDialog(true);
+    navigate(`/dashboard/${userType}/sessions/${session.id}`);
   };
 
   const handleConfirmSession = (sessionId: string) => {

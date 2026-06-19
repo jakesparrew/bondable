@@ -1,22 +1,8 @@
 import DashboardLayout from "@/components/layout/DashboardLayout";
-import console from "@/lib/production-console";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { SimpleDatePicker } from "@/components/ui/simple-date-picker";
-import { TimePicker } from "@/components/ui/time-picker";
-import AddressAutoComplete, {
-  AddressType,
-} from "@/components/ui/address-autocomplete";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   ArrowLeft,
@@ -26,156 +12,212 @@ import {
   User,
   Video,
   Phone,
-  Edit,
-  Trash2,
   Type,
-  Plus,
-  Target,
   FileText,
-  ArrowRight,
-  X,
-  MinusIcon,
 } from "lucide-react";
-import { useOptimizedState } from '@/hooks/performance/useOptimizedComponents';
 import { useTranslation } from "react-i18next";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { SessionService, type Session } from "@/services/api/SessionService";
+import { useAuthManager } from "@/hooks/api/useAuthManager";
+import { isSessionPast } from "@/components/sessions/sessionLoopUtils";
+import SessionRecapCard from "@/components/sessions/SessionRecapCard";
+import PostSessionAllianceCheck from "@/components/sessions/PostSessionAllianceCheck";
+import PreSessionNudge from "@/components/sessions/PreSessionNudge";
 
-interface SessionDetail {
-  id: string;
-  title: string;
+/** Session enriched with resolved counterpart names for display. */
+interface SessionWithNames extends Session {
   clientName?: string;
   therapistName?: string;
-  date: string;
-  startTime: string;
-  endTime: string;
-  location?: string;
-  address?: AddressType;
-  type: "in-person" | "video" | "phone";
-  status: "upcoming" | "completed" | "cancelled";
-  notes?: string;
-  objectives?: string[];
-  nextSteps?: string;
 }
+
+/**
+ * Fetch a single session and resolve the client/therapist display names.
+ *
+ * `SessionService.getSession` selects the raw row (no profile join), so we
+ * look the two profiles up directly — the dev mock resolves `profiles` by id.
+ */
+const fetchSessionWithNames = async (
+  sessionId: string,
+): Promise<SessionWithNames | null> => {
+  const session = await SessionService.getSession(sessionId);
+  if (!session) return null;
+
+  const ids = [session.client_id, session.therapist_id].filter(Boolean);
+  let nameById: Record<string, string> = {};
+  if (ids.length) {
+    const { data } = await supabase
+      .from("profiles")
+      .select("id, first_name, last_name")
+      .in("id", ids);
+    nameById = (data || []).reduce<Record<string, string>>((acc, p: any) => {
+      acc[p.id] = `${p.first_name || ""} ${p.last_name || ""}`.trim();
+      return acc;
+    }, {});
+  }
+
+  return {
+    ...session,
+    clientName: session.client?.full_name || nameById[session.client_id],
+    therapistName:
+      session.therapist?.full_name || nameById[session.therapist_id],
+  };
+};
+
+const getSessionIcon = (type?: string) => {
+  switch (type) {
+    case "video":
+    case "video_call":
+      return <Video className="h-4 w-4" />;
+    case "phone":
+    case "phone_call":
+      return <Phone className="h-4 w-4" />;
+    default:
+      return <Type className="h-4 w-4" />;
+  }
+};
+
+const formatDate = (dateString?: string) => {
+  if (!dateString) return "";
+  const date = new Date(dateString);
+  if (Number.isNaN(date.getTime())) return dateString;
+  return date.toLocaleDateString("en-GB", {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
+};
+
+const formatTime = (time?: string) => (time ? time.slice(0, 5) : "");
+
+/** Brand-token status chip; only genuinely-negative states use destructive red. */
+const getStatusBadgeClasses = (status: Session["status"]) => {
+  switch (status) {
+    case "Cancelled":
+    case "Denied":
+    case "No Show":
+      return "bg-destructive/10 text-destructive border-destructive/20";
+    case "Completed":
+      return "bg-primary/10 text-primary border-primary/20";
+    default:
+      // Pending / Confirmed / upcoming
+      return "bg-secondary text-secondary-foreground border-border";
+  }
+};
+
+const InfoTile = ({
+  icon,
+  label,
+  value,
+  className = "",
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: React.ReactNode;
+  className?: string;
+}) => (
+  <div className={`p-4 transition-colors hover:bg-muted ${className}`}>
+    <div className="mb-3 flex items-center gap-3">
+      <div className="rounded-lg bg-muted p-2 text-foreground">{icon}</div>
+      <span className="text-sm font-medium text-foreground">{label}</span>
+    </div>
+    <p className="text-sm font-semibold leading-tight text-muted-foreground">
+      {value}
+    </p>
+  </div>
+);
 
 const SessionDetail = () => {
   const { t } = useTranslation();
-  const { userType, sessionId } = useParams();
+  const { userType, sessionId } = useParams<{
+    userType: string;
+    sessionId: string;
+  }>();
   const navigate = useNavigate();
-  const [isEditing, setIsEditing] = useOptimizedState(false);
-  const [showObjectives, setShowObjectives] = useOptimizedState(false);
-  const [showNotes, setShowNotes] = useOptimizedState(false);
-  const [showNextSteps, setShowNextSteps] = useOptimizedState(false);
-  const [searchInput, setSearchInput] = useOptimizedState("");
-  const hideForNow = false;
-
-  // Mock data - in a real app this would come from an API
-  const [session, setSession] = useOptimizedState<SessionDetail>({
-    id: sessionId || "1",
-    title: t("therapy_session"),
-    clientName: userType === "therapist" ? "John Doe" : undefined,
-    therapistName: userType === "client" ? "Dr. Sarah Smith" : undefined,
-    date: "2025-06-08",
-    startTime: "10:00",
-    endTime: "11:00",
-    location: t("room_101"),
-    address: {
-      address1: "123 Main St",
-      address2: "",
-      formattedAddress: "123 Main St, Room 101, City, State 12345",
-      city: "City",
-      region: "State",
-      postalCode: "12345",
-      country: "US",
-      lat: 0,
-      lng: 0,
-    },
-    type: "in-person",
-    status: "upcoming",
-    notes: "",
-    objectives: [],
-    nextSteps: "",
-  });
-
-  const getSessionIcon = (type: string) => {
-    switch (type) {
-      case "video":
-        return <Video className="h-4 w-4" />;
-      case "phone":
-        return <Phone className="h-4 w-4" />;
-      default:
-        return <Type className="h-4 w-4" />;
-    }
-  };
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-UK", {
-      weekday: "long",
-      month: "long",
-      day: "numeric",
-      year: "numeric",
-    });
-  };
-
-  const getStatusBadgeColor = (status: string) => {
-    switch (status) {
-      case "upcoming":
-        return "bg-blue-500/10 text-blue-400 border-blue-500/20";
-      case "completed":
-        return "bg-green-500/10 text-green-400 border-green-500/20";
-      case "cancelled":
-        return "bg-red-500/10 text-red-400 border-red-500/20";
-      default:
-        return "bg-muted/10 text-muted-foreground border-muted/20";
-    }
-  };
-
-  const handleBack = () => {
-    navigate(`/dashboard/${userType}/sessions`);
-  };
+  const { user } = useAuthManager();
 
   const isTherapist = userType === "therapist";
 
-  const addObjective = () => {
-    setSession({
-      ...session,
-      objectives: [...(session.objectives || []), ""],
-    });
-    setShowObjectives(true);
-  };
+  const {
+    data: session,
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ["session", sessionId],
+    queryFn: () => fetchSessionWithNames(sessionId as string),
+    enabled: Boolean(sessionId),
+  });
 
-  const updateObjective = (index: number, value: string) => {
-    const newObjectives = [...(session.objectives || [])];
-    newObjectives[index] = value;
-    setSession({ ...session, objectives: newObjectives });
-  };
+  const handleBack = () => navigate(`/dashboard/${userType}/sessions`);
 
-  const removeObjective = (index: number) => {
-    const newObjectives =
-      session.objectives?.filter((_, i) => i !== index) || [];
-    setSession({ ...session, objectives: newObjectives });
-    if (newObjectives.length === 0) {
-      setShowObjectives(false);
-    }
-  };
+  // ---- Loading ----------------------------------------------------------
+  if (isLoading) {
+    return (
+      <DashboardLayout userType={userType as "therapist" | "client"}>
+        <div className="space-y-6">
+          <div className="flex items-center gap-4">
+            <Skeleton className="h-8 w-8 rounded-md" />
+            <div className="space-y-2">
+              <Skeleton className="h-7 w-48" />
+              <Skeleton className="h-4 w-64" />
+            </div>
+          </div>
+          <Skeleton className="h-32 w-full rounded-lg" />
+          <Skeleton className="h-40 w-full rounded-lg" />
+        </div>
+      </DashboardLayout>
+    );
+  }
 
-  const hasAnyContent =
-    showObjectives ||
-    (session.objectives && session.objectives.length > 0) ||
-    showNotes ||
-    session.notes ||
-    showNextSteps ||
-    session.nextSteps;
+  // ---- Not found / error ------------------------------------------------
+  if (isError || !session) {
+    return (
+      <DashboardLayout userType={userType as "therapist" | "client"}>
+        <div className="space-y-6">
+          <div className="flex items-center gap-4">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleBack}
+              className="h-8 w-8 p-0"
+              aria-label={t("back", "Back")}
+            >
+              <ArrowLeft className="h-4 w-4" />
+            </Button>
+            <h1 className="text-2xl font-semibold text-foreground">
+              {t("session_not_found_title", "Session not found")}
+            </h1>
+          </div>
+          <Card className="border border-border bg-card">
+            <CardContent className="flex flex-col items-center gap-3 py-12 text-center">
+              <FileText className="h-10 w-10 text-muted-foreground opacity-50" />
+              <p className="text-sm text-muted-foreground">
+                {t(
+                  "session_not_found_body",
+                  "We couldn't find this session. It may have been removed or the link is out of date.",
+                )}
+              </p>
+              <Button onClick={handleBack} className="mt-2">
+                {t("back_to_sessions", "Back to sessions")}
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </DashboardLayout>
+    );
+  }
 
-  // Fixed logic: buttons should show when editing is true
-  const shouldShowAddButtons = !hasAnyContent && isEditing;
+  // ---- Loaded -----------------------------------------------------------
+  const counterpartName = isTherapist
+    ? session.clientName
+    : session.therapistName;
+  const counterpartLabel = isTherapist ? t("client") : t("therapist");
 
-  const handleAddressChange = (newAddress: AddressType) => {
-    setSession({
-      ...session,
-      address: newAddress,
-      location: newAddress.address1 || newAddress.formattedAddress,
-    });
-  };
+  const canEditRecap = isTherapist && session.therapist_id === user?.id;
+  const past = isSessionPast(session);
+  const isClientOwner = !isTherapist && session.client_id === user?.id;
+  const sessionFormat = session.session_format || session.session_type;
 
   return (
     <DashboardLayout userType={userType as "therapist" | "client"}>
@@ -188,202 +230,80 @@ const SessionDetail = () => {
               size="sm"
               onClick={handleBack}
               className="h-8 w-8 p-0"
+              aria-label={t("back", "Back")}
             >
               <ArrowLeft className="h-4 w-4" />
             </Button>
             <div>
-              <h1 className="text-2xl font-semibold">{session.title}</h1>
+              <h1 className="text-2xl font-semibold text-foreground">
+                {t("therapy_session", "Therapy session")}
+              </h1>
               <p className="text-sm text-muted-foreground">
-                {formatDate(session.date)} • {session.startTime} -{" "}
-                {session.endTime}
+                {formatDate(session.session_date)}
+                {session.session_time
+                  ? ` • ${formatTime(session.session_time)}`
+                  : ""}
               </p>
             </div>
           </div>
 
           <Badge
             variant="outline"
-            className={getStatusBadgeColor(session.status)}
+            className={getStatusBadgeClasses(session.status)}
           >
-            {session.status.charAt(0).toUpperCase() + session.status.slice(1)}
+            {t(`status_${session.status.toLowerCase().replace(/ /g, "_")}`, session.status)}
           </Badge>
         </div>
 
-        {/* Session Details Card */}
-        <Card className="overflow-visible bg-card border border-border">
+        {/* Session details */}
+        <Card className="overflow-hidden border border-border bg-card">
           <CardContent className="p-0">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 md:divide-y-0 md:divide-x divide-border ">
-              {/* Date */}
-              <div className="p-4 hover:bg-muted rounded-tl-lg group transition-colors">
-                <div className="flex items-center gap-3 mb-3 ">
-                  <div className="p-2 rounded-lg bg-muted text-foreground transition-colors group-hover:bg-muted">
-                    <Calendar className="h-4 w-4" />
-                  </div>
-                  <span className="text-sm font-medium text-foreground">
-                    {t("date")}
+            <div className="grid grid-cols-1 divide-y divide-border md:grid-cols-2 md:divide-x md:divide-y-0 lg:grid-cols-4">
+              <InfoTile
+                icon={<Calendar className="h-4 w-4" />}
+                label={t("date")}
+                value={formatDate(session.session_date)}
+              />
+              <InfoTile
+                icon={<Clock className="h-4 w-4" />}
+                label={t("time")}
+                value={
+                  session.session_time
+                    ? formatTime(session.session_time)
+                    : t("not_specified", "Not specified")
+                }
+              />
+              <InfoTile
+                icon={getSessionIcon(sessionFormat)}
+                label={t("type")}
+                value={
+                  <span className="capitalize">
+                    {(sessionFormat || t("not_specified", "Not specified"))
+                      .toString()
+                      .replace(/[-_]/g, " ")}
                   </span>
-                </div>
-                {isEditing && isTherapist ? (
-                  <SimpleDatePicker
-                    label=""
-                    defaultValue={session.date}
-                    onChange={(date) => setSession({ ...session, date })}
-                    className="bg-background border-border text-foreground !mt-0"
-                  />
-                ) : (
-                  <p className="font-semibold text-sm leading-tight text-muted-foreground">
-                    {formatDate(session.date)}
-                  </p>
-                )}
-              </div>
-
-              {/* Time */}
-              <div className="p-4 hover:bg-muted group transition-colors">
-                <div className="flex items-center gap-3 mb-1 ">
-                  <div className="p-2 rounded-lg bg-muted text-foreground transition-colors group-hover:bg-muted">
-                    <Clock className="h-4 w-4" />
-                  </div>
-                  <span className="text-sm font-medium text-foreground">
-                    {t("time")}
-                  </span>
-                </div>
-                {isEditing && isTherapist ? (
-                  <div className="flex items-center gap-2">
-                    <div className="flex-1">
-                      <TimePicker
-                        label=""
-                        value={session.startTime}
-                        onChange={(time) =>
-                          setSession({ ...session, startTime: time })
-                        }
-                        className="w-full bg-background border-border text-foreground"
-                      />
-                    </div>
-
-                    <span className="text-xs text-muted-foreground whitespace-nowrap">
-                      {t("to")}
-                    </span>
-
-                    <div className="flex-1">
-                      <TimePicker
-                        label=""
-                        value={session.endTime}
-                        onChange={(time) =>
-                          setSession({ ...session, endTime: time })
-                        }
-                        className="w-full bg-background border-border text-foreground"
-                      />
-                    </div>
-                  </div>
-                ) : (
-                  <p className="font-semibold text-sm text-muted-foreground pt-2">
-                    {session.startTime} - {session.endTime}
-                  </p>
-                )}
-              </div>
-
-              {/* Type */}
-              <div className="p-4 hover:bg-muted group transition-colors">
-                <div className="flex items-center gap-3 mb-3 ">
-                  <div className="p-2 rounded-lg bg-muted text-foreground transition-colors group-hover:bg-muted">
-                    {getSessionIcon(session.type)}
-                  </div>
-                  <span className="text-sm font-medium text-foreground">
-                    {t("type")}
-                  </span>
-                </div>
-                {isEditing && isTherapist ? (
-                  <Select
-                    value={session.type}
-                    onValueChange={(value: "in-person" | "video" | "phone") =>
-                      setSession({ ...session, type: value })
-                    }
-                  >
-                    <SelectTrigger className="w-full bg-background border-border text-foreground">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="bg-card border-border">
-                      <SelectItem
-                        value="in-person"
-                        className="text-muted-foreground hover:!text-foreground data-[state=checked]:text-foreground data-[highlighted]:!text-foreground"
-                      >
-                        {t("in_person")}
-                      </SelectItem>
-                      <SelectItem
-                        value="video"
-                        className="text-muted-foreground hover:!text-foreground data-[state=checked]:text-foreground data-[highlighted]:!text-foreground"
-                      >
-                        {t("video_call")}
-                      </SelectItem>
-                      <SelectItem
-                        value="phone"
-                        className="text-muted-foreground hover:!text-foreground data-[state=checked]:text-foreground data-[highlighted]:!text-foreground"
-                      >
-                        {t("phone_call")}
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
-                ) : (
-                  <p className="font-semibold text-sm capitalize text-muted-foreground">
-                    {session.type.replace("-", " ")}
-                  </p>
-                )}
-              </div>
-
-              {/* Location */}
-              <div className="p-4 group hover:bg-muted rounded-tr-lg transition-colors">
-                <div className="flex items-center gap-3 mb-3 ">
-                  <div className="p-2 rounded-lg bg-muted text-foreground transition-colors group-hover:bg-muted">
-                    <MapPin className="h-4 w-4 " />
-                  </div>
-                  <span className="text-sm font-medium text-foreground">
-                    {t("location")}
-                  </span>
-                </div>
-                {isEditing && isTherapist ? (
-                  <div className="relative">
-                    <AddressAutoComplete
-                      address={
-                        session.address || {
-                          address1: "",
-                          address2: "",
-                          formattedAddress: "",
-                          city: "",
-                          region: "",
-                          postalCode: "",
-                          country: "",
-                          lat: 0,
-                          lng: 0,
-                        }
-                      }
-                      setAddress={handleAddressChange}
-                      searchInput={searchInput}
-                      setSearchInput={setSearchInput}
-                      dialogTitle={t("edit_session_location")}
-                      placeholder={t("enter_session_location")}
-                      className="bg-background border-border text-foreground"
-                    />
-                  </div>
-                ) : (
-                  <p className="font-semibold text-sm text-muted-foreground">
-                    {session.location || t("not_specified")}
-                  </p>
-                )}
-              </div>
+                }
+              />
+              <InfoTile
+                icon={<MapPin className="h-4 w-4" />}
+                label={t("location")}
+                value={session.location || t("not_specified", "Not specified")}
+              />
             </div>
 
-            {/* Client/Therapist Info */}
-            {(session.clientName || session.therapistName) && (
-              <div className="px-4 py-3 border-t border-border">
+            {/* Counterpart */}
+            {counterpartName && (
+              <div className="border-t border-border px-4 py-3">
                 <div className="flex items-center gap-3">
-                  <div className="p-3 rounded-lg bg-muted text-foreground">
+                  <div className="rounded-lg bg-muted p-3 text-foreground">
                     <User className="h-4 w-4" />
                   </div>
                   <div>
                     <span className="text-sm font-medium text-foreground">
-                      {userType === "therapist" ? t("client") : t("therapist")}
+                      {counterpartLabel}
                     </span>
-                    <p className="font-semibold text-sm text-muted-foreground">
-                      {session.clientName || session.therapistName}
+                    <p className="text-sm font-semibold text-muted-foreground">
+                      {counterpartName}
                     </p>
                   </div>
                 </div>
@@ -392,347 +312,44 @@ const SessionDetail = () => {
           </CardContent>
         </Card>
 
-        {/* Session Information - Therapist Only */}
-        {isTherapist && hideForNow && (
-          <Card className="overflow-hidden bg-card border border-border shadow-lg">
-            <CardHeader className="pb-6 bg-card border-b border-border">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <CardTitle className="text-xl text-foreground font-semibold">
-              {t("session_information")}
-                  </CardTitle>
-                </div>
-                {shouldShowAddButtons && (
-                  <div className="flex items-center gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={addObjective}
-                      className="h-8 hover:text-foreground hover:bg-muted"
-                    >
-                      <Plus className="h-4 w-4 mr-1" />
-                      {t("add_objective")}
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setShowNotes(true)}
-                      className="h-8 hover:text-foreground hover:bg-muted"
-                    >
-                      <Plus className="h-4 w-4 mr-1" />
-                      {t("add_notes")}
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setShowNextSteps(true)}
-                      className="h-8 hover:text-foreground hover:bg-muted"
-                    >
-                      <Plus className="h-4 w-4 mr-1" />
-                      {t("add_next_steps")}
-                    </Button>
-                  </div>
-                )}
+        {/* Pre-session nudge — upcoming sessions; client can add a prep note.
+            (The component self-hides unless the session is within 24h.) */}
+        {!past && (
+          <PreSessionNudge
+            session={session}
+            canAddPrepNote={isClientOwner}
+          />
+        )}
+
+        {/* Session recap — therapist authors/edits; client sees it read-only. */}
+        <SessionRecapCard
+          sessionId={session.id}
+          recap={session.recap}
+          canEdit={canEditRecap}
+        />
+
+        {/* Therapist-authored notes (read-only surface). */}
+        {session.notes && (
+          <Card className="border border-border bg-card">
+            <CardContent className="space-y-2 p-4">
+              <div className="flex items-center gap-2">
+                <FileText className="h-4 w-4 text-muted-foreground" />
+                <h4 className="text-sm font-semibold text-foreground">
+                  {t("session_notes", "Session notes")}
+                </h4>
               </div>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              {!hasAnyContent ? (
-                <div className="text-center py-12">
-                  <div className="text-foreground mb-4">
-                    <FileText className="h-12 w-12 mx-auto mb-3 opacity-50 " />
-                    <p>No session information added yet</p>
-                    {isEditing ? (
-                      <p className="text-sm">
-                        Use the buttons above to add objectives, notes, or next
-                        steps
-                      </p>
-                    ) : (
-                      <p className="text-sm">
-                        Enter edit mode to add objectives, notes, or next steps
-                      </p>
-                    )}
-                  </div>
-                </div>
-              ) : (
-                <>
-                  {/* Objectives */}
-                  {(showObjectives ||
-                    (session.objectives && session.objectives.length > 0)) && (
-                    <div className="space-y-3 mt-4">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <Target className="h-4 w-4 text-muted-foreground" />
-                          <h4 className="font-medium text-muted-foreground">
-                            {t("session_objectives")}
-                          </h4>
-                        </div>
-                        {isEditing && (
-                          <div className="flex items-center gap-2">
-                            {!showNotes && !session.notes && (
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => setShowNotes(true)}
-                                className="h-8 text-xs hover:text-primary-foreground hover:bg-primary/90 text-primary-foreground bg-primary"
-                              >
-                                <Plus className="h-3 w-3 mr-1" />
-                                Notes
-                              </Button>
-                            )}
-                            {!showNextSteps && !session.nextSteps && (
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => setShowNextSteps(true)}
-                                className="h-8 text-xs hover:text-primary-foreground hover:bg-primary/90 text-primary-foreground bg-primary"
-                              >
-                                <Plus className="h-3 w-3 mr-1" />
-                                Next Steps
-                              </Button>
-                            )}
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={addObjective}
-                              className="h-8 text-xs hover:text-primary-foreground hover:bg-primary/90 text-primary-foreground bg-primary"
-                            >
-                              <Plus className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        )}
-                      </div>
-                      <div className="space-y-2">
-                        {session.objectives?.map((objective, index) => (
-                          <div key={index} className="flex items-stretch gap-2">
-                            <div className="w-2 h-2 bg-muted-foreground rounded-full flex-shrink-0 mt-4" />
-                            <Input
-                              value={objective}
-                              onChange={(e) =>
-                                updateObjective(index, e.target.value)
-                              }
-                              placeholder={t("enter_objective")}
-                              className="flex-1 bg-background border border-border text-foreground"
-                              readOnly={!isEditing}
-                            />
-                            {isEditing && (
-                              <div className="flex flex-col">
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => removeObjective(index)}
-                                  className="h-full text-xs bg-muted border-border text-muted-foreground hover:bg-muted hover:border-border hover:text-foreground"
-                                >
-                                  <MinusIcon />
-                                </Button>
-                              </div>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Notes */}
-                  {(showNotes || session.notes) && (
-                    <div className="space-y-3 mt-4">
-                      {(showObjectives ||
-                        (session.objectives &&
-                          session.objectives.length > 0)) && (
-                        <hr className="-mx-6 w-[calc(100%+3rem)] border-t border-border pb-1" />
-                      )}
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <FileText className="h-4 w-4 text-muted-foreground" />
-                          <h4 className="font-medium text-muted-foreground">
-                            {t("session_notes")}
-                          </h4>
-                        </div>
-                        {isEditing && (
-                          <div className="flex items-center gap-2">
-                            {!showObjectives &&
-                              (!session.objectives ||
-                                session.objectives.length === 0) && (
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={addObjective}
-                                  className="h-8 text-xs hover:text-primary-foreground hover:bg-primary/90 text-primary-foreground bg-primary"
-                                >
-                                  <Plus className="h-3 w-3 mr-1" />
-                                  Objective
-                                </Button>
-                              )}
-                            {!showNextSteps && !session.nextSteps && (
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => setShowNextSteps(true)}
-                                className="h-8 text-xs hover:text-primary-foreground hover:bg-primary/90 text-primary-foreground bg-primary"
-                              >
-                                <Plus className="h-3 w-3 mr-1" />
-                                Next Steps
-                              </Button>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                      <div className="flex gap-2">
-                        <div className="flex-1">
-                          <Textarea
-                            value={session.notes || ""}
-                            onChange={(e) =>
-                              setSession({ ...session, notes: e.target.value })
-                            }
-                            placeholder={t("enter_session_notes")}
-                            rows={4}
-                            className="w-full bg-background border border-border text-foreground "
-                            readOnly={!isEditing}
-                          />
-                        </div>
-                        {isEditing && (
-                          <div className="flex flex-col">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => {
-                                setSession({ ...session, notes: "" });
-                                setShowNotes(false);
-                              }}
-                              className="h-full text-xs bg-muted border-border text-muted-foreground hover:bg-muted hover:border-border hover:text-foreground"
-                            >
-                              <MinusIcon />
-                            </Button>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Next Steps */}
-                  {(showNextSteps || session.nextSteps) && (
-                    <div className="space-y-3 mt-4">
-                      {(showNotes || session.notes) && (
-                        <hr className="-mx-6 w-[calc(100%+3rem)] border-t border-border pb-1" />
-                      )}
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <ArrowRight className="h-4 w-4 text-muted-foreground" />
-                          <h4 className="font-medium text-muted-foreground">
-                            {t("next_steps")}
-                          </h4>
-                        </div>
-                        {isEditing && (
-                          <div className="flex items-center gap-2">
-                            {!showObjectives &&
-                              (!session.objectives ||
-                                session.objectives.length === 0) && (
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={addObjective}
-                                  className="h-8 text-xs hover:text-primary-foreground hover:bg-primary/90 text-primary-foreground bg-primary"
-                                >
-                                  <Plus className="h-3 w-3 mr-1" />
-                                  Objective
-                                </Button>
-                              )}
-                            {!showNotes && !session.notes && (
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => setShowNotes(true)}
-                                className="h-8 text-xs hover:text-primary-foreground hover:bg-primary/90 text-primary-foreground bg-primary"
-                              >
-                                <Plus className="h-3 w-3 mr-1" />
-                                Notes
-                              </Button>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                      <div className="flex gap-2 items-stretch">
-                        <Textarea
-                          value={session.nextSteps || ""}
-                          onChange={(e) =>
-                            setSession({
-                              ...session,
-                              nextSteps: e.target.value,
-                            })
-                          }
-                          placeholder={t("enter_next_steps")}
-                          rows={3}
-                          className="w-full bg-background border border-border text-foreground "
-                          readOnly={!isEditing}
-                        />
-                        {isEditing && (
-                          <div className="flex flex-col justify-center">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => {
-                                setSession({ ...session, nextSteps: "" });
-                                setShowNextSteps(false);
-                              }}
-                              className="h-full text-xs bg-muted border-border text-muted-foreground hover:bg-muted hover:border-border hover:text-foreground"
-                            >
-                              <MinusIcon />
-                            </Button>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  )}
-                </>
-              )}
+              <p className="whitespace-pre-line text-sm leading-relaxed text-muted-foreground">
+                {session.notes}
+              </p>
             </CardContent>
           </Card>
         )}
+
+        {/* Post-session alliance micro-check — client only, past/completed. */}
+        {past && isClientOwner && (
+          <PostSessionAllianceCheck sessionId={session.id} />
+        )}
       </div>
-      {/* Action Buttons - Therapist Only */}
-      {isTherapist && (
-        <div className="flex justify-end gap-3 mt-4">
-          {isEditing ? (
-            <>
-              <Button
-                variant="outline"
-                onClick={() => setIsEditing(false)}
-                className="px-6 py-2 bg-muted border-border text-muted-foreground hover:bg-muted hover:border-border hover:text-foreground transition-all duration-200"
-              >
-                {t("cancel")}
-              </Button>
-
-              <Button
-                onClick={() => {
-                  setIsEditing(false);
-                  console.log("Saving session changes:", session);
-                }}
-                className="hover:text-primary-foreground hover:bg-primary/90 text-primary-foreground bg-primary"
-              >
-                {t("save_changes")}
-              </Button>
-            </>
-          ) : (
-            <>
-              <Button
-                variant="outline"
-                onClick={() => setIsEditing(true)}
-                className="px-6 py-2 bg-muted border-border text-muted-foreground hover:bg-muted hover:border-border hover:text-foreground transition-all duration-200"
-              >
-                <Edit className="h-4 w-4 mr-2" />
-                {t("edit")}
-              </Button>
-
-              <Button
-                variant="outline"
-                className="px-6 py-2 bg-red-900/50 border-red-700/50 text-red-300 hover:bg-red-800/60 hover:border-red-600/60 hover:text-red-200 transition-all duration-200"
-              >
-                <Trash2 className="h-4 w-4 mr-2" />
-                {t("cancel_session")}
-              </Button>
-            </>
-          )}
-        </div>
-      )}
     </DashboardLayout>
   );
 };
