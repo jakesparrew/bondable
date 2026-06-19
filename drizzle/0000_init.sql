@@ -47,6 +47,7 @@ CREATE TABLE IF NOT EXISTS "profiles" (
   "last_name"                       text,
   "phone"                           text,
   "role"                            "user_role" NOT NULL DEFAULT 'client',
+  "is_regulated"                    boolean NOT NULL DEFAULT false,
   "updated_at"                      timestamptz DEFAULT now(),
   "weekly_availability"             jsonb
 );

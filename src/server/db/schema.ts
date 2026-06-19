@@ -74,6 +74,7 @@ export const profiles = pgTable('profiles', {
   lastName: text('last_name'),
   phone: text('phone'),
   role: userRole('role').notNull().default('client'),
+  isRegulated: boolean('is_regulated').notNull().default(false),
   updatedAt: timestamp('updated_at', tz).defaultNow(),
   weeklyAvailability: jsonb('weekly_availability'),
 }, (t) => ({

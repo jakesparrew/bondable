@@ -8,6 +8,7 @@ import MyHomework from "./MyHomework";
 import NextSessionCard from "./NextSessionCard";
 import BondCompanionCard from "./BondCompanionCard";
 import RecentJournalCard from "./RecentJournalCard";
+import { CrisisHelpButton, CrisisResources } from "@/components/safety/CrisisResources";
 
 interface ClientDashboardContentProps {
   /** Optional banner (e.g. IntakePendingBanner) rendered above the greeting. */
@@ -41,11 +42,15 @@ const ClientDashboardContent = ({ headerSlot }: ClientDashboardContentProps) => 
       <div className="space-y-2">
         {headerSlot}
 
-        <div>
-          <h1 className="text-lg font-bold tracking-tight text-foreground">
-            {firstName ? t("client_greeting", { name: firstName }) : t("client_greeting_fallback")}
-          </h1>
-          <p className="text-xs text-muted-foreground">{today}</p>
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h1 className="text-lg font-bold tracking-tight text-foreground">
+              {firstName ? t("client_greeting", { name: firstName }) : t("client_greeting_fallback")}
+            </h1>
+            <p className="text-xs text-muted-foreground">{today}</p>
+          </div>
+          {/* Always-visible safety affordance — opens offline crisis resources. */}
+          <CrisisHelpButton className="shrink-0" />
         </div>
 
         <div className="pt-4">
@@ -60,6 +65,7 @@ const ClientDashboardContent = ({ headerSlot }: ClientDashboardContentProps) => 
               <NextSessionCard />
               <BondCompanionCard />
               <RecentJournalCard />
+              <CrisisResources />
             </div>
           </div>
         </div>

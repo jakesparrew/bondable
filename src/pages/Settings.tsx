@@ -63,6 +63,7 @@ const Settings = () => {
     { code: "en", label: "English", icon: "🇬🇧" },
     { code: "fr", label: "Français", icon: "🇫🇷" },
     { code: "es", label: "Espagnol", icon: "🇪🇸" },
+    { code: "nl", label: "Nederlands", icon: "🇧🇪" },
   ];
 
   useOptimizedEffect(() => {
