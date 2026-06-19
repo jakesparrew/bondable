@@ -9,7 +9,6 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/ui/use-toast";
 
 interface QuickAction {
   id: string;
@@ -22,7 +21,7 @@ interface QuickAction {
 }
 
 const ACTIONS: QuickAction[] = [
-  { id: "bond", labelKey: "cqa_talk_to_bond", icon: Sparkles, ai: true },
+  { id: "bond", labelKey: "cqa_talk_to_bond", icon: Sparkles, ai: true, to: "/dashboard/client/bond" },
   { id: "message", labelKey: "cqa_message_therapist", icon: MessageSquare, to: "/dashboard/client/messages" },
   { id: "book", labelKey: "cqa_book_session", icon: CalendarPlus, to: "/dashboard/client/sessions" },
   { id: "journal", labelKey: "cqa_new_journal", icon: FileEdit, to: "/dashboard/client/journal" },
@@ -32,26 +31,14 @@ const ACTIONS: QuickAction[] = [
 /**
  * Action-first Quick Actions row for the client. Each tile links to a real app
  * route; the mint-accented "Talk to Bond" tile is the standout AI entry point
- * (placeholder until the Bond companion is wired).
+ * that opens the Bond companion chat.
  */
 const ClientQuickActions = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const { toast } = useToast();
 
   const handleClick = (action: QuickAction) => {
-    if (action.to) {
-      navigate(action.to);
-      return;
-    }
-    // Bond placeholder — AI companion not yet wired.
-    toast({
-      title: t("bond_coming_soon_title", "Bond is coming soon"),
-      description: t(
-        "bond_coming_soon_body",
-        "Your supervised AI companion is on the way. You'll be able to chat with Bond here soon.",
-      ),
-    });
+    if (action.to) navigate(action.to);
   };
 
   return (

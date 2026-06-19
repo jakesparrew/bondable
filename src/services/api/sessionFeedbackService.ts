@@ -2,6 +2,17 @@ import { supabase } from '@/integrations/supabase/client';
 import console from '@/lib/production-console';
 
 /**
+ * `session_feedback` is provisioned in the Drizzle schema + dev mock, but the
+ * generated Supabase `Database` types haven't been regenerated to include it
+ * yet (same status as the sibling `client_checkins` table). Until they are, we
+ * access this one table through an untyped view of the client so this file
+ * stays type-clean. Everything else keeps the fully-typed client.
+ */
+const db = supabase as unknown as {
+  from: (table: string) => any;
+};
+
+/**
  * Post-session "working alliance" micro-check + therapist recap.
  *
  * Two tiny, additive pieces of the session loop that the Data phase has already
@@ -42,7 +53,7 @@ export class SessionFeedbackService {
   static async submitFeedback(input: SessionFeedbackInput): Promise<SessionFeedback | null> {
     const rating = Math.max(1, Math.min(5, Math.round(input.allianceRating)));
 
-    const { data, error } = await supabase
+    const { data, error } = await db
       .from('session_feedback')
       .insert({
         session_id: input.sessionId,
@@ -66,7 +77,7 @@ export class SessionFeedbackService {
    * one (per client), but couples/family sessions may carry several.
    */
   static async getFeedbackForSession(sessionId: string): Promise<SessionFeedback[]> {
-    const { data, error } = await supabase
+    const { data, error } = await db
       .from('session_feedback')
       .select('*')
       .eq('session_id', sessionId)
@@ -95,7 +106,7 @@ export class SessionFeedbackService {
    * stored), so the UI keeps the value in local state after a successful call.
    */
   static async saveRecap(sessionId: string, recap: string): Promise<void> {
-    const { error } = await supabase
+    const { error } = await db
       .from('sessions')
       .update({ recap: recap.trim(), updated_at: new Date().toISOString() })
       .eq('id', sessionId);

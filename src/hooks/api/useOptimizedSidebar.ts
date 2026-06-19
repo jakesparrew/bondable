@@ -16,6 +16,7 @@ import {
   LifeBuoy,
   Send,
   ClipboardList,
+  MessageCircleHeart,
 } from "lucide-react";
 
 interface NavigationItem {
@@ -26,6 +27,8 @@ interface NavigationItem {
   items?: { title: string; url: string }[];
   disabled?: boolean;
   hasOptions?: boolean;
+  /** Mint "AI" treatment — reserved for Bond, the standout nav entry. */
+  ai?: boolean;
 }
 
 interface ProjectItem {
@@ -422,6 +425,14 @@ export function useOptimizedSidebar(
           icon: LayoutDashboard,
           isActive: isRouteActive(`/dashboard/${userType}`),
           items: [],
+        },
+        {
+          title: t("bond_nav", "Bond"),
+          url: `/dashboard/${userType}/bond`,
+          icon: MessageCircleHeart,
+          isActive: isRouteActive(`/dashboard/${userType}/bond`),
+          items: [],
+          ai: true,
         },
         {
           title: t("therapists"),

@@ -5,7 +5,10 @@ import { Video, MapPin, CalendarPlus } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useOptimizedSessions } from "@/hooks/api/useOptimizedSessions";
-import { getNextSession, formatSessionDateTime } from "./clientSessionUtils";
+import { getNextSession, getLastSession, formatSessionDateTime } from "./clientSessionUtils";
+import PreSessionNudge from "@/components/sessions/PreSessionNudge";
+import SessionRecapCard from "@/components/sessions/SessionRecapCard";
+import PostSessionAllianceCheck from "@/components/sessions/PostSessionAllianceCheck";
 
 /**
  * Right column — upcoming session card. Shows the soonest non-terminal session
@@ -17,6 +20,7 @@ const NextSessionCard = () => {
   const { data: sessions = [], isLoading } = useOptimizedSessions("client");
 
   const next = useMemo(() => getNextSession(sessions), [sessions]);
+  const last = useMemo(() => getLastSession(sessions), [sessions]);
   const isVideo = next?.session_format === "video";
 
   return (
@@ -90,6 +94,28 @@ const NextSessionCard = () => {
               {t("session_details")}
             </Button>
           </div>
+
+          {/* 24h-before reminder + optional prep note (renders only when due) */}
+          <div className="mt-3">
+            <PreSessionNudge session={next} canAddPrepNote />
+          </div>
+        </div>
+      )}
+
+      {/* Continuity from the last session: therapist recap + a quick
+          "how connected did you feel?" micro-check the client can still answer. */}
+      {last && (
+        <div className="mt-4 space-y-3 border-t border-border pt-4">
+          <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+            {t("last_session_label", "Your last session")}
+          </p>
+          <SessionRecapCard
+            sessionId={last.id}
+            recap={last.recap}
+            canEdit={false}
+            compact
+          />
+          <PostSessionAllianceCheck sessionId={last.id} compact />
         </div>
       )}
     </Card>

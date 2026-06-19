@@ -55,6 +55,7 @@ const AdminProfile = lazy(() => import("./pages/AdminProfile"));
 const IntakeTemplates = lazy(() => import("@/pages/IntakeTemplates"));
 const IntakeTemplateBuilder = lazy(() => import("@/pages/IntakeTemplateBuilder"));
 const ClientIntake = lazy(() => import("@/pages/ClientIntake"));
+const BondChatPage = lazy(() => import("@/pages/BondChat"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 
@@ -233,6 +234,14 @@ const App = () => {
                   element={
                     <RouteProtection requiredUserType="client">
                       <ClientIntake />
+                    </RouteProtection>
+                  }
+                />
+                <Route
+                  path="/dashboard/client/bond"
+                  element={
+                    <RouteProtection requiredUserType="client">
+                      <BondChatPage />
                     </RouteProtection>
                   }
                 />

@@ -271,6 +271,33 @@ const fetchProfileData = async (userIds: string[]) => {
     }
   }, [messages]);
 
+  // Mark incoming messages as read once the conversation is open, then refresh
+  // the unread-count caches so the Messages nav badge updates immediately.
+  useEffect(() => {
+    if (!conversationId || !user) return;
+
+    const hasUnreadIncoming = messages.some(
+      (msg) =>
+        msg.recipient_id === user.id &&
+        msg.sender_id !== user.id &&
+        !msg.read_at &&
+        msg.status !== "read" &&
+        !msg.id.startsWith("temp-")
+    );
+
+    if (!hasUnreadIncoming) return;
+
+    const timeoutId = setTimeout(() => {
+      markAsRead();
+      // Refresh unread counts/conversations so the sidebar badge updates.
+      queryClient.invalidateQueries({ queryKey: ["optimized-unread-counts"] });
+      queryClient.invalidateQueries({ queryKey: ["optimized-conversations"] });
+      queryClient.invalidateQueries({ queryKey: ["sidebar-unread-counts"] });
+    }, 800);
+
+    return () => clearTimeout(timeoutId);
+  }, [conversationId, user, messages, markAsRead, queryClient]);
+
   useEffect(() => {
     // Prevent re-initialization if it's the same client or if we're already initializing
     if (

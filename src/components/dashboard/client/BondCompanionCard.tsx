@@ -1,30 +1,24 @@
+import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Sparkles } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import AiSupervisedBadge from "@/components/ai/AiSupervisedBadge";
-import { useToast } from "@/hooks/ui/use-toast";
 import { useConnectedTherapists } from "@/hooks/api/useOptimizedTherapists";
 
 /**
  * "Bond — your AI companion" card. Mint surface (mint is reserved for AI), with
- * the AiSupervisedBadge showing the connected therapist's name. The CTA is a
- * placeholder until the Bond companion is wired.
+ * the AiSupervisedBadge showing the connected therapist's name. The CTA opens
+ * the Bond companion chat.
  */
 const BondCompanionCard = () => {
   const { t } = useTranslation();
-  const { toast } = useToast();
+  const navigate = useNavigate();
   const { data: therapists = [] } = useConnectedTherapists();
   const therapistName = therapists[0]?.name;
 
   const handleChat = () => {
-    toast({
-      title: t("bond_coming_soon_title", "Bond is coming soon"),
-      description: t(
-        "bond_coming_soon_body",
-        "Your supervised AI companion is on the way. You'll be able to chat with Bond here soon.",
-      ),
-    });
+    navigate("/dashboard/client/bond");
   };
 
   return (

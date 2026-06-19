@@ -29,6 +29,8 @@ export function NavMain({
     url: string
     icon?: React.ComponentType<{ className?: string }>
     isActive?: boolean
+    /** Mint "AI" treatment — reserved for Bond, the standout nav entry. */
+    ai?: boolean
     items?: {
       title: string
       url: string
@@ -51,12 +53,18 @@ export function NavMain({
           if (!hasSubItems) {
             return (
               <SidebarMenuItem key={item.title}>
-                <SidebarMenuButton 
+                <SidebarMenuButton
                   asChild
                   isActive={item.isActive}
                 >
                   <button onClick={() => navigate(item.url)}>
-                    {Icon && <Icon className="h-4 w-4" />}
+                    {Icon && (
+                      <Icon
+                        className={
+                          item.ai ? "h-4 w-4 text-mint" : "h-4 w-4"
+                        }
+                      />
+                    )}
                     <span>{item.title}</span>
                   </button>
                 </SidebarMenuButton>
