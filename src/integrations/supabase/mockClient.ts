@@ -228,9 +228,14 @@ function buildSeed(): Record<string, any[]> {
     updated_at: NOW_ISO,
   }));
 
+  // Stable ids for the two past (completed) sessions so post-session
+  // feedback rows can reference them.
+  const sessionLottePastId = genId();
+  const sessionThomasPastId = genId();
+
   const sessions = [
     {
-      id: genId(),
+      id: sessionLottePastId,
       client_id: CLIENT_ID,
       therapist_id: THERAPIST_ID,
       session_date: dayOffsetDate(-7),
@@ -241,6 +246,11 @@ function buildSeed(): Record<string, any[]> {
       duration_minutes: 60,
       location: 'Leuven office',
       notes: 'Reviewed sleep hygiene plan; good progress.',
+      // Therapist-authored summary, visible to both sides.
+      recap:
+        'We reviewed your sleep-hygiene plan and the wins from this week. ' +
+        'Next step: keep a consistent wind-down routine and we will look at ' +
+        'the thought-record technique together next time.',
       status: 'completed',
       waiting_for_response_from: null,
       // convenience aliases
@@ -251,7 +261,7 @@ function buildSeed(): Record<string, any[]> {
       updated_at: dayOffsetISO(-7),
     },
     {
-      id: genId(),
+      id: sessionThomasPastId,
       client_id: CLIENT_ID_3,
       therapist_id: THERAPIST_ID,
       session_date: dayOffsetDate(-3),
@@ -262,6 +272,7 @@ function buildSeed(): Record<string, any[]> {
       duration_minutes: 60,
       location: null,
       notes: 'Communication exercises assigned.',
+      recap: null,
       status: 'completed',
       waiting_for_response_from: null,
       title: 'Couples session — Thomas',
@@ -725,11 +736,47 @@ function buildSeed(): Record<string, any[]> {
     },
   ];
 
+  // Post-session working-alliance micro-checks left by clients.
+  const session_feedback = [
+    {
+      id: genId(),
+      session_id: sessionLottePastId,
+      client_id: CLIENT_ID,
+      alliance_rating: 5,
+      note: 'Felt really heard today — the sleep plan makes sense.',
+      created_at: dayOffsetISO(-7, '11:05:00'),
+    },
+    {
+      id: genId(),
+      session_id: sessionThomasPastId,
+      client_id: CLIENT_ID_3,
+      alliance_rating: 4,
+      note: 'Useful, though the exercises felt a little fast.',
+      created_at: dayOffsetISO(-3, '15:35:00'),
+    },
+  ];
+
+  // Between-session "I'm not okay this week" flags from client → therapist.
+  // One UNACKNOWLEDGED distress flag for Lotte so the therapist sees an alert.
+  const client_checkins = [
+    {
+      id: genId(),
+      client_id: CLIENT_ID,
+      therapist_id: THERAPIST_ID,
+      kind: 'distress',
+      note: "I'm having a really hard week and could use an earlier session.",
+      acknowledged_at: null,
+      created_at: dayOffsetISO(-1, '22:40:00'),
+    },
+  ];
+
   return {
     profiles,
     client_therapist_relationships,
     clients: [],
     sessions,
+    session_feedback,
+    client_checkins,
     tasks,
     conversations,
     messages,

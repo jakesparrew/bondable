@@ -1,7 +1,7 @@
 -- ============================================================================
 -- Bondable — initial database schema (Neon / PostgreSQL)
 -- ============================================================================
--- Builds the full Bondable physical schema (23 tables + 1 enum) on a fresh,
+-- Builds the full Bondable physical schema (25 tables + 1 enum) on a fresh,
 -- empty Neon `neondb` database. Paste-and-run from the Neon web SQL editor,
 -- top to bottom — no CLI, no npm required.
 --
@@ -214,6 +214,7 @@ CREATE TABLE IF NOT EXISTS "sessions" (
   "duration_minutes"            integer NOT NULL DEFAULT 60,
   "location"                    text,
   "notes"                       text,
+  "recap"                       text,
   "status"                      text NOT NULL DEFAULT 'scheduled',
   "waiting_for_response_from"   uuid,
   "created_at"                  timestamptz NOT NULL DEFAULT now(),
@@ -235,6 +236,27 @@ CREATE TABLE IF NOT EXISTS "tasks" (
   "denied_reason"  text,
   "created_at"     timestamptz DEFAULT now(),
   "updated_at"     timestamptz DEFAULT now()
+);
+
+-- session_feedback -----------------------------------------------------------
+CREATE TABLE IF NOT EXISTS "session_feedback" (
+  "id"               uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  "session_id"       uuid NOT NULL,
+  "client_id"        uuid NOT NULL,
+  "alliance_rating"  integer,
+  "note"             text,
+  "created_at"       timestamptz DEFAULT now()
+);
+
+-- client_checkins ------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS "client_checkins" (
+  "id"               uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  "client_id"        uuid NOT NULL,
+  "therapist_id"     uuid NOT NULL,
+  "kind"             text NOT NULL,
+  "note"             text,
+  "acknowledged_at"  timestamptz,
+  "created_at"       timestamptz DEFAULT now()
 );
 
 -- messaging_sessions ---------------------------------------------------------
@@ -446,6 +468,20 @@ ALTER TABLE "client_questionnaires"
 ALTER TABLE "questionnaire_responses"
   ADD CONSTRAINT "questionnaire_responses_client_questionnaire_id_fkey"
   FOREIGN KEY ("client_questionnaire_id") REFERENCES "client_questionnaires"("id") ON DELETE CASCADE;
+
+ALTER TABLE "session_feedback"
+  ADD CONSTRAINT "session_feedback_session_id_fkey"
+  FOREIGN KEY ("session_id") REFERENCES "sessions"("id") ON DELETE CASCADE;
+ALTER TABLE "session_feedback"
+  ADD CONSTRAINT "session_feedback_client_id_fkey"
+  FOREIGN KEY ("client_id") REFERENCES "profiles"("id") ON DELETE CASCADE;
+
+ALTER TABLE "client_checkins"
+  ADD CONSTRAINT "client_checkins_client_id_fkey"
+  FOREIGN KEY ("client_id") REFERENCES "profiles"("id") ON DELETE CASCADE;
+ALTER TABLE "client_checkins"
+  ADD CONSTRAINT "client_checkins_therapist_id_fkey"
+  FOREIGN KEY ("therapist_id") REFERENCES "profiles"("id") ON DELETE CASCADE;
 
 -- ----------------------------------------------------------------------------
 -- 5. Unique indexes (carried over from schema.ts table-level constraints)

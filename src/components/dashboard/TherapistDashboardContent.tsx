@@ -1,9 +1,11 @@
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import QuickActions from "@/components/dashboard/QuickActions";
 import ActiveClientsTable from "@/components/dashboard/ActiveClientsTable";
 import DashboardKpis from "@/components/dashboard/DashboardKpis";
 import ClinicalQueue from "@/components/dashboard/ClinicalQueue";
+import { CheckInAlerts } from "@/components/safety/BetweenSessionCheckIn";
 
 /**
  * Action-focused therapist dashboard main content. Rendered inside the shared
@@ -13,6 +15,7 @@ import ClinicalQueue from "@/components/dashboard/ClinicalQueue";
  */
 const TherapistDashboardContent = () => {
   const { t, i18n } = useTranslation();
+  const navigate = useNavigate();
   const today = new Date().toLocaleDateString(i18n.language || undefined, {
     weekday: "long",
     year: "numeric",
@@ -38,7 +41,13 @@ const TherapistDashboardContent = () => {
               <ActiveClientsTable />
               <DashboardKpis />
             </div>
-            <div className="lg:col-span-4">
+            <div className="space-y-6 lg:col-span-4">
+              {/* Unacknowledged client distress flags — surfaced in the
+                  clinical-queue column so nothing slips between sessions. */}
+              <CheckInAlerts
+                onMessage={() => navigate("/dashboard/therapist/messages")}
+                onView={() => navigate("/dashboard/therapist/clients")}
+              />
               <ClinicalQueue />
             </div>
           </div>

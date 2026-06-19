@@ -33,6 +33,10 @@ import { useAuthManager } from "@/hooks/api/useAuthManager";
 import { toast } from "sonner";
 import { useProfileAvatar } from "@/hooks/ui/useProfileAvatar";
 import { useTranslation } from "react-i18next";
+import PreSessionNudge from "@/components/sessions/PreSessionNudge";
+import SessionRecapCard from "@/components/sessions/SessionRecapCard";
+import PostSessionAllianceCheck from "@/components/sessions/PostSessionAllianceCheck";
+import { isSessionPast } from "@/components/sessions/sessionLoopUtils";
 
 // Separate component for session card to properly use hooks
 const SessionCard = ({ session, userType, onViewDetails, onConfirmSession, onCancelSession, onRequestUpdate }: { 
@@ -168,6 +172,32 @@ const SessionCard = ({ session, userType, onViewDetails, onConfirmSession, onCan
             <p className="text-muted-foreground text-sm mt-2">{session.notes}</p>
           )}
         </div>
+
+        {/* Session loop — pre-session nudge (upcoming) */}
+        {!isSessionPast(session) && session.status !== "Denied" && (
+          <div className="mt-3">
+            <PreSessionNudge session={session} canAddPrepNote={userType === "client"} />
+          </div>
+        )}
+
+        {/* Session loop — recap (therapist authors, both read) on past sessions */}
+        {isSessionPast(session) && (
+          <div className="mt-3">
+            <SessionRecapCard
+              sessionId={session.id}
+              recap={session.recap}
+              canEdit={userType === "therapist" && session.therapist_id === user?.id}
+              compact
+            />
+          </div>
+        )}
+
+        {/* Session loop — client alliance micro-check on past sessions */}
+        {isSessionPast(session) && userType === "client" && session.client_id === user?.id && (
+          <div className="mt-3 rounded-2xl border border-border bg-card p-3">
+            <PostSessionAllianceCheck sessionId={session.id} compact />
+          </div>
+        )}
 
         <div className="flex gap-2 mt-4">
           <Button

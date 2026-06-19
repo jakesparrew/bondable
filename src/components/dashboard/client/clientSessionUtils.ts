@@ -26,6 +26,18 @@ export const getNextSession = (sessions: Session[], now = Date.now()): Session |
   return [...live].sort((a, b) => sessionStart(a) - sessionStart(b))[0] ?? null;
 };
 
+/**
+ * Pick the most recent past/completed session for a client — the one whose
+ * recap (and alliance micro-check) is most relevant to surface on the dashboard.
+ */
+export const getLastSession = (sessions: Session[], now = Date.now()): Session | null => {
+  const past = sessions.filter(
+    (s) => s.status === "Completed" || (sessionStart(s) > 0 && sessionStart(s) < now),
+  );
+  if (past.length === 0) return null;
+  return [...past].sort((a, b) => sessionStart(b) - sessionStart(a))[0] ?? null;
+};
+
 /** Human-friendly date+time for a session, localized. */
 export const formatSessionDateTime = (s: Session, locale?: string): string => {
   const ts = sessionStart(s);

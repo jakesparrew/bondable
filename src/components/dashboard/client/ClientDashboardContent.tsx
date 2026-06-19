@@ -9,6 +9,7 @@ import NextSessionCard from "./NextSessionCard";
 import BondCompanionCard from "./BondCompanionCard";
 import RecentJournalCard from "./RecentJournalCard";
 import { CrisisHelpButton, CrisisResources } from "@/components/safety/CrisisResources";
+import { BetweenSessionCheckIn } from "@/components/safety/BetweenSessionCheckIn";
 
 interface ClientDashboardContentProps {
   /** Optional banner (e.g. IntakePendingBanner) rendered above the greeting. */
@@ -66,6 +67,12 @@ const ClientDashboardContent = ({ headerSlot }: ClientDashboardContentProps) => 
               <BondCompanionCard />
               <RecentJournalCard />
               <CrisisResources />
+              {/* Gentle between-session distress flag — sits with the calm
+                  safety surface; records a client_checkins 'distress' row and
+                  points to CrisisResources for true emergencies. */}
+              <div className="flex justify-center">
+                <BetweenSessionCheckIn className="w-full sm:w-auto" />
+              </div>
             </div>
           </div>
         </div>

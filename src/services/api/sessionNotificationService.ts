@@ -75,4 +75,43 @@ export const sessionNotificationService = {
       return false;
     }
   },
+
+  /**
+   * Pre-session nudge — a reminder fired ~24h before a confirmed session, with
+   * an optional prep note ("anything you'd like to focus on?"). In the dev mock
+   * this is a no-op/log (no live email backend); in production it would call the
+   * same edge-function transport as creation notifications. The reminder is
+   * surfaced in the UI regardless of send success, so the value is visible
+   * without a working mail server.
+   */
+  async sendPreSessionReminder(params: {
+    sessionId: string;
+    sessionDate: string;
+    sessionTime?: string;
+    prepNote?: string;
+  }): Promise<boolean> {
+    try {
+      console.log('🔔 Pre-session reminder scheduled (24h before):', {
+        sessionId: params.sessionId,
+        sessionDate: params.sessionDate,
+        sessionTime: params.sessionTime,
+        hasPrepNote: Boolean(params.prepNote?.trim()),
+      });
+
+      // Dev mock has no live mail backend — invoking the edge function is a
+      // best-effort no-op. We never fail the UI on a reminder.
+      try {
+        await supabase.functions.invoke('send-session-notification', {
+          body: { ...params, kind: 'pre_session_reminder' },
+        });
+      } catch {
+        /* no-op in explore mode */
+      }
+
+      return true;
+    } catch (error) {
+      console.error('❌ Error scheduling pre-session reminder:', error);
+      return false;
+    }
+  },
 };

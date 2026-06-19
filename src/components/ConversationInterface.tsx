@@ -1,4 +1,5 @@
 import { useRef, useEffect, useCallback } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   useOptimizedState,
   useOptimizedEffect,
@@ -20,6 +21,9 @@ import {
   X,
   ArrowLeft,
   ChevronDown,
+  Check,
+  CheckCheck,
+  Clock,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -58,7 +62,12 @@ import { enUS, fr } from "date-fns/locale";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Skeleton } from "./ui/skeleton";
-import { TooltipProvider } from "./ui/tooltip";
+import {
+  TooltipProvider,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "./ui/tooltip";
 import { useTranslation } from "react-i18next";
 import { ScrollToBottomButton } from "./ScrollToBottomButton";
 import { Capacitor } from "@capacitor/core";
@@ -86,6 +95,7 @@ const ConversationInterface = ({
   const { t, i18n } = useTranslation();
   const { user } = useAuthManager();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const isMobile = useIsMobile();
   const [isInputVisible, setIsInputVisible] = useOptimizedState(true);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -175,6 +185,7 @@ const ConversationInterface = ({
     sendMessage,
     sendFileMessages,
     sendVoiceMessage,
+    markAsRead,
   } = usePaginatedMessages({ conversationId: conversationId || undefined });
 
   // Get the selected client's avatar - ensure it resets when client changes
@@ -634,27 +645,79 @@ const fetchProfileData = async (userIds: string[]) => {
     return profiles[userId];
   };
 
+  // Read-receipt indicator for the current user's own messages.
+  // Derives state primarily from `read_at` (set when the recipient has opened
+  // the conversation), falling back to the legacy `status` field. Renders a
+  // subtle check / double-check with an accessible label + tooltip.
   const getStatusDisplay = (message: any, isCurrentUser: boolean) => {
     if (!isCurrentUser) return null;
 
-    const statusMap = {
-      sending: { text: t("message_status_sending"), color: "text-muted-foreground" },
-      sent: { text: t("message_status_sent"), color: "text-muted-foreground" },
-      delivered: {
-        text: t("message_status_delivered"),
-        color: "text-blue-400",
-      },
-      read: { text: t("message_status_read"), color: "text-foreground" },
-    };
-
-    const status =
-      statusMap[message.status as keyof typeof statusMap] || statusMap.sent;
-
+    // Optimistic / in-flight messages
+    if (message.status === "sending" || message.id?.startsWith?.("temp-")) {
+      const label = t("message_status_sending", "Sending");
       return (
-        <>
-          , <span className={`text-xs ${status.color}`}>{status.text}</span>
-        </>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <span
+              className="ml-1 inline-flex items-center text-muted-foreground"
+              role="img"
+              aria-label={label}
+            >
+              <Clock className="h-3 w-3" aria-hidden="true" />
+            </span>
+          </TooltipTrigger>
+          <TooltipContent side="top">{label}</TooltipContent>
+        </Tooltip>
       );
+    }
+
+    const isRead = !!message.read_at || message.status === "read";
+
+    if (isRead) {
+      const label = t("message_status_read", "Read");
+      return (
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <span
+              className="ml-1 inline-flex items-center gap-0.5 text-primary"
+              role="img"
+              aria-label={label}
+            >
+              <CheckCheck className="h-3.5 w-3.5" aria-hidden="true" />
+              <span className="text-[10px] font-medium leading-none">
+                {label}
+              </span>
+            </span>
+          </TooltipTrigger>
+          <TooltipContent side="top">{label}</TooltipContent>
+        </Tooltip>
+      );
+    }
+
+    // Delivered = double check (muted); Sent = single check (muted)
+    const delivered = message.status === "delivered";
+    const label = delivered
+      ? t("message_status_delivered", "Delivered")
+      : t("message_status_sent", "Sent");
+
+    return (
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <span
+            className="ml-1 inline-flex items-center text-muted-foreground"
+            role="img"
+            aria-label={label}
+          >
+            {delivered ? (
+              <CheckCheck className="h-3.5 w-3.5" aria-hidden="true" />
+            ) : (
+              <Check className="h-3.5 w-3.5" aria-hidden="true" />
+            )}
+          </span>
+        </TooltipTrigger>
+        <TooltipContent side="top">{label}</TooltipContent>
+      </Tooltip>
+    );
   };
 
   // Simplified logic to determine what to show for each message
@@ -888,7 +951,7 @@ const fetchProfileData = async (userIds: string[]) => {
                             : "justify-start"
                         }`}
                       >
-                        <span className="text-xs text-muted-foreground">
+                        <span className="inline-flex items-center text-xs text-muted-foreground">
                           {formatTime(message.created_at)}
                           {getStatusDisplay(message, isCurrentUser)}
                         </span>

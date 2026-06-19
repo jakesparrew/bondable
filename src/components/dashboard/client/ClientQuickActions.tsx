@@ -46,8 +46,11 @@ const ClientQuickActions = () => {
     }
     // Bond placeholder — AI companion not yet wired.
     toast({
-      title: t("cqa_talk_to_bond"),
-      description: t("cqa_bond_placeholder"),
+      title: t("bond_coming_soon_title", "Bond is coming soon"),
+      description: t(
+        "bond_coming_soon_body",
+        "Your supervised AI companion is on the way. You'll be able to chat with Bond here soon.",
+      ),
     });
   };
 

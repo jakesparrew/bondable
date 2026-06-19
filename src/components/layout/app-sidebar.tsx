@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { useOptimizedSidebar } from "@/hooks/api/useOptimizedSidebar";
+import { useOptimizedMessages } from "@/hooks/api/useOptimizedMessages";
 import { useAuthManager } from "@/hooks/api/useAuthManager";
 import { useTranslation } from "react-i18next";
 
@@ -31,6 +32,44 @@ export function AppSidebar({ userType, ...props }: AppSidebarProps) {
     sidebarData,
     userProfile,
   } = useOptimizedSidebar(userId, userType);
+
+  // Robust unread total for the Messages badge. We derive it from the
+  // conversations' unread_count_* fields (returned by getConversations) so the
+  // badge is accurate regardless of whether the unread-count RPC is available.
+  const messagesRole: "client" | "therapist" =
+    userType === "client" ? "client" : "therapist";
+  const { conversations, totalUnreadCount } = useOptimizedMessages(
+    userType === "admin" ? "" : userId,
+    messagesRole,
+    { enableRealtime: false }
+  );
+
+  const unreadMessageCount = React.useMemo(() => {
+    if (userType === "admin") return 0;
+    const key =
+      userType === "client"
+        ? "unread_count_client"
+        : "unread_count_therapist";
+    const fromConversations = (conversations || []).reduce(
+      (sum: number, conv: any) => sum + (Number(conv?.[key]) || 0),
+      0
+    );
+    // Prefer the conversation-derived count; fall back to the hook's RPC total.
+    return fromConversations || totalUnreadCount || 0;
+  }, [conversations, totalUnreadCount, userType]);
+
+  // Inject the derived unread count into the Messages quick-access item so the
+  // badge stays in sync even when the unread-count RPC is unavailable.
+  const projectsWithBadge = React.useMemo(() => {
+    return sidebarData.projects.map((project) => {
+      const isMessages = project.url.endsWith("/messages");
+      if (!isMessages) return project;
+      return {
+        ...project,
+        badge: unreadMessageCount > 0 ? String(unreadMessageCount) : undefined,
+      };
+    });
+  }, [sidebarData.projects, unreadMessageCount]);
 
   // Show loading state while user profile is being fetched
   if (!userProfile && userId) {
@@ -99,7 +138,7 @@ export function AppSidebar({ userType, ...props }: AppSidebarProps) {
       
       <SidebarContent className="bg-sidebar">
         <NavMain items={sidebarData.navMain} />
-        <NavProjects projects={sidebarData.projects} />
+        <NavProjects projects={projectsWithBadge} />
         <NavSecondary items={sidebarData.navSecondary} className="mt-auto" />
       </SidebarContent>
 

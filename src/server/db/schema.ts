@@ -305,6 +305,9 @@ export const sessions = pgTable('sessions', {
   durationMinutes: integer('duration_minutes').notNull().default(60),
   location: text('location'),
   notes: text('notes'),
+  // Therapist-authored post-session summary, visible to both client and
+  // therapist (the "recap" / shared session note). Nullable until written.
+  recap: text('recap'),
   // History: CHECK IN ('client_requested','therapist_confirmed',
   // 'therapist_requested_update','client_confirmed_update','denied','completed').
   // Reconstruction collapsed to DEFAULT 'scheduled'. The app's request/approve
@@ -338,6 +341,37 @@ export const tasks = pgTable('tasks', {
   deniedReason: text('denied_reason'),
   createdAt: timestamp('created_at', tz).defaultNow(),
   updatedAt: timestamp('updated_at', tz).defaultNow(),
+});
+
+/* -------------------------------------------------------------------------- */
+/* session_feedback (post-session alliance micro-check)                        */
+/* -------------------------------------------------------------------------- */
+
+export const sessionFeedback = pgTable('session_feedback', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  sessionId: uuid('session_id').notNull().references(() => sessions.id, { onDelete: 'cascade' }),
+  clientId: uuid('client_id').notNull().references(() => profiles.id, { onDelete: 'cascade' }),
+  // 1–5 working-alliance rating. CHECK (alliance_rating BETWEEN 1 AND 5) is
+  // enforced at the API layer, mirroring the file's "no CHECK here" convention.
+  allianceRating: integer('alliance_rating'),
+  note: text('note'),
+  createdAt: timestamp('created_at', tz).defaultNow(),
+});
+
+/* -------------------------------------------------------------------------- */
+/* client_checkins (between-session "I'm not okay this week" flag)             */
+/* -------------------------------------------------------------------------- */
+
+export const clientCheckins = pgTable('client_checkins', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  clientId: uuid('client_id').notNull().references(() => profiles.id, { onDelete: 'cascade' }),
+  therapistId: uuid('therapist_id').notNull().references(() => profiles.id, { onDelete: 'cascade' }),
+  // e.g. 'distress' | 'checkin'. CHECK enforced at the API layer.
+  kind: text('kind').notNull(),
+  note: text('note'),
+  // Set when the therapist acknowledges the flag; null = still needs attention.
+  acknowledgedAt: timestamp('acknowledged_at', tz),
+  createdAt: timestamp('created_at', tz).defaultNow(),
 });
 
 /* -------------------------------------------------------------------------- */
@@ -511,6 +545,9 @@ export const profilesRelations = relations(profiles, ({ many, one }) => ({
   conversationsAsTherapist: many(conversations, { relationName: 'conv_therapist' }),
   sessionsAsClient: many(sessions, { relationName: 'sess_client' }),
   sessionsAsTherapist: many(sessions, { relationName: 'sess_therapist' }),
+  sessionFeedback: many(sessionFeedback, { relationName: 'sf_client' }),
+  checkinsAsClient: many(clientCheckins, { relationName: 'cc_client' }),
+  checkinsAsTherapist: many(clientCheckins, { relationName: 'cc_therapist' }),
   tasksAsClient: many(tasks, { relationName: 'task_client' }),
   tasksAsTherapist: many(tasks, { relationName: 'task_therapist' }),
   messagesSent: many(messages, { relationName: 'msg_sender' }),
@@ -612,7 +649,7 @@ export const notificationsRelations = relations(notifications, ({ one }) => ({
   }),
 }));
 
-export const sessionsRelations = relations(sessions, ({ one }) => ({
+export const sessionsRelations = relations(sessions, ({ one, many }) => ({
   client: one(profiles, {
     fields: [sessions.clientId],
     references: [profiles.id],
@@ -622,6 +659,32 @@ export const sessionsRelations = relations(sessions, ({ one }) => ({
     fields: [sessions.therapistId],
     references: [profiles.id],
     relationName: 'sess_therapist',
+  }),
+  feedback: many(sessionFeedback),
+}));
+
+export const sessionFeedbackRelations = relations(sessionFeedback, ({ one }) => ({
+  session: one(sessions, {
+    fields: [sessionFeedback.sessionId],
+    references: [sessions.id],
+  }),
+  client: one(profiles, {
+    fields: [sessionFeedback.clientId],
+    references: [profiles.id],
+    relationName: 'sf_client',
+  }),
+}));
+
+export const clientCheckinsRelations = relations(clientCheckins, ({ one }) => ({
+  client: one(profiles, {
+    fields: [clientCheckins.clientId],
+    references: [profiles.id],
+    relationName: 'cc_client',
+  }),
+  therapist: one(profiles, {
+    fields: [clientCheckins.therapistId],
+    references: [profiles.id],
+    relationName: 'cc_therapist',
   }),
 }));
 
@@ -697,6 +760,10 @@ export type JournalEntry = typeof journalEntries.$inferSelect;
 export type LocalDocument = typeof localDocuments.$inferSelect;
 export type Notification = typeof notifications.$inferSelect;
 export type Session = typeof sessions.$inferSelect;
+export type SessionFeedback = typeof sessionFeedback.$inferSelect;
+export type NewSessionFeedback = typeof sessionFeedback.$inferInsert;
+export type ClientCheckin = typeof clientCheckins.$inferSelect;
+export type NewClientCheckin = typeof clientCheckins.$inferInsert;
 export type Task = typeof tasks.$inferSelect;
 export type MessagingSession = typeof messagingSessions.$inferSelect;
 export type UserDevice = typeof userDevices.$inferSelect;

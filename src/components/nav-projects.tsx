@@ -16,6 +16,7 @@ import {
   SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuAction,
+  SidebarMenuBadge,
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
@@ -29,7 +30,8 @@ export function NavProjects({
     url: string;
     icon: React.ComponentType<{ className?: string }>;
     hasOptions?: boolean;
-    disabled?: boolean; 
+    disabled?: boolean;
+    badge?: string;
   }[];
 }) {
   const { isMobile } = useSidebar();
@@ -58,6 +60,19 @@ export function NavProjects({
                   <span>{item.name}</span>
                 </button>
               </SidebarMenuButton>
+              {item.badge && !item.disabled && (
+                <SidebarMenuBadge className="pointer-events-none">
+                  <span
+                    className="flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold leading-none text-primary-foreground"
+                    aria-label={t("unread_messages_count", {
+                      count: Number(item.badge),
+                      defaultValue: "{{count}} unread",
+                    })}
+                  >
+                    {item.badge}
+                  </span>
+                </SidebarMenuBadge>
+              )}
               {item.hasOptions && (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>

@@ -60,6 +60,8 @@ export interface Session {
   location?: string;
   status: 'Pending' | 'Confirmed' | 'Completed' | 'Cancelled' | 'No Show' | 'Denied';
   notes?: string;
+  /** Therapist-authored post-session summary, shared with the client. */
+  recap?: string | null;
   current_requester_id?: string;
   created_at: string;
   updated_at: string;

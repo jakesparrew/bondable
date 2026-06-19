@@ -254,6 +254,7 @@ export const CrisisHelpButton = ({
           aria-label={t("crisis.button_aria", "Open crisis support resources")}
           className={cn(
             "gap-2 rounded-full border-accent text-primary hover:bg-accent hover:text-accent-foreground",
+            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
             className,
           )}
         >
