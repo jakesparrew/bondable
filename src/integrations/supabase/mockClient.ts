@@ -25,6 +25,14 @@ const CLIENT_ID_4 = '00000000-0000-0000-0000-000000000004';
 const CLIENT_ID_5 = '00000000-0000-0000-0000-000000000005';
 const CLIENT_ID_6 = '00000000-0000-0000-0000-000000000006';
 
+// Finder marketplace: extra public providers (profiles with role 'therapist'),
+// a mix of regulated clinicians (is_regulated true) and coaches (false).
+const PROVIDER_ID_1 = '00000000-0000-0000-0000-000000000101';
+const PROVIDER_ID_2 = '00000000-0000-0000-0000-000000000102';
+const PROVIDER_ID_3 = '00000000-0000-0000-0000-000000000103';
+const PROVIDER_ID_4 = '00000000-0000-0000-0000-000000000104';
+const PROVIDER_ID_5 = '00000000-0000-0000-0000-000000000105';
+
 const THERAPIST_EMAIL = 'dev-therapist@bondable.local';
 
 // Fixed "today" so seeded sessions/tasks land in a stable past/present/future.
@@ -108,6 +116,8 @@ function buildSeed(): Record<string, any[]> {
       emergency_contact_phone: null,
       emergency_contact_relationship: null,
       invite_code: 'DEVTHER',
+      // Regulated clinician — appears in the Finder as a regulated provider.
+      is_regulated: true,
       weekly_availability: null,
       // convenience alias some screens may read
       status: 'active',
@@ -212,6 +222,93 @@ function buildSeed(): Record<string, any[]> {
       weekly_availability: null,
       status: 'active',
       created_at: dayOffsetISO(-30),
+      updated_at: NOW_ISO,
+    },
+
+    /* --- Finder marketplace providers (public directory) -------------------- */
+    {
+      id: PROVIDER_ID_1,
+      first_name: 'Marieke',
+      last_name: 'Claes',
+      email: 'marieke.claes@bondable.local',
+      role: 'therapist',
+      avatar_url: null,
+      phone: '+32 476 10 10 10',
+      address: 'Bondgenotenlaan 1, 3000 Leuven',
+      // Regulated clinical psychologist.
+      is_regulated: true,
+      invite_code: null,
+      weekly_availability: null,
+      status: 'active',
+      created_at: dayOffsetISO(-200),
+      updated_at: NOW_ISO,
+    },
+    {
+      id: PROVIDER_ID_2,
+      first_name: 'Youssef',
+      last_name: 'El Amrani',
+      email: 'youssef.elamrani@bondable.local',
+      role: 'therapist',
+      avatar_url: null,
+      phone: '+32 477 20 20 20',
+      address: 'Korenmarkt 8, 9000 Gent',
+      // Regulated psychotherapist.
+      is_regulated: true,
+      invite_code: null,
+      weekly_availability: null,
+      status: 'active',
+      created_at: dayOffsetISO(-160),
+      updated_at: NOW_ISO,
+    },
+    {
+      id: PROVIDER_ID_3,
+      first_name: 'Sanne',
+      last_name: 'Hendrickx',
+      email: 'sanne.hendrickx@bondable.local',
+      role: 'therapist',
+      avatar_url: null,
+      phone: '+32 478 30 30 30',
+      address: 'Meir 50, 2000 Antwerpen',
+      // Coach (NOT a regulated clinician).
+      is_regulated: false,
+      invite_code: null,
+      weekly_availability: null,
+      status: 'active',
+      created_at: dayOffsetISO(-140),
+      updated_at: NOW_ISO,
+    },
+    {
+      id: PROVIDER_ID_4,
+      first_name: 'Lucas',
+      last_name: 'Maes',
+      email: 'lucas.maes@bondable.local',
+      role: 'therapist',
+      avatar_url: null,
+      phone: '+32 479 40 40 40',
+      address: 'Rue de la Loi 100, 1000 Brussel',
+      // Coach (NOT a regulated clinician).
+      is_regulated: false,
+      invite_code: null,
+      weekly_availability: null,
+      status: 'active',
+      created_at: dayOffsetISO(-110),
+      updated_at: NOW_ISO,
+    },
+    {
+      id: PROVIDER_ID_5,
+      first_name: 'Fatima',
+      last_name: 'Ben Salah',
+      email: 'fatima.bensalah@bondable.local',
+      role: 'therapist',
+      avatar_url: null,
+      phone: '+32 470 50 50 50',
+      address: 'Vrijdagmarkt 12, 9000 Gent',
+      // Regulated clinical psychologist.
+      is_regulated: true,
+      invite_code: null,
+      weekly_availability: null,
+      status: 'active',
+      created_at: dayOffsetISO(-95),
       updated_at: NOW_ISO,
     },
   ];
@@ -770,6 +867,185 @@ function buildSeed(): Record<string, any[]> {
     },
   ];
 
+  // Finder marketplace: one provider_profiles row per public provider. These
+  // mirror src/server/db/schema.ts (snake_case). The existing dev therapist
+  // (THERAPIST_ID, regulated) is included alongside the 5 new providers, for a
+  // varied directory across specializations / languages / cities / modalities.
+  // NB: hourly_rate is shown for transparency only — never a ranking input.
+  const provider_profiles = [
+    {
+      provider_id: THERAPIST_ID,
+      headline: 'Klinisch psycholoog — angst, burn-out & stress',
+      bio: 'Ik help volwassenen die vastlopen door piekeren, stress of een burn-out om opnieuw grip te krijgen. Warme, praktische aanpak.',
+      specializations: ['anxiety', 'burnout', 'depression'],
+      languages: ['nl', 'en'],
+      modalities: ['in_person', 'online'],
+      approach: 'Cognitieve gedragstherapie (CGT) met aandacht voor leefstijl en herstel.',
+      hourly_rate: 75,
+      city: 'Leuven',
+      country: 'BE',
+      accepting_new_clients: true,
+      credentials: 'Master klinische psychologie (KU Leuven), erkend psycholoog',
+      years_experience: 12,
+      photo_url: null,
+      rating: 4.8,
+      review_count: 41,
+      is_published: true,
+      created_at: dayOffsetISO(-180),
+      updated_at: NOW_ISO,
+    },
+    {
+      provider_id: PROVIDER_ID_1,
+      headline: 'Klinisch psycholoog — koppels & relaties',
+      bio: 'Samen aan jullie relatie werken: communicatie, vertrouwen en verbinding herstellen in een veilige setting.',
+      specializations: ['couples', 'anxiety'],
+      languages: ['nl', 'fr', 'en'],
+      modalities: ['in_person', 'online'],
+      approach: 'Emotionally Focused Therapy (EFT) voor koppels.',
+      hourly_rate: 90,
+      city: 'Leuven',
+      country: 'BE',
+      accepting_new_clients: true,
+      credentials: 'Master klinische psychologie, EFT-gecertificeerd',
+      years_experience: 15,
+      photo_url: null,
+      rating: 4.9,
+      review_count: 58,
+      is_published: true,
+      created_at: dayOffsetISO(-200),
+      updated_at: NOW_ISO,
+    },
+    {
+      provider_id: PROVIDER_ID_2,
+      headline: 'Psychotherapeut — trauma & rouw',
+      bio: 'Gespecialiseerd in traumaverwerking en rouw. Ik werk op jouw tempo, met respect voor je verhaal.',
+      specializations: ['trauma', 'grief', 'depression'],
+      languages: ['nl', 'fr', 'en'],
+      modalities: ['in_person', 'online'],
+      approach: 'EMDR en schematherapie.',
+      hourly_rate: 80,
+      city: 'Gent',
+      country: 'BE',
+      accepting_new_clients: false,
+      credentials: 'Erkend psychotherapeut, EMDR-practitioner',
+      years_experience: 10,
+      photo_url: null,
+      rating: 4.7,
+      review_count: 33,
+      is_published: true,
+      created_at: dayOffsetISO(-160),
+      updated_at: NOW_ISO,
+    },
+    {
+      provider_id: PROVIDER_ID_3,
+      headline: 'Stress- & burn-outcoach',
+      bio: 'Praktische coaching om uit de overlevingsstand te komen: energie, grenzen en focus terugvinden.',
+      specializations: ['burnout', 'stress', 'adhd'],
+      languages: ['nl', 'en'],
+      modalities: ['online'],
+      approach: 'Oplossingsgerichte coaching en ACT-technieken.',
+      hourly_rate: 65,
+      city: 'Antwerpen',
+      country: 'BE',
+      accepting_new_clients: true,
+      credentials: 'Gecertificeerd loopbaan- & stresscoach (geen klinische erkenning)',
+      years_experience: 6,
+      photo_url: null,
+      rating: 4.6,
+      review_count: 22,
+      is_published: true,
+      created_at: dayOffsetISO(-140),
+      updated_at: NOW_ISO,
+    },
+    {
+      provider_id: PROVIDER_ID_4,
+      headline: 'Life- & loopbaancoach',
+      bio: 'Voor wie keuzes wil maken met meer rust en richting. Heldere doelen, haalbare stappen.',
+      specializations: ['stress', 'burnout'],
+      languages: ['fr', 'en'],
+      modalities: ['in_person', 'online'],
+      approach: 'Oplossingsgerichte gesprekken en doelgericht plannen.',
+      hourly_rate: 70,
+      city: 'Brussel',
+      country: 'BE',
+      accepting_new_clients: true,
+      credentials: 'ICF-gecertificeerd coach (geen klinische erkenning)',
+      years_experience: 8,
+      photo_url: null,
+      rating: 4.5,
+      review_count: 17,
+      is_published: true,
+      created_at: dayOffsetISO(-110),
+      updated_at: NOW_ISO,
+    },
+    {
+      provider_id: PROVIDER_ID_5,
+      headline: 'Klinisch psycholoog — ADHD & depressie',
+      bio: 'Ondersteuning bij ADHD, somberheid en zelfbeeld, voor jongvolwassenen en volwassenen.',
+      specializations: ['adhd', 'depression', 'anxiety'],
+      languages: ['nl', 'fr', 'en'],
+      modalities: ['in_person', 'online'],
+      approach: 'Cognitieve gedragstherapie en psycho-educatie.',
+      hourly_rate: 78,
+      city: 'Gent',
+      country: 'BE',
+      accepting_new_clients: true,
+      credentials: 'Master klinische psychologie (UGent), erkend psycholoog',
+      years_experience: 9,
+      photo_url: null,
+      rating: 4.8,
+      review_count: 29,
+      is_published: true,
+      created_at: dayOffsetISO(-95),
+      updated_at: NOW_ISO,
+    },
+  ];
+
+  // Finder leads. Two PENDING for the dev therapist (THERAPIST_ID) so the
+  // lead inbox is non-empty; one already-accepted on another provider.
+  // The first lead is a brand-new visitor (client_id null).
+  const provider_requests = [
+    {
+      id: genId(),
+      provider_id: THERAPIST_ID,
+      client_id: null,
+      client_name: 'Nora Willems',
+      client_email: 'nora.willems@example.com',
+      topic: 'burnout',
+      message: 'Ik zit al maanden tegen een burn-out aan en wil graag starten. Werkt online voor mij.',
+      preferred_modality: 'online',
+      status: 'pending',
+      created_at: dayOffsetISO(-2, '10:15:00'),
+      responded_at: null,
+    },
+    {
+      id: genId(),
+      provider_id: THERAPIST_ID,
+      client_id: CLIENT_ID_4,
+      client_name: 'Amélie Dubois',
+      client_email: 'amelie.dubois@bondable.local',
+      topic: 'anxiety',
+      message: 'Ik heb veel last van angst en zou graag een afspraak inplannen.',
+      preferred_modality: 'in_person',
+      status: 'pending',
+      created_at: dayOffsetISO(-1, '14:40:00'),
+      responded_at: null,
+    },
+    {
+      id: genId(),
+      provider_id: PROVIDER_ID_1,
+      client_id: null,
+      client_name: 'Tom Verbeke',
+      client_email: 'tom.verbeke@example.com',
+      topic: 'couples',
+      message: 'Mijn partner en ik zoeken relatietherapie, het liefst in het Nederlands.',
+      preferred_modality: 'in_person',
+      status: 'accepted',
+      created_at: dayOffsetISO(-6, '09:05:00'),
+      responded_at: dayOffsetISO(-5, '11:20:00'),
+    },
+  ];
+
   return {
     profiles,
     client_therapist_relationships,
@@ -782,6 +1058,8 @@ function buildSeed(): Record<string, any[]> {
     messages,
     journal_entries,
     notifications,
+    provider_profiles,
+    provider_requests,
     // Everything else: empty arrays.
     message_attachments: [],
     external_messages: [],
@@ -1091,6 +1369,24 @@ class MockQueryBuilder {
           enriched.client = client;
           enriched.profiles = client;
           enriched.client_profile = client;
+        }
+        break;
+      }
+      case 'provider_profiles': {
+        // Finder: attach the backing profile (name / photo / is_regulated).
+        if ('provider_id' in row) {
+          const profile = profileById(row.provider_id);
+          enriched.profile = profile;
+          enriched.profiles = profile;
+        }
+        break;
+      }
+      case 'provider_requests': {
+        if ('provider_id' in row) {
+          enriched.provider = profileById(row.provider_id);
+        }
+        if ('client_id' in row) {
+          enriched.client = profileById(row.client_id);
         }
         break;
       }

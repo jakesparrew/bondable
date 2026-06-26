@@ -5,6 +5,7 @@ import QuickActions from "@/components/dashboard/QuickActions";
 import ActiveClientsTable from "@/components/dashboard/ActiveClientsTable";
 import DashboardKpis from "@/components/dashboard/DashboardKpis";
 import ClinicalQueue from "@/components/dashboard/ClinicalQueue";
+import ProviderLeads from "@/components/dashboard/therapist/ProviderLeads";
 import { CheckInAlerts } from "@/components/safety/BetweenSessionCheckIn";
 
 /**
@@ -42,6 +43,10 @@ const TherapistDashboardContent = () => {
               <DashboardKpis />
             </div>
             <div className="space-y-6 lg:col-span-4">
+              {/* Incoming Finder leads — new client requests routed to this
+                  provider. Accept = "client connected"; referral-neutral
+                  (newest-first, never payment-prioritised). */}
+              <ProviderLeads limit={4} />
               {/* Unacknowledged client distress flags — surfaced in the
                   clinical-queue column so nothing slips between sessions. */}
               <CheckInAlerts

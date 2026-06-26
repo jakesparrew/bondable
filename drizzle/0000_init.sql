@@ -259,6 +259,49 @@ CREATE TABLE IF NOT EXISTS "client_checkins" (
   "created_at"       timestamptz DEFAULT now()
 );
 
+-- provider_profiles (Finder marketplace — public provider directory) ----------
+-- provider_id is BOTH the PK and the FK to profiles.id (1:1 with a profile).
+-- regulated-clinician-vs-coach is read from profiles.is_regulated, not stored
+-- here. hourly_rate is shown for transparency but is NEVER a ranking input.
+CREATE TABLE IF NOT EXISTS "provider_profiles" (
+  "provider_id"            uuid PRIMARY KEY,
+  "headline"               text,
+  "bio"                    text,
+  "specializations"        jsonb,
+  "languages"              jsonb,
+  "modalities"             jsonb,
+  "approach"               text,
+  "hourly_rate"            integer,
+  "city"                   text,
+  "country"                text DEFAULT 'BE',
+  "accepting_new_clients"  boolean NOT NULL DEFAULT true,
+  "credentials"            text,
+  "years_experience"       integer,
+  "photo_url"              text,
+  "rating"                 numeric,
+  "review_count"           integer,
+  "is_published"           boolean NOT NULL DEFAULT true,
+  "created_at"             timestamptz NOT NULL DEFAULT now(),
+  "updated_at"             timestamptz NOT NULL DEFAULT now()
+);
+
+-- provider_requests (Finder leads — client → provider contact requests) -------
+-- client_id is nullable: a brand-new visitor leaves name/email and client_id
+-- stays null until/if they register as a Bondable user.
+CREATE TABLE IF NOT EXISTS "provider_requests" (
+  "id"                  uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  "provider_id"         uuid NOT NULL,
+  "client_id"           uuid,
+  "client_name"         text,
+  "client_email"        text,
+  "topic"               text,
+  "message"             text,
+  "preferred_modality"  text,
+  "status"              text NOT NULL DEFAULT 'pending',
+  "created_at"          timestamptz NOT NULL DEFAULT now(),
+  "responded_at"        timestamptz
+);
+
 -- messaging_sessions ---------------------------------------------------------
 CREATE TABLE IF NOT EXISTS "messaging_sessions" (
   "id"               uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -483,6 +526,17 @@ ALTER TABLE "client_checkins"
   ADD CONSTRAINT "client_checkins_therapist_id_fkey"
   FOREIGN KEY ("therapist_id") REFERENCES "profiles"("id") ON DELETE CASCADE;
 
+ALTER TABLE "provider_profiles"
+  ADD CONSTRAINT "provider_profiles_provider_id_fkey"
+  FOREIGN KEY ("provider_id") REFERENCES "profiles"("id") ON DELETE CASCADE;
+
+ALTER TABLE "provider_requests"
+  ADD CONSTRAINT "provider_requests_provider_id_fkey"
+  FOREIGN KEY ("provider_id") REFERENCES "profiles"("id") ON DELETE CASCADE;
+ALTER TABLE "provider_requests"
+  ADD CONSTRAINT "provider_requests_client_id_fkey"
+  FOREIGN KEY ("client_id") REFERENCES "profiles"("id") ON DELETE SET NULL;
+
 -- ----------------------------------------------------------------------------
 -- 5. Unique indexes (carried over from schema.ts table-level constraints)
 -- ----------------------------------------------------------------------------
@@ -506,6 +560,12 @@ CREATE INDEX IF NOT EXISTS "idx_profiles_invite_code"
   ON "profiles" ("invite_code") WHERE "invite_code" IS NOT NULL;
 CREATE INDEX IF NOT EXISTS "idx_notifications_user_unread"
   ON "notifications" ("user_id") WHERE "is_read" = false;
+
+-- Finder: list only published providers; surface a provider's pending leads.
+CREATE INDEX IF NOT EXISTS "idx_provider_profiles_published"
+  ON "provider_profiles" ("is_published") WHERE "is_published" = true;
+CREATE INDEX IF NOT EXISTS "idx_provider_requests_provider"
+  ON "provider_requests" ("provider_id");
 
 -- ============================================================================
 -- End of 0000_init.sql — Bondable schema build complete.

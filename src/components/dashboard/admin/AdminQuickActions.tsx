@@ -1,6 +1,16 @@
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Bell, KeyRound, ShieldCheck, Settings, Sparkles, type LucideIcon } from "lucide-react";
+import {
+  Bell,
+  KeyRound,
+  ShieldCheck,
+  Settings,
+  Sparkles,
+  MessagesSquare,
+  UsersRound,
+  HeartHandshake,
+  type LucideIcon,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface AdminAction {
@@ -14,6 +24,27 @@ interface AdminAction {
 }
 
 const ACTIONS: AdminAction[] = [
+  {
+    id: "chats",
+    labelKey: "admin_qa_chats",
+    label: "All chats",
+    icon: MessagesSquare,
+    to: "/dashboard/admin/chats",
+  },
+  {
+    id: "clients",
+    labelKey: "admin_qa_clients",
+    label: "Clients",
+    icon: UsersRound,
+    to: "/dashboard/admin/clients",
+  },
+  {
+    id: "providers",
+    labelKey: "admin_qa_providers",
+    label: "Coaches & therapists",
+    icon: HeartHandshake,
+    to: "/dashboard/admin/providers",
+  },
   {
     id: "notifications",
     labelKey: "admin_qa_notification_settings",

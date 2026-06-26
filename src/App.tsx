@@ -29,6 +29,7 @@ import {
 } from "@/components/layout/skeletons";
 
 // Lazy load all page components for code splitting
+const Home = lazy(() => import("./pages/Home"));
 const Login = lazy(() => import("./pages/Login"));
 const SetupPassword = lazy(() => import("./pages/SetupPassword"));
 const TherapistDashboard = lazy(() => import("./pages/TherapistDashboard"));
@@ -52,10 +53,20 @@ const AdminNotificationSettingsPage = lazy(() => import("./pages/AdminNotificati
 const AdminAPISettingsPage = lazy(() => import("./pages/AdminAPISettings"));
 const AdminSettings = lazy(() => import("./pages/AdminSettings"));
 const AdminProfile = lazy(() => import("./pages/AdminProfile"));
+// Superadmin management surfaces (all chats, clients, coaches/therapists)
+const AdminAllChats = lazy(() => import("./pages/AdminAllChats"));
+const AdminClients = lazy(() => import("./pages/AdminClients"));
+const AdminProviders = lazy(() => import("./pages/AdminProviders"));
 const IntakeTemplates = lazy(() => import("@/pages/IntakeTemplates"));
 const IntakeTemplateBuilder = lazy(() => import("@/pages/IntakeTemplateBuilder"));
 const ClientIntake = lazy(() => import("@/pages/ClientIntake"));
 const BondChatPage = lazy(() => import("@/pages/BondChat"));
+// Public Finder marketplace (NOT behind RouteProtection — visitors can browse)
+const Find = lazy(() => import("@/pages/Find"));
+const FindMatch = lazy(() => import("@/pages/FindMatch"));
+const ProviderProfilePublic = lazy(() => import("@/pages/ProviderProfilePublic"));
+// Therapist-only: edit the provider's own public Finder profile (protected).
+const ProviderPublicProfileEdit = lazy(() => import("@/pages/ProviderPublicProfileEdit"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 
@@ -138,9 +149,12 @@ const App = () => {
                   <BrowserRouter>
                     <Suspense fallback={<RouteSkeleton />}>
                   <Routes>
+                {/* Public homepage (front door) - no protection needed */}
+                <Route path="/" element={<Home />} />
+
                 {/* Login route - no protection needed */}
-                <Route path="/" element={<Login />} />
-                
+                <Route path="/login" element={<Login />} />
+
                 {/* Setup Password route - no protection needed */}
                 <Route path="/setup-password" element={<SetupPassword />} />
                 
@@ -200,6 +214,15 @@ const App = () => {
                   element={
                     <RouteProtection requiredUserType="therapist">
                       <IntakeTemplateBuilder />
+                    </RouteProtection>
+                  }
+                />
+                {/* Therapist's own editable public Finder profile */}
+                <Route
+                  path="/dashboard/therapist/public-profile"
+                  element={
+                    <RouteProtection requiredUserType="therapist">
+                      <ProviderPublicProfileEdit />
                     </RouteProtection>
                   }
                 />
@@ -312,8 +335,32 @@ const App = () => {
                   } 
                 />
                 {/* Admin specific routes */}
-                <Route 
-                  path="/dashboard/admin/settings" 
+                <Route
+                  path="/dashboard/admin/chats"
+                  element={
+                    <RouteProtection requiredUserType="admin" isAdminRoute={true}>
+                      <AdminAllChats />
+                    </RouteProtection>
+                  }
+                />
+                <Route
+                  path="/dashboard/admin/clients"
+                  element={
+                    <RouteProtection requiredUserType="admin" isAdminRoute={true}>
+                      <AdminClients />
+                    </RouteProtection>
+                  }
+                />
+                <Route
+                  path="/dashboard/admin/providers"
+                  element={
+                    <RouteProtection requiredUserType="admin" isAdminRoute={true}>
+                      <AdminProviders />
+                    </RouteProtection>
+                  }
+                />
+                <Route
+                  path="/dashboard/admin/settings"
                   element={
                     <RouteProtection requiredUserType="admin" isAdminRoute={true}>
                       <AdminSettings />
@@ -353,6 +400,13 @@ const App = () => {
                   } 
                 />
                 
+                {/* Public Finder marketplace — no RouteProtection so
+                    prospective clients can browse without an account.
+                    Order matters: /find/match before /find/:providerId. */}
+                <Route path="/find" element={<Find />} />
+                <Route path="/find/match" element={<FindMatch />} />
+                <Route path="/find/:providerId" element={<ProviderProfilePublic />} />
+
                 <Route path="*" element={<NotFound />} />
               </Routes>
                   </Suspense>

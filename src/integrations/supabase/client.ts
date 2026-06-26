@@ -31,14 +31,18 @@ const realSupabase = createClient<Database>(
 );
 
 /**
- * DEV-ONLY explore mode: when running `vite` dev (import.meta.env.DEV) AND
- * VITE_DEV_BYPASS_AUTH is set, use the in-memory mock backend (seeded demo data)
- * so the whole app is explorable without a live database. In production builds
- * import.meta.env.DEV is false, so the real client is always used.
+ * DEV / DEMO explore mode: use the in-memory mock backend (seeded demo data) so
+ * the whole app is explorable without a live database. Active whenever we're in
+ * `vite` dev (import.meta.env.DEV) OR a shareable demo build (VITE_DEMO_MODE).
+ *
+ * NOTE: this is intentionally INDEPENDENT of the login-role bypass. The homepage
+ * now lets you enter as therapist/client/admin at runtime, so the mock must stay
+ * on for the whole dev/demo session regardless of which role (if any) is active.
+ * In a real production build both flags are false, so the real client is used.
  */
 const _env = (import.meta as { env: Record<string, string | undefined> }).env;
 const USE_MOCK_BACKEND =
-  (import.meta.env.DEV && !!_env.VITE_DEV_BYPASS_AUTH) ||
+  import.meta.env.DEV ||
   String(_env.VITE_DEMO_MODE ?? '').toLowerCase() === 'true';
 
 export const supabase = (USE_MOCK_BACKEND ? mockSupabase : realSupabase) as typeof realSupabase;

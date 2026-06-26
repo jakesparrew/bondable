@@ -17,6 +17,9 @@ import {
   Send,
   ClipboardList,
   MessageCircleHeart,
+  Search,
+  MessagesSquare,
+  Stethoscope,
 } from "lucide-react";
 
 interface NavigationItem {
@@ -268,6 +271,34 @@ export function useOptimizedSidebar(
         user: { ...userData, name: "Admin User", email: "admin@example.com" },
         navMain: [
           {
+            title: t("dashboard"),
+            url: "/dashboard/admin",
+            icon: LayoutDashboard,
+            isActive: isRouteActive("/dashboard/admin"),
+            items: [],
+          },
+          {
+            title: t("admin_nav_chats", "Gesprekken"),
+            url: "/dashboard/admin/chats",
+            icon: MessagesSquare,
+            isActive: isRouteActive("/dashboard/admin/chats"),
+            items: [],
+          },
+          {
+            title: t("admin_nav_clients", "Cliënten"),
+            url: "/dashboard/admin/clients",
+            icon: UsersRound,
+            isActive: isRouteActive("/dashboard/admin/clients"),
+            items: [],
+          },
+          {
+            title: t("admin_nav_providers", "Hulpverleners"),
+            url: "/dashboard/admin/providers",
+            icon: Stethoscope,
+            isActive: isRouteActive("/dashboard/admin/providers"),
+            items: [],
+          },
+          {
             title: t("settings"),
             url: "#",
             icon: Settings2,
@@ -439,6 +470,14 @@ export function useOptimizedSidebar(
           url: `/dashboard/${userType}/therapists`,
           icon: UsersRound,
           isActive: isRouteActive(`/dashboard/${userType}/therapists`),
+          items: [],
+        },
+        {
+          title: t("finder_nav_find", "Vind een hulpverlener"),
+          // Public Finder marketplace (lives outside /dashboard).
+          url: "/find",
+          icon: Search,
+          isActive: isRouteActive("/find"),
           items: [],
         },
         {

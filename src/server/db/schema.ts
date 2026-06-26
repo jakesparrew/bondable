@@ -534,6 +534,69 @@ export const auditLogs = pgTable('audit_logs', {
 });
 
 /* -------------------------------------------------------------------------- */
+/* provider_profiles (Finder marketplace — public-facing provider directory)   */
+/* ----------------------------------------------------------------------------*/
+/* One row per provider (therapist/psychologist/coach) that opts into the      */
+/* public Finder. provider_id is BOTH the PK and the FK to profiles.id, so a   */
+/* profile has at most one provider profile. Whether a provider is a regulated */
+/* clinician vs a coach is read from profiles.is_regulated (NOT duplicated     */
+/* here) to keep the dichotomieverbod / EU P2B "rank on FIT, never on payment" */
+/* invariant in one place. NB: hourly_rate is stored for transparency on the   */
+/* public profile, but it is NEVER an input to ranking/matching.               */
+export const providerProfiles = pgTable('provider_profiles', {
+  // provider_id is the PK and FKs profiles.id (cascade): 1:1 with a profile.
+  providerId: uuid('provider_id')
+    .primaryKey()
+    .references(() => profiles.id, { onDelete: 'cascade' }),
+  headline: text('headline'),
+  bio: text('bio'),
+  // string[] — e.g. ['anxiety','burnout','trauma']
+  specializations: jsonb('specializations'),
+  // string[] — BCP-ish language codes e.g. ['nl','fr','en']
+  languages: jsonb('languages'),
+  // string[] — e.g. ['in_person','online']
+  modalities: jsonb('modalities'),
+  approach: text('approach'),
+  // Displayed for transparency only — never a ranking/match input.
+  hourlyRate: integer('hourly_rate'),
+  city: text('city'),
+  country: text('country').default('BE'),
+  acceptingNewClients: boolean('accepting_new_clients').notNull().default(true),
+  credentials: text('credentials'),
+  yearsExperience: integer('years_experience'),
+  photoUrl: text('photo_url'),
+  rating: numeric('rating'),
+  reviewCount: integer('review_count'),
+  isPublished: boolean('is_published').notNull().default(true),
+  createdAt: timestamp('created_at', tz).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', tz).notNull().defaultNow(),
+});
+
+/* -------------------------------------------------------------------------- */
+/* provider_requests (Finder leads — client → provider contact requests)       */
+/* ----------------------------------------------------------------------------*/
+/* A lead created from the public Finder. client_id is nullable: a brand-new   */
+/* visitor (not yet a Bondable user) leaves name/email and client_id stays     */
+/* null until/if they register. status drives the provider's lead inbox.       */
+export const providerRequests = pgTable('provider_requests', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  providerId: uuid('provider_id')
+    .notNull()
+    .references(() => profiles.id, { onDelete: 'cascade' }),
+  // null = brand-new lead (visitor has no Bondable account yet).
+  clientId: uuid('client_id').references(() => profiles.id, { onDelete: 'set null' }),
+  clientName: text('client_name'),
+  clientEmail: text('client_email'),
+  topic: text('topic'),
+  message: text('message'),
+  preferredModality: text('preferred_modality'),
+  // CHECK IN ('pending','accepted','declined') — API-enforced.
+  status: text('status').notNull().default('pending'),
+  createdAt: timestamp('created_at', tz).notNull().defaultNow(),
+  respondedAt: timestamp('responded_at', tz),
+});
+
+/* -------------------------------------------------------------------------- */
 /* Relations                                                                    */
 /* -------------------------------------------------------------------------- */
 
@@ -559,6 +622,10 @@ export const profilesRelations = relations(profiles, ({ many, one }) => ({
   questionnaireTemplates: many(questionnaireTemplates),
   clientQuestionnairesAsClient: many(clientQuestionnaires, { relationName: 'cq_client' }),
   clientQuestionnairesAsTherapist: many(clientQuestionnaires, { relationName: 'cq_therapist' }),
+  // Finder marketplace: at most one public provider profile; leads received.
+  providerProfile: one(providerProfiles),
+  providerRequestsReceived: many(providerRequests, { relationName: 'preq_provider' }),
+  providerRequestsAsClient: many(providerRequests, { relationName: 'preq_client' }),
 }));
 
 export const clientTherapistRelationshipsRelations = relations(clientTherapistRelationships, ({ one }) => ({
@@ -742,6 +809,27 @@ export const questionnaireResponsesRelations = relations(questionnaireResponses,
   }),
 }));
 
+export const providerProfilesRelations = relations(providerProfiles, ({ one, many }) => ({
+  profile: one(profiles, {
+    fields: [providerProfiles.providerId],
+    references: [profiles.id],
+  }),
+  requests: many(providerRequests, { relationName: 'preq_provider' }),
+}));
+
+export const providerRequestsRelations = relations(providerRequests, ({ one }) => ({
+  provider: one(profiles, {
+    fields: [providerRequests.providerId],
+    references: [profiles.id],
+    relationName: 'preq_provider',
+  }),
+  client: one(profiles, {
+    fields: [providerRequests.clientId],
+    references: [profiles.id],
+    relationName: 'preq_client',
+  }),
+}));
+
 /* -------------------------------------------------------------------------- */
 /* Inferred types (handy for the API/data layer)                               */
 /* -------------------------------------------------------------------------- */
@@ -775,3 +863,7 @@ export type AdminUser = typeof adminUsers.$inferSelect;
 export type AdminNotificationSetting = typeof adminNotificationSettings.$inferSelect;
 export type AiSetting = typeof aiSettings.$inferSelect;
 export type AuditLog = typeof auditLogs.$inferSelect;
+export type ProviderProfile = typeof providerProfiles.$inferSelect;
+export type NewProviderProfile = typeof providerProfiles.$inferInsert;
+export type ProviderRequest = typeof providerRequests.$inferSelect;
+export type NewProviderRequest = typeof providerRequests.$inferInsert;

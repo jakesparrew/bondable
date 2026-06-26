@@ -37,3 +37,14 @@ export type TaskInsert = {
 // Message attachments (avoiding type conflicts)
 export { messageAttachmentService } from './messageAttachmentService';
 export type { MessageAttachment } from './messageAttachmentService';
+
+// Finder marketplace (scoped exports to avoid Provider/Session name conflicts)
+export { finderService } from './finderService';
+export type {
+  Provider,
+  ProviderRequest,
+  MatchResult,
+  MatchIntake,
+  FinderFilters,
+  CreateRequestPayload,
+} from './finderService';

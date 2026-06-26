@@ -8,7 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { PasswordStrengthInput } from "@/components/ui/password-strength-input";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/ui/use-toast";
-import { useAuthManager } from "@/hooks/api/useAuthManager";
+import { useAuthManager, isBypassAvailable, setDemoRole } from "@/hooks/api/useAuthManager";
 import { RoleSelectionDialog } from "@/components/ui/role-selection-dialog";
 import { useTranslation } from "react-i18next";
 
@@ -250,43 +250,12 @@ const Login = () => {
     }
   };
 
-  const quickLogin = async (role: "therapist" | "client") => {
-    const creds = {
-      therapist: { email: "dev-therapist@bondable.local", password: "DevPass123!", first: "Dev", last: "Therapist" },
-      client:    { email: "dev-client@bondable.local",    password: "DevPass123!", first: "Dev", last: "Client" },
-    }[role];
-
-    setIsLoading(true);
-    try {
-      let { error } = await supabase.auth.signInWithPassword({ email: creds.email, password: creds.password });
-
-      if (error?.message.includes("Invalid login credentials")) {
-        const { error: signUpErr } = await supabase.auth.signUp({
-          email: creds.email,
-          password: creds.password,
-          options: { data: { first_name: creds.first, last_name: creds.last, role, full_name: `${creds.first} ${creds.last}` } },
-        });
-        if (signUpErr && !signUpErr.message.includes("already")) {
-          showNotification("error", `Quick login signup failed: ${signUpErr.message}`);
-          return;
-        }
-        ({ error } = await supabase.auth.signInWithPassword({ email: creds.email, password: creds.password }));
-      }
-
-      if (error) {
-        if (error.message.includes("Email not confirmed")) {
-          showNotification("warning", "Disable 'Confirm email' in Supabase Dashboard → Authentication → Providers → Email, then click again.");
-        } else {
-          showNotification("error", `Quick login failed: ${error.message}`);
-        }
-        return;
-      }
-      showNotification("success", `Signed in as ${role}`);
-    } catch (err) {
-      showNotification("error", `Quick login error: ${err instanceof Error ? err.message : "unknown"}`);
-    } finally {
-      setIsLoading(false);
-    }
+  // Demo bypass: enter the app as a role WITHOUT a backend. Stores the chosen
+  // role (localStorage) and does a full navigation so the auth provider picks it
+  // up. Replaces the old Supabase quick-login that failed against the mock.
+  const quickLogin = (role: "therapist" | "client" | "admin") => {
+    setDemoRole(role);
+    window.location.assign(`/dashboard/${role}`);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -465,25 +434,32 @@ const Login = () => {
               </p>
             </div>
 
-            {import.meta.env.DEV && !isRegister && (
-              <div className="space-y-2 rounded-md border border-yellow-700/40 bg-yellow-900/10 p-3">
-                <p className="text-xs text-yellow-400 font-medium">Dev quick login</p>
+            {isBypassAvailable() && !isRegister && (
+              <div className="space-y-2 rounded-md border border-dashed border-border bg-secondary/50 p-3">
+                <p className="text-xs font-medium text-muted-foreground">
+                  {t("login_demo_label", "Demo — bekijk de app zonder login")}
+                </p>
                 <div className="flex space-x-2">
                   <Button
                     type="button"
                     onClick={() => quickLogin("therapist")}
-                    disabled={isLoading}
-                    className="flex-1 h-9 rounded-md text-xs bg-card border border-border text-foreground hover:bg-muted"
+                    className="h-9 flex-1 rounded-md border border-border bg-card text-xs text-foreground hover:bg-muted"
                   >
-                    Care Provider
+                    {t("login_demo_therapist", "Hulpverlener")}
                   </Button>
                   <Button
                     type="button"
                     onClick={() => quickLogin("client")}
-                    disabled={isLoading}
-                    className="flex-1 h-9 rounded-md text-xs bg-card border border-border text-foreground hover:bg-muted"
+                    className="h-9 flex-1 rounded-md border border-border bg-card text-xs text-foreground hover:bg-muted"
                   >
-                    Client
+                    {t("login_demo_client", "Cliënt")}
+                  </Button>
+                  <Button
+                    type="button"
+                    onClick={() => quickLogin("admin")}
+                    className="h-9 flex-1 rounded-md border border-border bg-card text-xs text-foreground hover:bg-muted"
+                  >
+                    {t("login_demo_admin", "Admin")}
                   </Button>
                 </div>
               </div>

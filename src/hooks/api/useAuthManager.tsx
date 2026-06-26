@@ -38,20 +38,72 @@ interface AuthManagerProviderProps {
 }
 
 /**
- * DEV-ONLY login bypass. Active only under `vite` dev (import.meta.env.DEV) AND
- * when VITE_DEV_BYPASS_AUTH is set ("therapist" | "client" | "admin", or "true"
- * => therapist). Completely stripped from production builds. Lets you view the
- * UI without a working backend while the Supabase->Neon migration is in progress.
+ * DEMO / DEV login bypass — now RUNTIME-SWITCHABLE.
+ *
+ * The bypass is *available* under `vite` dev (import.meta.env.DEV) OR in any
+ * build with VITE_DEMO_MODE=true (a shareable demo deploy). Which role (if any)
+ * is *active* is chosen at runtime from the homepage: the picked role is stored
+ * in localStorage so it survives reloads, and the env var VITE_DEV_BYPASS_AUTH
+ * is used only as an initial fallback. Pick a role -> we render the matching
+ * dashboard with seeded mock data; pick nothing -> the public homepage shows.
+ *
+ * This whole mechanism is stripped from a real production build (DEV false and
+ * VITE_DEMO_MODE unset), where normal authentication runs instead.
+ */
+const DEMO_ROLE_STORAGE_KEY = 'bondable_demo_role';
+
+/** True when the demo bypass is available at all (dev or demo build). */
+export const isBypassAvailable = (): boolean => {
+  const env = (import.meta as { env: Record<string, string | undefined> }).env;
+  return import.meta.env.DEV || String(env.VITE_DEMO_MODE ?? '').toLowerCase() === 'true';
+};
+
+const normalizeRole = (v: string | null | undefined): UserRole => {
+  const s = String(v ?? '').toLowerCase();
+  if (s === 'therapist' || s === 'client' || s === 'admin') return s as UserRole;
+  if (s === 'true' || s === '1') return 'therapist';
+  return null;
+};
+
+/** The role chosen on the homepage (localStorage), if any. */
+export const getStoredDemoRole = (): UserRole => {
+  if (typeof window === 'undefined') return null;
+  try {
+    return normalizeRole(window.localStorage.getItem(DEMO_ROLE_STORAGE_KEY));
+  } catch {
+    return null;
+  }
+};
+
+/** Enter the app as a given role (used by the homepage / login bypass buttons). */
+export const setDemoRole = (role: 'therapist' | 'client' | 'admin'): void => {
+  try {
+    window.localStorage.setItem(DEMO_ROLE_STORAGE_KEY, role);
+  } catch {
+    /* ignore storage failures */
+  }
+};
+
+/** Leave the demo (back to the public homepage / real login). */
+export const clearDemoRole = (): void => {
+  try {
+    window.localStorage.removeItem(DEMO_ROLE_STORAGE_KEY);
+  } catch {
+    /* ignore */
+  }
+};
+
+/**
+ * Resolve the active bypass role at module load: localStorage first (the
+ * homepage choice), then the VITE_DEV_BYPASS_AUTH env fallback. The homepage
+ * buttons do a full navigation, so this re-evaluates with the fresh choice.
  */
 const DEV_BYPASS_ROLE: UserRole = (() => {
+  if (!isBypassAvailable()) return null;
+  const stored = getStoredDemoRole();
+  if (stored) return stored;
   const env = (import.meta as { env: Record<string, string | undefined> }).env;
-  const demo = String(env.VITE_DEMO_MODE ?? '').toLowerCase() === 'true';
-  // Active in `vite` dev, OR in ANY build when VITE_DEMO_MODE=true (shareable demo deploy).
-  if (!import.meta.env.DEV && !demo) return null;
-  const v = String(env.VITE_DEV_BYPASS_AUTH ?? '').toLowerCase();
-  if (v === 'therapist' || v === 'client' || v === 'admin') return v as UserRole;
-  if (v === 'true' || v === '1') return 'therapist';
-  return demo ? 'therapist' : null;
+  return normalizeRole(env.VITE_DEV_BYPASS_AUTH);
 })();
 
 const DevBypassAuthProvider = ({ children, role }: { children: ReactNode; role: 'therapist' | 'client' | 'admin' }) => {
@@ -77,7 +129,12 @@ const DevBypassAuthProvider = ({ children, role }: { children: ReactNode; role: 
   const value: UseAuthManagerReturn = {
     user: mockUser, session: mockSession, loading: false, initialized: true,
     role, roleLoading: false, error: null,
-    signOut: async () => { /* no-op under dev bypass */ },
+    // Under the demo bypass, "sign out" means leaving the demo: drop the chosen
+    // role and return to the public homepage (full reload re-reads localStorage).
+    signOut: async () => {
+      clearDemoRole();
+      if (typeof window !== 'undefined') window.location.assign('/');
+    },
     refreshProfile: async () => {},
     getCurrentUserType: () => (role === 'admin' ? 'admin' : role),
   };

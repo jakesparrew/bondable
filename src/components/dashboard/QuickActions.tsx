@@ -5,6 +5,7 @@ import {
   CalendarPlus,
   FileEdit,
   CreditCard,
+  UserRoundSearch,
   type LucideIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";

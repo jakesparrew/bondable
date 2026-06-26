@@ -4,6 +4,7 @@ import AdminQuickActions from "@/components/dashboard/admin/AdminQuickActions";
 import AdminKpis from "@/components/dashboard/admin/AdminKpis";
 import RecentUsersTable from "@/components/dashboard/admin/RecentUsersTable";
 import SystemStatusCard from "@/components/dashboard/admin/SystemStatusCard";
+import FlaggedConversationsCard from "@/components/dashboard/admin/FlaggedConversationsCard";
 
 /**
  * Action-focused admin dashboard main content. Rendered inside the shared
@@ -44,6 +45,8 @@ const AdminDashboardContent = () => {
               <SystemStatusCard />
             </div>
           </div>
+
+          <FlaggedConversationsCard />
         </div>
       </div>
     </DashboardLayout>
