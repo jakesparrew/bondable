@@ -68,7 +68,30 @@ const RouteProtection = ({ children, requiredUserType, isAdminRoute = false }: R
     }
   }, [loading, user, role, isAdminRoute, requiredUserType, location.pathname, navigate]);
 
-  // Instant render; navigation guards handled in effects above
+  // Avoid flashing protected content that's about to be redirected away.
+  // The effects above redirect when the user is unauthenticated or their role
+  // doesn't match the route; until auth/role is resolved we don't know yet.
+  // Rendering the dashboard in those windows caused a "dashboard flash" before
+  // landing on the homepage. Gate the render on the SAME conditions instead.
+  const willRedirectUnauth = !loading && !user && !error;
+  const willRedirectForRole =
+    !loading &&
+    !!user &&
+    !!role &&
+    (
+      (role === "admin" && !isAdminRoute) ||
+      (role !== "admin" && isAdminRoute) ||
+      (!!requiredUserType && role !== requiredUserType)
+    );
+
+  if (loading || willRedirectUnauth || willRedirectForRole) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-foreground" />
+      </div>
+    );
+  }
+
   return <>{children}</>;
 };
 

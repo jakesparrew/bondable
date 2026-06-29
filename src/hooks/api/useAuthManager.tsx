@@ -141,9 +141,37 @@ const DevBypassAuthProvider = ({ children, role }: { children: ReactNode; role: 
   return <AuthManagerContext.Provider value={value}>{children}</AuthManagerContext.Provider>;
 };
 
+/**
+ * Demo/dev "logged out" state. When the bypass is AVAILABLE (dev or demo build)
+ * but NO role has been chosen on the homepage, present an explicit signed-out
+ * context. Otherwise the in-memory mock backend's default session would quietly
+ * authenticate the visitor (as a therapist) and protected routes would render
+ * for a beat before redirecting — the "dashboard flash" before the homepage.
+ * With this, the public homepage is the clean landing and dashboards redirect
+ * straight there until the visitor picks a role.
+ */
+const DemoLoggedOutProvider = ({ children }: { children: ReactNode }) => {
+  const value: UseAuthManagerReturn = {
+    user: null, session: null, loading: false, initialized: true,
+    role: null, roleLoading: false, error: null,
+    signOut: async () => {
+      clearDemoRole();
+      if (typeof window !== 'undefined') window.location.assign('/');
+    },
+    refreshProfile: async () => {},
+    getCurrentUserType: () => null,
+  };
+  return <AuthManagerContext.Provider value={value}>{children}</AuthManagerContext.Provider>;
+};
+
 export const AuthManagerProvider = ({ children }: AuthManagerProviderProps) => {
   if (DEV_BYPASS_ROLE) {
     return <DevBypassAuthProvider role={DEV_BYPASS_ROLE}>{children}</DevBypassAuthProvider>;
+  }
+
+  // Bypass available but no role chosen → treat as signed out (see above).
+  if (isBypassAvailable()) {
+    return <DemoLoggedOutProvider>{children}</DemoLoggedOutProvider>;
   }
 
   const [authState, setAuthState] = useState<AuthState>({
