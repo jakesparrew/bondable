@@ -2,9 +2,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { CacheManager } from "@/services/cache/CacheManager";
 
 export class OptimizedMessagesService {
-  private static cacheManager = new CacheManager({ defaultTTL: 2 * 60 * 1000 }); // 2 minutes
-  private static conversationsCache = new CacheManager({ defaultTTL: 5 * 60 * 1000 }); // 5 minutes
-  private static unreadCountsCache = new CacheManager({ defaultTTL: 1 * 60 * 1000 }); // 1 minute
+  private static cacheManager = new CacheManager({ defaultTTL: 2 * 60 * 1000, namespace: "messages" }); // 2 minutes
+  private static conversationsCache = new CacheManager({ defaultTTL: 5 * 60 * 1000, namespace: "conversations" }); // 5 minutes
+  private static unreadCountsCache = new CacheManager({ defaultTTL: 1 * 60 * 1000, namespace: "unread-counts" }); // 1 minute
 
   static async getConversations(
     userId: string,

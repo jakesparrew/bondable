@@ -14,12 +14,23 @@ export interface CacheConfig {
   defaultTTL: number; // Time to live in milliseconds
   maxSize: number; // Maximum number of entries
   enablePersistence: boolean; // Whether to persist to localStorage
+  /**
+   * Unique localStorage namespace for this cache instance. REQUIRED for any
+   * cache that uses non-unique key strings (e.g. a bare user id), so two
+   * services can't collide. If omitted, a per-instance anonymous namespace is
+   * generated (still never shared across instances).
+   */
+  namespace?: string;
 }
 
 export class CacheManager {
+  // Monotonic counter for instances that don't pass an explicit namespace, so
+  // every CacheManager gets its OWN localStorage key.
+  private static anonCount = 0;
+
   private cache = new Map<string, CacheEntry<any>>();
   private config: CacheConfig;
-  private readonly storageKey = 'app_cache';
+  private readonly storageKey: string;
 
   constructor(config: Partial<CacheConfig> = {}) {
     this.config = {
@@ -28,6 +39,13 @@ export class CacheManager {
       enablePersistence: true,
       ...config
     };
+
+    // Per-instance storage key. Previously EVERY instance shared 'app_cache',
+    // so persistent caches clobbered each other's blob and a cold load could
+    // rehydrate one cache's entries into another (e.g. a messages "unread
+    // counts" object returned where a tasks "clients" array was expected →
+    // `clients.map is not a function`). Namespacing per instance prevents that.
+    this.storageKey = `app_cache:${this.config.namespace ?? `anon-${CacheManager.anonCount++}`}`;
 
     if (this.config.enablePersistence) {
       this.loadFromStorage();

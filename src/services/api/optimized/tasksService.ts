@@ -3,9 +3,9 @@ import { CacheManager } from "@/services/cache/CacheManager";
 import type { TaskWithProfiles, TaskCreate, TaskUpdate, TaskFilters } from "../TaskService";
 
 export class OptimizedTasksService {
-  private static cacheManager = new CacheManager({ defaultTTL: 5 * 60 * 1000 }); 
-  private static statsCache = new CacheManager({ defaultTTL: 2 * 60 * 1000 }); 
-  private static clientsCache = new CacheManager({ defaultTTL: 10 * 60 * 1000 });
+  private static cacheManager = new CacheManager({ defaultTTL: 5 * 60 * 1000, namespace: "tasks" }); 
+  private static statsCache = new CacheManager({ defaultTTL: 2 * 60 * 1000, namespace: "task-stats" }); 
+  private static clientsCache = new CacheManager({ defaultTTL: 10 * 60 * 1000, namespace: "task-clients" });
 
   static async getTasks(
     filters: TaskFilters = {},
@@ -155,7 +155,9 @@ export class OptimizedTasksService {
     
     if (useCache) {
       const cached = this.clientsCache.get(cacheKey) as any[];
-      if (cached) {
+      // Only trust a cached value if it's actually an array — defends against
+      // any stale/cross-contaminated cache entry sneaking in a non-array.
+      if (cached && Array.isArray(cached)) {
         console.log("👥 Returning cached clients data");
         return cached;
       }

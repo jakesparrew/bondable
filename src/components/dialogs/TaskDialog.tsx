@@ -63,6 +63,10 @@ export default function TaskDialog({
   userType = "therapist",
 }: TaskDialogProps) {
   const { t } = useTranslation();
+  // Defensive: `clients` must be an array. JSX children are evaluated eagerly,
+  // so `clients.map(...)` below runs on every render even while the dialog is
+  // closed — a non-array prop would crash the whole page. Never trust the shape.
+  const safeClients = Array.isArray(clients) ? clients : [];
   const [formData, setFormData] = useOptimizedState({
     title: "",
     description: "",
@@ -110,7 +114,7 @@ export default function TaskDialog({
       return;
     }
 
-    const client = clients.find((c) => c.id === formData.clientId);
+    const client = safeClients.find((c) => c.id === formData.clientId);
     const taskData = {
       ...formData,
       clientName: client?.name || "",
@@ -206,7 +210,7 @@ export default function TaskDialog({
                 <SelectValue placeholder={t("select_client")} />
               </SelectTrigger>
               <SelectContent className="bg-card border-border">
-                {clients.map((client) => (
+                {safeClients.map((client) => (
                   <SelectItem
                     className="text-muted-foreground data-[state=checked]:text-neutral-50 data-[highlighted]:!text-neutral-50"
                     key={client.id}
@@ -366,32 +370,43 @@ export default function TaskDialog({
             />
           </div>
 
-          {/* Client Status Update Section */}
-          {userType === "client" && mode === "view" && task && task.status === "assigned" && (
-            <div className="space-y-4 p-4 bg-card rounded-lg border border-border">
-              <Label className="text-muted-foreground">{t('update_task_status')}</Label>
-              <div className="flex gap-2">
-                <Button
-                  onClick={() => handleStatusChange("in-progress")}
-                  className="bg-yellow-600 hover:bg-yellow-700"
-                >
-                  {t("start_task")}
-                </Button>
-                <Button
-                  onClick={() => handleStatusChange("completed")}
-                  className="bg-green-600 hover:bg-green-700"
-                >
-                  {t("mark_complete")}
-                </Button>
-                <Button
-                  onClick={() => handleStatusChange("denied")}
-                  variant="destructive"
-                >
-                  {t("decline_task")}
-                </Button>
-              </div>
-              
-              {showDeniedReason && (
+          {/* Client Status Update Section — actionable while the task is open
+              (assigned or in progress). NOTE: status values are underscore-cased
+              ("in_progress") to match the rest of the app; a hyphen here would
+              produce an unknown status the task table can't render. */}
+          {userType === "client" &&
+            mode === "view" &&
+            task &&
+            (task.status === "assigned" || task.status === "in_progress") && (
+            <div className="space-y-3 p-4 bg-secondary/50 rounded-lg border border-border">
+              <Label className="text-foreground font-medium">
+                {t('update_task_status', 'Update status')}
+              </Label>
+              {!showDeniedReason ? (
+                <div className="flex flex-wrap gap-2">
+                  {task.status === "assigned" && (
+                    <Button
+                      onClick={() => handleStatusChange("in_progress")}
+                      variant="outline"
+                      className="border-border"
+                    >
+                      {t("start_task", "Start task")}
+                    </Button>
+                  )}
+                  <Button
+                    onClick={() => handleStatusChange("completed")}
+                    className="bg-primary text-primary-foreground hover:bg-primary/90"
+                  >
+                    {t("mark_complete", "Mark complete")}
+                  </Button>
+                  <Button
+                    onClick={() => handleStatusChange("denied")}
+                    variant="destructive"
+                  >
+                    {t("decline_task", "Decline")}
+                  </Button>
+                </div>
+              ) : (
                 <div className="space-y-2">
                   <Label className="text-muted-foreground">{t("reason_for_declining")}</Label>
                   <Textarea
@@ -418,6 +433,25 @@ export default function TaskDialog({
                     </Button>
                   </div>
                 </div>
+              )}
+            </div>
+          )}
+
+          {/* Read-only confirmation once the task is resolved (client). */}
+          {userType === "client" &&
+            mode === "view" &&
+            task &&
+            (task.status === "completed" || task.status === "denied") && (
+            <div className="p-4 bg-secondary/50 rounded-lg border border-border">
+              <p className="text-sm text-foreground">
+                {task.status === "completed"
+                  ? t("task_completed_note", "You marked this task complete. Nice work!")
+                  : t("task_declined_note", "You declined this task.")}
+              </p>
+              {task.status === "denied" && task.deniedReason && (
+                <p className="mt-2 text-xs text-muted-foreground">
+                  {t("reason_for_declining", "Reason")}: {task.deniedReason}
+                </p>
               )}
             </div>
           )}

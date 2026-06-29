@@ -748,7 +748,16 @@ const Tasks = () => {
                   {paginatedTasks.map((task) => (
                     <TableRow
                       key={task.id}
-                      className="border-border hover:bg-muted transition-colors"
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => openDialog("view", task)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          openDialog("view", task);
+                        }
+                      }}
+                      className="border-border hover:bg-muted transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                     >
                       <TableCell>
                         <span className="font-mono text-xs text-muted-foreground">
@@ -829,7 +838,19 @@ const Tasks = () => {
         {tasks.length > 0 && (
           <div className="md:hidden space-y-3">
             {paginatedTasks.map((task) => (
-              <Card key={task.id} className="bg-card border-border">
+              <Card
+                key={task.id}
+                role="button"
+                tabIndex={0}
+                onClick={() => openDialog("view", task)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    openDialog("view", task);
+                  }
+                }}
+                className="bg-card border-border cursor-pointer transition-colors hover:bg-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
                 <CardContent className="p-4">
                   <div className="space-y-3">
                     {/* Header with ID and Status */}
