@@ -48,6 +48,10 @@ interface TaskDialogProps {
   clients: Client[];
   onSave: (task: Omit<TaskData, "id" | "assignedDate">) => void;
   onStatusChange?: (taskId: string, status: string, reason?: string) => void;
+  /** Therapist-only: switch the open detail into edit mode. */
+  onEdit?: () => void;
+  /** Therapist-only: delete the task being viewed. */
+  onDelete?: () => void;
   mode: "add" | "edit" | "view";
   userType?: "therapist" | "client";
 }
@@ -59,6 +63,8 @@ export default function TaskDialog({
   clients,
   onSave,
   onStatusChange,
+  onEdit,
+  onDelete,
   mode,
   userType = "therapist",
 }: TaskDialogProps) {
@@ -452,6 +458,37 @@ export default function TaskDialog({
                 <p className="mt-2 text-xs text-muted-foreground">
                   {t("reason_for_declining", "Reason")}: {task.deniedReason}
                 </p>
+              )}
+            </div>
+          )}
+
+          {/* Therapist quick actions in the read-only detail view: edit or
+              delete the task without digging into the row's "⋯" menu. */}
+          {isReadOnly && userType === "therapist" && (
+            <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+              {onDelete && (
+                <Button
+                  variant="destructive"
+                  onClick={onDelete}
+                  className="sm:mr-auto"
+                >
+                  {t("delete", "Delete")}
+                </Button>
+              )}
+              <Button
+                variant="outline"
+                onClick={() => setOpen(false)}
+                className="border-border bg-transparent hover:bg-muted text-muted-foreground"
+              >
+                {t("close", "Close")}
+              </Button>
+              {onEdit && (
+                <Button
+                  onClick={onEdit}
+                  className="bg-primary text-primary-foreground hover:bg-primary/90"
+                >
+                  {t("edit_task", "Edit task")}
+                </Button>
               )}
             </div>
           )}

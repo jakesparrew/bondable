@@ -954,6 +954,11 @@ const Tasks = () => {
           clients={clients}
           onSave={dialogMode === "add" ? handleAddTask : handleEditTask}
           onStatusChange={handleStatusChange}
+          onEdit={() => setDialogMode("edit")}
+          onDelete={() => {
+            if (selectedTask) handleDeleteTask(selectedTask.id);
+            setDialogOpen(false);
+          }}
           mode={dialogMode}
           userType={userType as "therapist" | "client"}
         />
