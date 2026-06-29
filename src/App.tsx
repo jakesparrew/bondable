@@ -67,6 +67,8 @@ const FindMatch = lazy(() => import("@/pages/FindMatch"));
 const ProviderProfilePublic = lazy(() => import("@/pages/ProviderProfilePublic"));
 // Therapist-only: edit the provider's own public Finder profile (protected).
 const ProviderPublicProfileEdit = lazy(() => import("@/pages/ProviderPublicProfileEdit"));
+// Public client self-onboarding via a therapist invite link.
+const InviteAccept = lazy(() => import("@/pages/InviteAccept"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 
@@ -406,6 +408,9 @@ const App = () => {
                 <Route path="/find" element={<Find />} />
                 <Route path="/find/match" element={<FindMatch />} />
                 <Route path="/find/:providerId" element={<ProviderProfilePublic />} />
+
+                {/* Public client self-onboarding via a therapist invite link. */}
+                <Route path="/invite/:token" element={<InviteAccept />} />
 
                 <Route path="*" element={<NotFound />} />
               </Routes>

@@ -5,6 +5,8 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import InviteClientPanel from "@/components/clients/InviteClientPanel";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -155,10 +157,22 @@ const AddClient = () => {
             {t("add_new_client")}
           </h2>
           <p className="text-muted-foreground text-sm">
-            {t("enter_client_info")}
+            {t("add_client_intro", "Nodig een cliënt uit om zelf zijn profiel aan te maken, of voeg de gegevens handmatig toe.")}
           </p>
         </div>
 
+        {/* Invite (recommended) vs manual entry */}
+        <Tabs defaultValue="invite" className="space-y-6">
+          <TabsList className="bg-secondary">
+            <TabsTrigger value="invite">{t("invite_tab", "Cliënt uitnodigen")}</TabsTrigger>
+            <TabsTrigger value="manual">{t("manual_tab", "Handmatig toevoegen")}</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="invite">
+            <InviteClientPanel />
+          </TabsContent>
+
+          <TabsContent value="manual">
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-6">
           <Card className="bg-card border-border">
@@ -321,6 +335,8 @@ const AddClient = () => {
             </Button>
           </div>
         </form>
+          </TabsContent>
+        </Tabs>
       </div>
     </DashboardLayout>
   );
