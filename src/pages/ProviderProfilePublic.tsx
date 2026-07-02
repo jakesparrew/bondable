@@ -28,6 +28,7 @@ import {
   ArrowLeft,
   BadgeCheck,
   Award,
+  ShieldCheck,
   MapPin,
   Languages as LanguagesIcon,
   Star,
@@ -46,10 +47,15 @@ import RequestProviderDialog from '@/components/finder/RequestProviderDialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Separator } from '@/components/ui/separator';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { finderService, type Modality, type Provider } from '@/services/api/finderService';
+import { providerBadge, providerLabel } from '@/lib/providerTypes';
 
 /* -------------------------------------------------------------------------- */
 /* Small presentational helpers                                                */
@@ -73,7 +79,7 @@ const SectionCard = ({
   title: string;
   children: React.ReactNode;
 }) => (
-  <Card className="border-border">
+  <Card className="rounded-card border-border shadow-none">
     <CardHeader className="pb-3">
       <CardTitle className="flex items-center gap-2 text-base font-semibold text-foreground">
         <Icon className="h-4 w-4 text-primary" />
@@ -91,26 +97,27 @@ const SectionCard = ({
 const ProfileSkeleton = () => (
   <div className="space-y-6">
     <Skeleton className="h-5 w-32" />
-    <Card className="border-border overflow-hidden">
-      <div className="h-20 bg-muted sm:h-24" />
-      <CardContent className="-mt-10 space-y-4 sm:-mt-12">
-        <Skeleton className="h-24 w-24 rounded-full border-4 border-card" />
-        <div className="space-y-2">
-          <Skeleton className="h-7 w-56" />
-          <Skeleton className="h-4 w-72" />
-          <div className="flex gap-2 pt-1">
-            <Skeleton className="h-6 w-24 rounded-full" />
-            <Skeleton className="h-6 w-20 rounded-full" />
+    <Card className="rounded-card border-border shadow-none">
+      <CardContent className="p-6">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
+          <Skeleton className="h-20 w-20 shrink-0 rounded-full" />
+          <div className="flex-1 space-y-2">
+            <Skeleton className="h-9 w-56" />
+            <Skeleton className="h-4 w-72" />
+            <div className="flex gap-2 pt-1">
+              <Skeleton className="h-6 w-24 rounded-ctl" />
+              <Skeleton className="h-6 w-20 rounded-ctl" />
+            </div>
           </div>
         </div>
       </CardContent>
     </Card>
     <div className="grid gap-6 lg:grid-cols-3">
       <div className="space-y-6 lg:col-span-2">
-        <Skeleton className="h-40 w-full rounded-lg" />
-        <Skeleton className="h-32 w-full rounded-lg" />
+        <Skeleton className="h-40 w-full rounded-card" />
+        <Skeleton className="h-32 w-full rounded-card" />
       </div>
-      <Skeleton className="h-64 w-full rounded-lg" />
+      <Skeleton className="h-64 w-full rounded-card" />
     </div>
   </div>
 );
@@ -119,10 +126,8 @@ const NotFound = () => {
   const { t } = useTranslation();
   return (
     <div className="mx-auto max-w-md py-16 text-center">
-      <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-muted text-muted-foreground">
-        <Info className="h-6 w-6" />
-      </div>
-      <h1 className="mt-4 text-xl font-semibold text-foreground">
+      <Info className="mx-auto h-8 w-8 text-muted-foreground" strokeWidth={1.5} />
+      <h1 className="mt-4 font-display text-display-md text-foreground">
         {t('finder_provider_notfound_title', 'Profiel niet gevonden')}
       </h1>
       <p className="mt-2 text-sm text-muted-foreground">
@@ -184,6 +189,21 @@ const ProviderProfilePublic = () => {
 
   const modalityIcon = (m: Modality) => (m === 'online' ? Video : Users);
 
+  // Trust badge + type label — reuse the same taxonomy grammar as ProviderCard.
+  const badge = provider
+    ? providerBadge(
+        {
+          providerType: provider.providerType,
+          verificationStatus: provider.verificationStatus,
+          isRegulated: provider.isRegulated,
+        },
+        t,
+      )
+    : null;
+  const typeLabel = provider
+    ? providerLabel(provider.providerType, t, { capitalize: true })
+    : '';
+
   return (
     <FinderLayout>
       {loading ? (
@@ -205,57 +225,73 @@ const ProviderProfilePublic = () => {
             </Link>
           </Button>
 
-          {/* Hero */}
-          <Card className="overflow-hidden border-border">
-            {/* Neutral brand banner — no "promoted"/featured treatment. */}
-            <div className="h-20 bg-primary/10 sm:h-24" />
-            <CardContent className="-mt-10 sm:-mt-12">
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-end">
-                  <Avatar className="h-24 w-24 border-4 border-card shadow-sm">
-                    {provider.photoUrl && (
-                      <AvatarImage src={provider.photoUrl} alt={provider.fullName} />
-                    )}
+          {/* Hero — flat, typography-led header (border-first, no rest shadow) */}
+          <Card className="rounded-card border-border shadow-none">
+            <CardContent className="p-6 sm:p-8">
+              <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
+                  {/* Initials avatar in teal — no photos on the finder */}
+                  <Avatar className="h-20 w-20 shrink-0 border border-border">
                     <AvatarFallback className="bg-primary/10 text-xl font-semibold text-primary">
                       {initialsOf(provider.fullName)}
                     </AvatarFallback>
                   </Avatar>
 
-                  <div className="space-y-1.5 sm:pb-1">
-                    <h1 className="text-2xl font-semibold tracking-tight text-foreground">
+                  <div className="min-w-0 space-y-2">
+                    <h1 className="font-display text-display-lg text-foreground">
                       {provider.fullName}
                     </h1>
-                    {provider.headline && (
-                      <p className="text-sm text-muted-foreground">
-                        {provider.headline}
-                      </p>
+
+                    {/* Type label + trust badge — transparency signal, not a ranking */}
+                    {badge && (
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="text-body-sm text-muted-foreground">
+                        {typeLabel}
+                      </span>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <span>
+                            <Badge variant={badge.variant} className="gap-1">
+                              {badge.kind === 'regulated' && (
+                                <ShieldCheck className="h-3.5 w-3.5" />
+                              )}
+                              {badge.kind === 'verified_coach' && (
+                                <CheckCircle2 className="h-3.5 w-3.5" />
+                              )}
+                              {badge.label}
+                            </Badge>
+                          </span>
+                        </TooltipTrigger>
+                        <TooltipContent className="max-w-xs">
+                          {badge.tooltip}
+                        </TooltipContent>
+                      </Tooltip>
+                    </div>
                     )}
 
-                    {/* Regulated-clinician vs coach indicator */}
-                    <div className="flex flex-wrap items-center gap-2 pt-1">
-                      {provider.isRegulated ? (
-                        <Badge className="gap-1">
-                          <BadgeCheck className="h-3.5 w-3.5" />
-                          {t('finder_badge_regulated', 'Erkende hulpverlener')}
-                        </Badge>
-                      ) : (
-                        <Badge variant="secondary" className="gap-1">
-                          <Award className="h-3.5 w-3.5" />
-                          {t('finder_badge_coach', 'Coach')}
-                        </Badge>
-                      )}
-
+                    {/* Meta: city · availability dot · rating */}
+                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-body-sm text-muted-foreground">
                       {provider.city && (
-                        <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
+                        <span className="inline-flex items-center gap-1">
                           <MapPin className="h-3.5 w-3.5" />
                           {provider.city}
                         </span>
                       )}
 
+                      {provider.acceptingNewClients && (
+                        <span className="inline-flex items-center gap-1.5 font-medium text-success">
+                          <span className="h-2 w-2 rounded-full bg-success" />
+                          {t(
+                            'finder_provider_accepting',
+                            'Neemt nieuwe cliënten aan',
+                          )}
+                        </span>
+                      )}
+
                       {provider.rating != null && (
-                        <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
+                        <span className="inline-flex items-center gap-1">
                           <Star className="h-3.5 w-3.5 fill-primary text-primary" />
-                          <span className="font-medium text-foreground">
+                          <span className="tabular font-medium text-foreground">
                             {provider.rating.toFixed(1)}
                           </span>
                           {provider.reviewCount != null && (
@@ -270,20 +306,27 @@ const ProviderProfilePublic = () => {
                         </span>
                       )}
                     </div>
+
+                    {/* Headline in body */}
+                    {provider.headline && (
+                      <p className="max-w-prose text-sm text-foreground/90">
+                        {provider.headline}
+                      </p>
+                    )}
                   </div>
                 </div>
 
                 {/* Primary CTA (desktop) */}
-                <div className="hidden sm:block sm:pb-1">
+                <div className="hidden shrink-0 sm:block">
                   <Button size="lg" onClick={() => setRequestOpen(true)}>
                     {t('finder_request_title', 'Aanvraag / Contact')}
                   </Button>
                 </div>
               </div>
 
-              {/* Languages */}
+              {/* Languages — hairline divider */}
               {provider.languages.length > 0 && (
-                <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-border pt-4">
+                <div className="mt-5 flex flex-wrap items-center gap-2 border-t border-border pt-4">
                   <span className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
                     <LanguagesIcon className="h-3.5 w-3.5" />
                     {t('finder_provider_languages', 'Talen')}
@@ -343,7 +386,7 @@ const ProviderProfilePublic = () => {
               {!provider.bio &&
                 provider.specializations.length === 0 &&
                 !provider.approach && (
-                  <Card className="border-border border-dashed">
+                  <Card className="rounded-card border-dashed border-border shadow-none">
                     <CardContent className="py-8 text-center text-sm text-muted-foreground">
                       {t(
                         'finder_provider_empty',
@@ -357,7 +400,7 @@ const ProviderProfilePublic = () => {
             {/* Sidebar */}
             <div className="space-y-6">
               {/* At-a-glance practical info */}
-              <Card className="border-border">
+              <Card className="rounded-card border-border shadow-none">
                 <CardHeader className="pb-3">
                   <CardTitle className="text-base font-semibold text-foreground">
                     {t('finder_provider_at_a_glance', 'In het kort')}
@@ -367,7 +410,7 @@ const ProviderProfilePublic = () => {
                   {/* Accepting new clients status */}
                   <div className="flex items-start gap-2.5">
                     {provider.acceptingNewClients ? (
-                      <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                      <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-success" />
                     ) : (
                       <CircleDashed className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
                     )}
@@ -394,7 +437,7 @@ const ProviderProfilePublic = () => {
                   {/* Modalities */}
                   {provider.modalities.length > 0 && (
                     <>
-                      <Separator />
+                      <div className="border-t border-border" />
                       <div>
                         <p className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
                           {t('finder_provider_modalities', 'Sessievorm')}
@@ -420,7 +463,7 @@ const ProviderProfilePublic = () => {
                   {/* Years of experience */}
                   {provider.yearsExperience != null && (
                     <>
-                      <Separator />
+                      <div className="border-t border-border" />
                       <div className="flex items-start gap-2.5">
                         <Briefcase className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
                         <div>
@@ -439,7 +482,7 @@ const ProviderProfilePublic = () => {
                   {/* Credentials — license for regulated, ICF/EMCC for coaches */}
                   {provider.credentials && (
                     <>
-                      <Separator />
+                      <div className="border-t border-border" />
                       <div className="flex items-start gap-2.5">
                         <GraduationCap className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
                         <div>
@@ -457,12 +500,12 @@ const ProviderProfilePublic = () => {
                   {/* Hourly rate — TRANSPARENCY ONLY, never a ranking signal */}
                   {provider.hourlyRate != null && (
                     <>
-                      <Separator />
+                      <div className="border-t border-border" />
                       <div>
                         <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                           {t('finder_provider_rate', 'Tarief (indicatief)')}
                         </p>
-                        <p className="mt-0.5 text-foreground">
+                        <p className="tabular mt-0.5 text-foreground">
                           {t('finder_provider_rate_value', '€{{rate}} per sessie', {
                             rate: provider.hourlyRate,
                           })}
@@ -474,7 +517,7 @@ const ProviderProfilePublic = () => {
               </Card>
 
               {/* Regulated/coach explainer — keeps the distinction transparent */}
-              <Card className="border-border bg-muted/30">
+              <Card className="rounded-card border-border bg-muted/30 shadow-none">
                 <CardContent className="flex items-start gap-2.5 py-4 text-xs text-muted-foreground">
                   {provider.isRegulated ? (
                     <BadgeCheck className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
@@ -497,11 +540,11 @@ const ProviderProfilePublic = () => {
             </div>
           </div>
 
-          {/* Sticky mobile CTA */}
+          {/* Sticky mobile CTA — overlay elevation is sanctioned here */}
           <div className="sticky bottom-4 z-30 sm:hidden">
             <Button
               size="lg"
-              className="w-full shadow-lg"
+              className="w-full shadow-overlay"
               onClick={() => setRequestOpen(true)}
             >
               {t('finder_request_title', 'Aanvraag / Contact')}

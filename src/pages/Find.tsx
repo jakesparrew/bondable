@@ -121,12 +121,12 @@ const Find = () => {
 
   return (
     <FinderLayout>
-      {/* Hero */}
+      {/* Hero — typography-led, border-first (no rest shadow) */}
       <section className="mb-8">
-        <div className="rounded-2xl border border-border bg-card p-6 sm:p-8">
-          <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+        <div className="rounded-card border border-border bg-card p-6 sm:p-8">
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-2xl space-y-3">
-              <h1 className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
+              <h1 className="font-display text-display-lg text-foreground">
                 {t('finder_find_title', 'Vind een hulpverlener die bij je past')}
               </h1>
               <p className="text-muted-foreground">
@@ -135,8 +135,8 @@ const Find = () => {
                   'Doorzoek erkende hulpverleners en coaches. We rangschikken op fit — specialisatie, taal en beschikbaarheid — nooit op betaling.',
                 )}
               </p>
-              <p className="inline-flex items-center gap-2 text-sm text-muted-foreground">
-                <ShieldCheck className="h-4 w-4 text-primary" />
+              <p className="inline-flex items-center gap-2 text-body-sm text-muted-foreground">
+                <ShieldCheck className="h-4 w-4 shrink-0 text-primary" />
                 {t(
                   'finder_find_neutrality',
                   'Onafhankelijk en neutraal: geen gesponsorde plaatsing.',
@@ -144,7 +144,7 @@ const Find = () => {
               </p>
             </div>
 
-            {/* Help me kiezen / Match me CTA — links to the AI matcher */}
+            {/* Help me kiezen / Match me CTA — links to the matcher (not Bond) */}
             <div className="shrink-0">
               <Button asChild size="lg" className="w-full lg:w-auto">
                 <Link to="/find/match">
@@ -165,7 +165,7 @@ const Find = () => {
                 'finder_find_search_ph',
                 'Zoek op naam, specialisatie of stad…',
               )}
-              className="h-12 pl-10 pr-10 text-base"
+              className="h-12 rounded-ctl pl-10 pr-10 text-base"
               aria-label={t('finder_find_search_aria', 'Zoek hulpverleners')}
             />
             {search && (
@@ -213,7 +213,7 @@ const Find = () => {
         <div>
           {/* Result count / status row */}
           <div className="mb-4 flex items-center justify-between gap-3">
-            <p className="text-sm text-muted-foreground" aria-live="polite">
+            <p className="text-body-sm text-muted-foreground" aria-live="polite">
               {loading
                 ? t('finder_results_loading', 'Hulpverleners laden…')
                 : t('finder_results_count', '{{count}} hulpverleners gevonden', {
@@ -238,21 +238,21 @@ const Find = () => {
               {Array.from({ length: 6 }).map((_, i) => (
                 <div
                   key={i}
-                  className="rounded-lg border border-border bg-card p-5"
+                  className="rounded-card border border-border bg-card p-5"
                 >
                   <div className="flex items-start gap-4">
                     <Skeleton className="h-16 w-16 rounded-full" />
                     <div className="flex-1 space-y-2">
                       <Skeleton className="h-4 w-2/3" />
-                      <Skeleton className="h-5 w-32 rounded-full" />
+                      <Skeleton className="h-5 w-32 rounded-ctl" />
                       <Skeleton className="h-3 w-1/2" />
                     </div>
                   </div>
                   <Skeleton className="mt-4 h-3 w-full" />
                   <Skeleton className="mt-2 h-3 w-4/5" />
                   <div className="mt-4 flex gap-1.5">
-                    <Skeleton className="h-6 w-16 rounded-full" />
-                    <Skeleton className="h-6 w-20 rounded-full" />
+                    <Skeleton className="h-6 w-16 rounded-ctl" />
+                    <Skeleton className="h-6 w-20 rounded-ctl" />
                   </div>
                 </div>
               ))}
@@ -291,10 +291,8 @@ interface EmptyStateProps {
 const EmptyState = ({ hasFilters, onReset }: EmptyStateProps) => {
   const { t } = useTranslation();
   return (
-    <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-border bg-card px-6 py-16 text-center">
-      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted text-muted-foreground">
-        <Search className="h-6 w-6" />
-      </div>
+    <div className="flex flex-col items-center justify-center rounded-card border border-dashed border-border bg-card px-6 py-16 text-center">
+      <Search className="h-8 w-8 text-muted-foreground" strokeWidth={1.5} />
       <h3 className="mt-4 text-base font-semibold text-foreground">
         {hasFilters
           ? t('finder_empty_filtered_title', 'Geen hulpverleners gevonden')

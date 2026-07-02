@@ -1,13 +1,13 @@
 import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
-import { Card } from "@/components/ui/card";
 import { useAuthManager } from "@/hooks/api/useAuthManager";
 import { dashboardService } from "@/services/api";
 
 /**
- * Condensed KPI cards row. Values come from dashboardService.getTherapistStats
- * (same source BaseDashboard uses). Billings/hours are presented as practice
- * snapshots derived from the live stats so nothing is hardcoded to fake data.
+ * Flat KPI strip (no card, no border, no shadow — sits on the page canvas).
+ * A hairline-divided row of label-caps + large display numbers. Values come
+ * from dashboardService.getTherapistStats (same source BaseDashboard uses),
+ * so nothing is hardcoded to fake data. Wraps to a 2x2 grid under 640px.
  */
 const DashboardKpis = () => {
   const { t } = useTranslation();
@@ -19,49 +19,54 @@ const DashboardKpis = () => {
     enabled: !!user?.id,
   });
 
+  const dash = "—";
   const activeClients = stats?.activeClients ?? 0;
   const todayAppointments = stats?.todayAppointments ?? 0;
   const pendingTasks = stats?.pendingTasks ?? 0;
   // Hours logged this week, capped at a 40h target (derived from today's load).
   const hoursTarget = 40;
   const hoursLogged = Math.min(todayAppointments * 5, hoursTarget);
-  const hoursPct = Math.round((hoursLogged / hoursTarget) * 100);
 
   return (
-    <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
-      <Card className="rounded-2xl border-border p-4 shadow-sm">
-        <p className="mb-1 text-[10px] font-bold uppercase text-muted-foreground">
-          {t("kpi_active_clients")}
+    <div className="mt-8 grid grid-cols-2 gap-x-6 gap-y-6 sm:flex sm:gap-0">
+      <div className="animate-enter sm:flex-1 sm:px-6 sm:first:pl-0">
+        <p className="text-label uppercase tracking-wide text-muted-foreground">
+          {t("kpi_active_clients", "Actieve cliënten")}
         </p>
-        <p className="text-xl font-bold text-foreground">{isLoading ? "—" : activeClients}</p>
-        <p className="mt-1 text-[9px] font-bold text-mint">{t("kpi_in_your_caseload")}</p>
-      </Card>
+        <p className="mt-1 font-display text-display-md tabular text-foreground">
+          {isLoading ? dash : activeClients}
+        </p>
+        <p className="mt-1 text-xs text-muted-foreground">
+          {t("kpi_in_your_caseload", "In je caseload")}
+        </p>
+      </div>
 
-      <Card className="rounded-2xl border-border p-4 shadow-sm">
-        <p className="mb-1 text-[10px] font-bold uppercase text-muted-foreground">
-          {t("kpi_hours_logged")}
+      <div className="animate-enter border-border sm:flex-1 sm:border-l sm:px-6">
+        <p className="text-label uppercase tracking-wide text-muted-foreground">
+          {t("kpi_hours_logged", "Uren deze week")}
         </p>
-        <p className="text-xl font-bold text-foreground">
-          {isLoading ? "—" : hoursLogged}
-          <span className="text-xs font-medium text-muted-foreground"> / {hoursTarget}</span>
+        <p className="mt-1 font-display text-display-md tabular text-foreground">
+          {isLoading ? dash : hoursLogged}
+          <span className="ml-1 text-base font-normal text-muted-foreground tabular">
+            / {hoursTarget}
+          </span>
         </p>
-        <div className="mt-2 h-1 w-full rounded-full bg-muted">
-          <div
-            className="h-1 rounded-full bg-mint transition-all"
-            style={{ width: `${isLoading ? 0 : hoursPct}%` }}
-          />
-        </div>
-      </Card>
+        <p className="mt-1 text-xs text-muted-foreground">
+          {t("kpi_hours_target", "Richtwaarde 40 uur")}
+        </p>
+      </div>
 
-      <Card className="rounded-2xl border-border p-4 shadow-sm">
-        <p className="mb-1 text-[10px] font-bold uppercase text-muted-foreground">
-          {t("kpi_pending_tasks")}
+      <div className="animate-enter border-border sm:flex-1 sm:border-l sm:px-6 sm:last:pr-0">
+        <p className="text-label uppercase tracking-wide text-muted-foreground">
+          {t("kpi_pending_tasks", "Openstaande taken")}
         </p>
-        <p className="text-xl font-bold text-foreground">{isLoading ? "—" : pendingTasks}</p>
-        <p className="mt-1 text-[9px] font-bold text-muted-foreground">
-          {t("kpi_appointments_today", { count: todayAppointments })}
+        <p className="mt-1 font-display text-display-md tabular text-foreground">
+          {isLoading ? dash : pendingTasks}
         </p>
-      </Card>
+        <p className="mt-1 text-xs text-muted-foreground">
+          {t("kpi_appointments_today", "{{count}} afspraken vandaag", { count: todayAppointments })}
+        </p>
+      </div>
     </div>
   );
 };
