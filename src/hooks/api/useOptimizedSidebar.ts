@@ -20,6 +20,9 @@ import {
   Search,
   MessagesSquare,
   Stethoscope,
+  Activity,
+  BookOpen,
+  ShieldCheck,
 } from "lucide-react";
 
 interface NavigationItem {
@@ -485,6 +488,34 @@ export function useOptimizedSidebar(
           url: `/dashboard/${userType}/journal`,
           icon: NotebookPen,
           isActive: isRouteActive(`/dashboard/${userType}/journal`),
+          items: [],
+        },
+        {
+          title: t("nav_care_plan", "Zorgplan"),
+          url: `/dashboard/${userType}/care-plan`,
+          icon: ClipboardList,
+          isActive: isRouteActive(`/dashboard/${userType}/care-plan`),
+          items: [],
+        },
+        {
+          title: t("nav_progress", "Voortgang"),
+          url: `/dashboard/${userType}/progress`,
+          icon: Activity,
+          isActive: isRouteActive(`/dashboard/${userType}/progress`),
+          items: [],
+        },
+        {
+          title: t("nav_resources", "Bronnen"),
+          url: `/dashboard/${userType}/resources`,
+          icon: BookOpen,
+          isActive: isRouteActive(`/dashboard/${userType}/resources`),
+          items: [],
+        },
+        {
+          title: t("nav_data", "Mijn gegevens"),
+          url: `/dashboard/${userType}/data`,
+          icon: ShieldCheck,
+          isActive: isRouteActive(`/dashboard/${userType}/data`),
           items: [],
         },
         {

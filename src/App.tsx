@@ -80,6 +80,11 @@ const DevEmails = lazy(() => import("@/pages/DevEmails"));
 // Public pricing + ranking-neutrality transparency (dichotomieverbod).
 const Pricing = lazy(() => import("@/pages/Pricing"));
 const RankingTransparency = lazy(() => import("@/pages/RankingTransparency"));
+// Client value surfaces (Phase 3.2/3.3): outcomes, consent, resources, care plan.
+const ClientProgress = lazy(() => import("@/pages/ClientProgress"));
+const ClientData = lazy(() => import("@/pages/ClientData"));
+const ClientResources = lazy(() => import("@/pages/ClientResources"));
+const ClientCarePlan = lazy(() => import("@/pages/ClientCarePlan"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 
@@ -286,6 +291,38 @@ const App = () => {
                   element={
                     <RouteProtection requiredUserType="client">
                       <BondChatPage />
+                    </RouteProtection>
+                  }
+                />
+                <Route
+                  path="/dashboard/client/progress"
+                  element={
+                    <RouteProtection requiredUserType="client">
+                      <ClientProgress />
+                    </RouteProtection>
+                  }
+                />
+                <Route
+                  path="/dashboard/client/data"
+                  element={
+                    <RouteProtection requiredUserType="client">
+                      <ClientData />
+                    </RouteProtection>
+                  }
+                />
+                <Route
+                  path="/dashboard/client/resources"
+                  element={
+                    <RouteProtection requiredUserType="client">
+                      <ClientResources />
+                    </RouteProtection>
+                  }
+                />
+                <Route
+                  path="/dashboard/client/care-plan"
+                  element={
+                    <RouteProtection requiredUserType="client">
+                      <ClientCarePlan />
                     </RouteProtection>
                   }
                 />
