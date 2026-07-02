@@ -72,6 +72,11 @@ const InviteAccept = lazy(() => import("@/pages/InviteAccept"));
 // Role-aware first-run welcome flows (Phase 2 onboarding).
 const WelcomeClient = lazy(() => import("@/pages/WelcomeClient"));
 const WelcomeProvider = lazy(() => import("@/pages/WelcomeProvider"));
+const WelcomePractice = lazy(() => import("@/pages/WelcomePractice"));
+// Group practice management + staff invite (public accept) + email preview.
+const PracticeSettings = lazy(() => import("@/pages/PracticeSettings"));
+const PracticeInviteAccept = lazy(() => import("@/pages/PracticeInviteAccept"));
+const DevEmails = lazy(() => import("@/pages/DevEmails"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 
@@ -228,6 +233,14 @@ const App = () => {
                   element={
                     <RouteProtection requiredUserType="therapist">
                       <ProviderPublicProfileEdit />
+                    </RouteProtection>
+                  }
+                />
+                <Route
+                  path="/dashboard/therapist/practice"
+                  element={
+                    <RouteProtection requiredUserType="therapist">
+                      <PracticeSettings />
                     </RouteProtection>
                   }
                 />
@@ -418,6 +431,11 @@ const App = () => {
                 {/* Role-aware first-run welcome flows (enter demo at the end). */}
                 <Route path="/welcome/client" element={<WelcomeClient />} />
                 <Route path="/welcome/provider" element={<WelcomeProvider />} />
+                <Route path="/welcome/practice" element={<WelcomePractice />} />
+
+                {/* Public staff-invite accept + dev email-template preview. */}
+                <Route path="/practice-invite/:token" element={<PracticeInviteAccept />} />
+                <Route path="/dev/emails" element={<DevEmails />} />
 
                 <Route path="*" element={<NotFound />} />
               </Routes>

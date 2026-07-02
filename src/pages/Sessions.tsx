@@ -37,6 +37,8 @@ import PreSessionNudge from "@/components/sessions/PreSessionNudge";
 import SessionRecapCard from "@/components/sessions/SessionRecapCard";
 import PostSessionAllianceCheck from "@/components/sessions/PostSessionAllianceCheck";
 import { isSessionPast } from "@/components/sessions/sessionLoopUtils";
+import EmptyState from "@/components/ui/empty-state";
+import LineSteps from "@/components/illustration/LineSteps";
 
 // Separate component for session card to properly use hooks
 const SessionCard = ({ session, userType, onViewDetails, onConfirmSession, onCancelSession, onRequestUpdate }: { 
@@ -657,9 +659,32 @@ const Sessions = () => {
 
           <TabsContent value="upcoming" className="space-y-6 mt-6">
             {Object.entries(groupSessionsByDate(upcomingSessions)).length === 0 ? (
-              <div className="text-center py-8">
-                <p className="text-muted-foreground">{t("no_upcoming_sessions_found")}</p>
-              </div>
+              <EmptyState
+                motif={<LineSteps className="h-28 w-28" />}
+                title={t("sessions_empty_title", "Nog geen sessies gepland")}
+                description={
+                  userType === "client"
+                    ? t(
+                        "sessions_empty_body_client",
+                        "Je begeleider plant hier jullie afspraken."
+                      )
+                    : t(
+                        "sessions_empty_body_provider",
+                        "Plan een eerste afspraak om jullie begeleiding op te starten."
+                      )
+                }
+                action={
+                  userType !== "client" ? (
+                    <Button
+                      className="bg-primary hover:bg-primary/90 text-primary-foreground"
+                      onClick={() => setShowScheduleDialog(true)}
+                    >
+                      <CalendarDays className="w-4 h-4 mr-2" />
+                      {t("schedule_new")}
+                    </Button>
+                  ) : undefined
+                }
+              />
             ) : (
               Object.entries(groupSessionsByDate(upcomingSessions)).map(
                 ([dateLabel, sessionsForDate]) =>
@@ -670,9 +695,14 @@ const Sessions = () => {
 
           <TabsContent value="history" className="space-y-6 mt-6">
             {Object.entries(groupSessionsByDate(pastSessions)).length === 0 ? (
-              <div className="text-center py-8">
-                <p className="text-muted-foreground">{t("no_past_sessions_found")}</p>
-              </div>
+              <EmptyState
+                motif={<LineSteps className="h-28 w-28" />}
+                title={t("sessions_history_empty_title", "Nog geen sessies geweest")}
+                description={t(
+                  "sessions_history_empty_body",
+                  "Zodra een afspraak achter de rug is, vind je hier het overzicht terug."
+                )}
+              />
             ) : (
               Object.entries(groupSessionsByDate(pastSessions)).map(
                 ([dateLabel, sessionsForDate]) =>

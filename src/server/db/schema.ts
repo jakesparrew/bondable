@@ -765,6 +765,36 @@ export const announcementReads = pgTable('announcement_reads', {
 });
 
 /* -------------------------------------------------------------------------- */
+/* Analytics spine (single event registry — master-plan R12)                   */
+/* ----------------------------------------------------------------------------*/
+/* The ONE event table the owner cockpit + monetization both read/emit through. */
+/* props MUST NEVER contain special-category (health) data.                     */
+export const analyticsEvents = pgTable('analytics_events', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  name: text('name').notNull(), // snake_case, e.g. finder_request_sent
+  profileId: uuid('profile_id').references(() => profiles.id, {
+    onDelete: 'set null',
+  }),
+  role: text('role'),
+  props: jsonb('props'), // non-PII/non-health only
+  sessionId: text('session_id'),
+  createdAt: timestamp('created_at', tz).notNull().defaultNow(),
+});
+
+export const metricDaily = pgTable(
+  'metric_daily',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    day: date('day').notNull(),
+    metric: text('metric').notNull(),
+    value: numeric('value').notNull().default('0'),
+  },
+  (t) => ({
+    uniqMetricDay: uniqueIndex('metric_daily_day_metric_uidx').on(t.day, t.metric),
+  }),
+);
+
+/* -------------------------------------------------------------------------- */
 /* Relations                                                                    */
 /* -------------------------------------------------------------------------- */
 

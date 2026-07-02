@@ -14,6 +14,8 @@ import { JournalEntryDialog } from "@/components/dialogs/JournalEntryDialog";
 import { JournalEntryCard } from "@/components/JournalEntryCard";
 import { TherapistSharingSelector } from "@/components/TherapistSharingSelector";
 import { useJournalEntries } from "@/hooks/api/useOptimizedJournal";
+import EmptyState from "@/components/ui/empty-state";
+import LineLoop from "@/components/illustration/LineLoop";
 import { useToast } from "@/hooks/ui/use-toast";
 import { useFileUpload } from "@/hooks/utils/use-file-upload";
 // Removed skeleton import - using instant loading
@@ -204,32 +206,31 @@ const Journal = () => {
                 {t("loading_entries")}
               </div>
             ) : entries.length === 0 ? (
-              <div className="text-center py-12 md:py-16">
-                <div className="w-12 h-12 bg-card rounded-lg flex items-center justify-center mx-auto mb-4">
-                  <BookOpen className="h-6 w-6 text-muted-foreground" />
-                </div>
-                <h3 className="text-lg font-medium text-foreground mb-2">
-                  {t("start_your_journal")}
-                </h3>
-                <p className="text-muted-foreground text-sm mb-6 px-4">
-                  {t("writing_regularly_helps_track_progress")}
-                </p>
-                <JournalEntryDialog
-                  onEntryCreated={(entry) => {
-                    addEntry(entry);
-                    toast({
-                      title: "Success",
-                      description: "Journal entry created.",
-                    });
-                  }}
-                  trigger={
-                    <Button className="bg-primary hover:bg-primary/90 text-primary-foreground w-full md:w-auto">
-                      <Plus className="w-4 h-4 mr-2" />
-                      {t("write_first_entry")}
-                    </Button>
-                  }
-                />
-              </div>
+              <EmptyState
+                motif={<LineLoop className="h-28 w-28" />}
+                title={t("journal_empty_title", "Je dagboek is nog leeg")}
+                description={t(
+                  "journal_empty_body",
+                  "Schrijf een eerste gedachte. Alleen jij kan dit lezen, tenzij je het deelt."
+                )}
+                action={
+                  <JournalEntryDialog
+                    onEntryCreated={(entry) => {
+                      addEntry(entry);
+                      toast({
+                        title: "Success",
+                        description: "Journal entry created.",
+                      });
+                    }}
+                    trigger={
+                      <Button className="bg-primary hover:bg-primary/90 text-primary-foreground w-full md:w-auto">
+                        <Plus className="w-4 h-4 mr-2" />
+                        {t("write_first_entry")}
+                      </Button>
+                    }
+                  />
+                }
+              />
             ) : (
               <div className="space-y-4">
                 {entries.map((entry) => (

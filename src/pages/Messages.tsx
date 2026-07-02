@@ -6,12 +6,16 @@ import TherapistSelector from "@/components/TherapistSelector";
 import ConversationInterface from "@/components/ConversationInterface";
 import { useIsMobile } from "@/hooks/ui/use-mobile";
 import { Button } from "@/components/ui/button";
+import EmptyState from "@/components/ui/empty-state";
+import LineMeet from "@/components/illustration/LineMeet";
+import { useTranslation } from "react-i18next";
 import { ArrowLeft } from "lucide-react";
 import { Client } from "@/types/client";
 import { Therapist } from "@/services/api";
 // Remove import MessagesSkeleton - no longer needed
 
 const Messages = () => {
+  const { t } = useTranslation();
   const { userType } = useParams();
   const [searchParams] = useSearchParams();
   const [selectedClient, setSelectedClient] = useOptimizedState<Client | null>(null);
@@ -113,24 +117,33 @@ const Messages = () => {
               onSelectTherapist={handleSelectTherapist}
               selectedTherapist={selectedTherapist}
             />
-            <ConversationInterface
-              selectedClient={
-                selectedTherapist
-                  ? {
-                      id: selectedTherapist.id,
-                      name: selectedTherapist.name,
-                      firstName: selectedTherapist.firstName,
-                      lastName: selectedTherapist.lastName,
-                      email: selectedTherapist.email,
-                      phone: selectedTherapist.phone,
-                      status: "Active",
-                      joinDate: "2020-01-01",
-                      lastSession: "2024-06-01",
-                    }
-                  : null
-              }
-              onBackClick={handleBackToList}
-            />
+            {selectedTherapist ? (
+              <ConversationInterface
+                selectedClient={{
+                  id: selectedTherapist.id,
+                  name: selectedTherapist.name,
+                  firstName: selectedTherapist.firstName,
+                  lastName: selectedTherapist.lastName,
+                  email: selectedTherapist.email,
+                  phone: selectedTherapist.phone,
+                  status: "Active",
+                  joinDate: "2020-01-01",
+                  lastSession: "2024-06-01",
+                }}
+                onBackClick={handleBackToList}
+              />
+            ) : (
+              <div className="flex-1 flex items-center justify-center">
+                <EmptyState
+                  motif={<LineMeet className="h-28 w-28" />}
+                  title={t("messages_empty_title", "Nog geen berichten")}
+                  description={t(
+                    "messages_empty_body_client",
+                    "Hier praat je veilig met je begeleider tussen de sessies door."
+                  )}
+                />
+              </div>
+            )}
           </div>
         )}
       </DashboardLayout>
@@ -168,11 +181,24 @@ const Messages = () => {
             selectedClient={selectedClient}
             preselectedClientId={clientIdParam}
           />
-          <ConversationInterface
-            selectedClient={selectedClient}
-            isPayingTherapist={isPayingTherapist}
-            onBackClick={handleBackToList}
-          />
+          {selectedClient ? (
+            <ConversationInterface
+              selectedClient={selectedClient}
+              isPayingTherapist={isPayingTherapist}
+              onBackClick={handleBackToList}
+            />
+          ) : (
+            <div className="flex-1 flex items-center justify-center">
+              <EmptyState
+                motif={<LineMeet className="h-28 w-28" />}
+                title={t("messages_empty_title", "Nog geen berichten")}
+                description={t(
+                  "messages_empty_body_provider",
+                  "Kies een cliënt om veilig verder te praten tussen de sessies door."
+                )}
+              />
+            </div>
+          )}
         </div>
       )}
     </DashboardLayout>
