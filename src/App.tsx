@@ -77,6 +77,9 @@ const WelcomePractice = lazy(() => import("@/pages/WelcomePractice"));
 const PracticeSettings = lazy(() => import("@/pages/PracticeSettings"));
 const PracticeInviteAccept = lazy(() => import("@/pages/PracticeInviteAccept"));
 const DevEmails = lazy(() => import("@/pages/DevEmails"));
+// Public pricing + ranking-neutrality transparency (dichotomieverbod).
+const Pricing = lazy(() => import("@/pages/Pricing"));
+const RankingTransparency = lazy(() => import("@/pages/RankingTransparency"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 
@@ -436,6 +439,10 @@ const App = () => {
                 {/* Public staff-invite accept + dev email-template preview. */}
                 <Route path="/practice-invite/:token" element={<PracticeInviteAccept />} />
                 <Route path="/dev/emails" element={<DevEmails />} />
+
+                {/* Public pricing + ranking-transparency. */}
+                <Route path="/pricing" element={<Pricing />} />
+                <Route path="/how-ranking-works" element={<RankingTransparency />} />
 
                 <Route path="*" element={<NotFound />} />
               </Routes>

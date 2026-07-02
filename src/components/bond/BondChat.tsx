@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { CalendarCheck, ChevronRight } from "lucide-react";
 
 import { useAuthManager } from "@/hooks/api/useAuthManager";
 import { useConnectedTherapists } from "@/hooks/api/useOptimizedTherapists";
@@ -10,6 +11,8 @@ import BondMessageBubble from "./BondMessageBubble";
 import BondTypingIndicator from "./BondTypingIndicator";
 import BondSuggestionChips from "./BondSuggestionChips";
 import BondComposer from "./BondComposer";
+import BondCheckIn from "./BondCheckIn";
+import MoodRibbon from "./MoodRibbon";
 import {
   bondRespond,
   buildOpeningMessage,
@@ -71,6 +74,11 @@ const BondChat = () => {
   const [messages, setMessages] = useState<BondMessage[]>([]);
   const [isTyping, setIsTyping] = useState(false);
   const [suggestions, setSuggestions] = useState<string[]>(DEFAULT_SUGGESTIONS);
+  // Structured daily check-in: a compact affordance that expands inline above the
+  // thread (mint is allowed — this is a Bond surface). `checkinNonce` forces the
+  // ribbon to re-read localStorage after a check-in is saved.
+  const [checkinOpen, setCheckinOpen] = useState(false);
+  const [checkinNonce, setCheckinNonce] = useState(0);
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const openedRef = useRef(false);
@@ -156,6 +164,48 @@ const BondChat = () => {
   return (
     <div className="flex h-[calc(100vh-8rem)] min-h-[28rem] flex-col overflow-hidden rounded-3xl border border-border bg-card shadow-sm">
       <BondHeader therapistName={therapistName} />
+
+      {/* Daily check-in affordance: compact prompt that expands inline. Mint is
+          allowed here (Bond surface). MoodRibbon sits subtly beneath it. */}
+      <div className="border-b border-border bg-card px-4 py-3 sm:px-6">
+        {checkinOpen ? (
+          <BondCheckIn
+            onComplete={() => setCheckinNonce((n) => n + 1)}
+            onCancel={() => setCheckinOpen(false)}
+          />
+        ) : (
+          <div className="flex flex-col gap-3">
+            <button
+              type="button"
+              onClick={() => setCheckinOpen(true)}
+              className="flex items-center justify-between gap-3 rounded-card border border-mint/40 bg-mint-soft px-3.5 py-3 text-left transition-colors hover:bg-mint/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+            >
+              <span className="flex items-center gap-3">
+                <span
+                  aria-hidden="true"
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-mint text-mint-foreground"
+                >
+                  <CalendarCheck className="h-5 w-5" />
+                </span>
+                <span className="min-w-0">
+                  <span className="block text-sm font-semibold text-foreground">
+                    {t("checkin_cta_title", "Dagelijkse check-in")}
+                  </span>
+                  <span className="block text-xs text-muted-foreground">
+                    {t("checkin_cta_subtitle", "Onder de minuut, helemaal aan jou")}
+                  </span>
+                </span>
+              </span>
+              <ChevronRight
+                className="h-4 w-4 shrink-0 text-muted-foreground"
+                aria-hidden="true"
+              />
+            </button>
+
+            <MoodRibbon key={checkinNonce} />
+          </div>
+        )}
+      </div>
 
       <div
         ref={scrollRef}

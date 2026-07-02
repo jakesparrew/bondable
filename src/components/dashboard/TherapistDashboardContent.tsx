@@ -6,6 +6,8 @@ import ActiveClientsTable from "@/components/dashboard/ActiveClientsTable";
 import DashboardKpis from "@/components/dashboard/DashboardKpis";
 import ClinicalQueue from "@/components/dashboard/ClinicalQueue";
 import ProviderLeads from "@/components/dashboard/therapist/ProviderLeads";
+import ActionInbox from "@/components/dashboard/therapist/ActionInbox";
+import TodayPrepRow from "@/components/dashboard/therapist/TodayPrepRow";
 import { CheckInAlerts } from "@/components/safety/BetweenSessionCheckIn";
 import SetupChecklist from "@/features/onboarding/SetupChecklist";
 import WelcomeModal from "@/features/onboarding/WelcomeModal";
@@ -39,6 +41,22 @@ const TherapistDashboardContent = () => {
         <div className="pt-4">
           <WelcomeModal role="provider" />
           <SetupChecklist />
+
+          {/* Today view additions (T-PX-2 + light T-PX-1): a slim, severity-sorted
+              ActionInbox strip under the title, and a "Vandaag" row of up to
+              three ClientPrepCards built from today's sessions. Both use
+              graceful absence and sit ABOVE the existing overview so nothing
+              below is removed or reshuffled. */}
+          <div className="mb-8 space-y-4">
+            <ActionInbox />
+            <div>
+              <h2 className="mb-3 text-sm font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+                {t("today_prep_heading", "Vandaag")}
+              </h2>
+              <TodayPrepRow />
+            </div>
+          </div>
+
           <QuickActions />
 
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
