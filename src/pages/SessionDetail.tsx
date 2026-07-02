@@ -14,7 +14,9 @@ import {
   Phone,
   Type,
   FileText,
+  NotebookPen,
 } from "lucide-react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -24,6 +26,8 @@ import { isSessionPast } from "@/components/sessions/sessionLoopUtils";
 import SessionRecapCard from "@/components/sessions/SessionRecapCard";
 import PostSessionAllianceCheck from "@/components/sessions/PostSessionAllianceCheck";
 import PreSessionNudge from "@/components/sessions/PreSessionNudge";
+import SessionNotes from "@/components/notes/SessionNotes";
+import QuickCaptureSheet from "@/components/notes/QuickCaptureSheet";
 
 /** Session enriched with resolved counterpart names for display. */
 interface SessionWithNames extends Session {
@@ -139,6 +143,11 @@ const SessionDetail = () => {
 
   const isTherapist = userType === "therapist";
 
+  // Clinical-note quick-capture (provider only). `notesKey` bumps to refetch the
+  // SessionNotes panel after a save/sign.
+  const [captureOpen, setCaptureOpen] = useState(false);
+  const [notesKey, setNotesKey] = useState(0);
+
   const {
     data: session,
     isLoading,
@@ -247,12 +256,25 @@ const SessionDetail = () => {
             </div>
           </div>
 
-          <Badge
-            variant="outline"
-            className={getStatusBadgeClasses(session.status)}
-          >
-            {t(`status_${session.status.toLowerCase().replace(/ /g, "_")}`, session.status)}
-          </Badge>
+          <div className="flex items-center gap-3">
+            {canEditRecap && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCaptureOpen(true)}
+                className="rounded-ctl"
+              >
+                <NotebookPen className="mr-1.5 h-4 w-4" />
+                {t("clinical_note_action", "Notitie")}
+              </Button>
+            )}
+            <Badge
+              variant="outline"
+              className={getStatusBadgeClasses(session.status)}
+            >
+              {t(`status_${session.status.toLowerCase().replace(/ /g, "_")}`, session.status)}
+            </Badge>
+          </div>
         </div>
 
         {/* Session details */}
@@ -321,21 +343,42 @@ const SessionDetail = () => {
           />
         )}
 
-        {/* Session recap — therapist authors/edits; client sees it read-only. */}
+        {/* Session recap — "Samenvatting voor cliënt" (client-visible, §2).
+            Provider authors/edits; client sees it read-only. */}
         <SessionRecapCard
           sessionId={session.id}
           recap={session.recap}
           canEdit={canEditRecap}
         />
 
-        {/* Therapist-authored notes (read-only surface). */}
+        {/* Clinical note — "Klinische notitie" (provider-only + supervision, §2).
+            Distinct from the recap above and the "Praktisch" logistics below. */}
+        {isTherapist && user?.id && (
+          <SessionNotes
+            key={notesKey}
+            sessionId={session.id}
+            viewer={{
+              id: user.id,
+              name: session.therapistName || t("provider", "Begeleider"),
+            }}
+            accessContext={
+              session.therapist_id === user.id ? "other" : "supervision"
+            }
+            canEdit={canEditRecap}
+            onOpenCapture={() => setCaptureOpen(true)}
+            refreshKey={notesKey}
+          />
+        )}
+
+        {/* Practical / logistics — "Praktisch" (§2): the free-text sessions.notes
+            column, relabeled. Location codes, "brings partner", etc. */}
         {session.notes && (
           <Card className="border border-border bg-card">
             <CardContent className="space-y-2 p-4">
               <div className="flex items-center gap-2">
                 <FileText className="h-4 w-4 text-muted-foreground" />
                 <h4 className="text-sm font-semibold text-foreground">
-                  {t("session_notes", "Session notes")}
+                  {t("session_logistics", "Praktisch")}
                 </h4>
               </div>
               <p className="whitespace-pre-line text-sm leading-relaxed text-muted-foreground">
@@ -350,6 +393,19 @@ const SessionDetail = () => {
           <PostSessionAllianceCheck sessionId={session.id} />
         )}
       </div>
+
+      {/* 90-second clinical-note quick-capture (provider owner only). */}
+      {canEditRecap && user?.id && (
+        <QuickCaptureSheet
+          open={captureOpen}
+          onOpenChange={setCaptureOpen}
+          sessionId={session.id}
+          providerId={user.id}
+          clientId={session.client_id}
+          clientName={session.clientName}
+          onSaved={() => setNotesKey((k) => k + 1)}
+        />
+      )}
     </DashboardLayout>
   );
 };

@@ -85,6 +85,8 @@ const ClientProgress = lazy(() => import("@/pages/ClientProgress"));
 const ClientData = lazy(() => import("@/pages/ClientData"));
 const ClientResources = lazy(() => import("@/pages/ClientResources"));
 const ClientCarePlan = lazy(() => import("@/pages/ClientCarePlan"));
+// Provider Belgium-aware client invoicing (distinct from the subscription).
+const ProviderInvoicing = lazy(() => import("@/pages/ProviderInvoicing"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 
@@ -249,6 +251,14 @@ const App = () => {
                   element={
                     <RouteProtection requiredUserType="therapist">
                       <PracticeSettings />
+                    </RouteProtection>
+                  }
+                />
+                <Route
+                  path="/dashboard/therapist/invoicing"
+                  element={
+                    <RouteProtection requiredUserType="therapist">
+                      <ProviderInvoicing />
                     </RouteProtection>
                   }
                 />

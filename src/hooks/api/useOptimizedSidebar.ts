@@ -23,6 +23,8 @@ import {
   Activity,
   BookOpen,
   ShieldCheck,
+  Building2,
+  Receipt,
 } from "lucide-react";
 
 interface NavigationItem {
@@ -387,6 +389,20 @@ export function useOptimizedSidebar(
             url: `/dashboard/${userType}/clients`,
             icon: UsersRound,
             isActive: isRouteActive(`/dashboard/${userType}/clients`),
+            items: [],
+          },
+          {
+            title: t("nav_practice", "Praktijk"),
+            url: `/dashboard/${userType}/practice`,
+            icon: Building2,
+            isActive: isRouteActive(`/dashboard/${userType}/practice`),
+            items: [],
+          },
+          {
+            title: t("nav_invoicing", "Facturatie"),
+            url: `/dashboard/${userType}/invoicing`,
+            icon: Receipt,
+            isActive: isRouteActive(`/dashboard/${userType}/invoicing`),
             items: [],
           },
           {
