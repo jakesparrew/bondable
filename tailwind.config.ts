@@ -34,7 +34,20 @@ export default {
 				},
 				destructive: {
 					DEFAULT: 'hsl(var(--destructive))',
-					foreground: 'hsl(var(--destructive-foreground))'
+					foreground: 'hsl(var(--destructive-foreground))',
+					soft: 'hsl(var(--destructive-soft))'
+				},
+				success: {
+					DEFAULT: 'hsl(var(--success))',
+					soft: 'hsl(var(--success-soft))'
+				},
+				warning: {
+					DEFAULT: 'hsl(var(--warning))',
+					soft: 'hsl(var(--warning-soft))'
+				},
+				info: {
+					DEFAULT: 'hsl(var(--info))',
+					soft: 'hsl(var(--info-soft))'
 				},
 				muted: {
 					DEFAULT: 'hsl(var(--muted))',
@@ -54,7 +67,8 @@ export default {
 				},
 				mint: {
 					DEFAULT: 'hsl(var(--mint))',
-					foreground: 'hsl(var(--mint-foreground))'
+					foreground: 'hsl(var(--mint-foreground))',
+					soft: 'hsl(var(--mint-soft))'
 				},
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
@@ -70,7 +84,27 @@ export default {
 			borderRadius: {
 				lg: 'var(--radius)',
 				md: 'calc(var(--radius) - 2px)',
-				sm: 'calc(var(--radius) - 4px)'
+				sm: 'calc(var(--radius) - 4px)',
+				ctl: 'var(--radius-ctl)',
+				card: 'var(--radius)',
+				hero: 'var(--radius-hero)'
+			},
+			fontFamily: {
+				sans: ['"Instrument Sans Variable"', 'system-ui', 'sans-serif'],
+				display: ['"Fraunces Variable"', 'Georgia', 'serif']
+			},
+			fontSize: {
+				'display-xl': ['3rem', { lineHeight: '1.05', letterSpacing: '-0.01em' }],
+				'display-lg': ['2.25rem', { lineHeight: '1.1', letterSpacing: '-0.01em' }],
+				'display-md': ['1.5rem', { lineHeight: '1.2', letterSpacing: '-0.01em' }],
+				title: ['1.125rem', { lineHeight: '1.35' }],
+				body: ['0.9375rem', { lineHeight: '1.55' }],
+				'body-sm': ['0.8125rem', { lineHeight: '1.5' }],
+				label: ['0.75rem', { lineHeight: '1.3', letterSpacing: '0.04em' }]
+			},
+			boxShadow: {
+				overlay: 'var(--shadow-overlay)',
+				raise: 'var(--shadow-raise)'
 			},
 			keyframes: {
 				'accordion-down': {

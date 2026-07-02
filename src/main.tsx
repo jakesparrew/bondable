@@ -11,6 +11,10 @@
 
 import { createRoot } from 'react-dom/client'
 import App from './App.tsx'
+// Self-hosted brand typefaces (no Google Fonts request — GDPR-clean).
+// Fraunces = display serif; Instrument Sans = humanist UI sans.
+import '@fontsource-variable/fraunces'
+import '@fontsource-variable/instrument-sans'
 import './index.css'
 import './i18n';
 import productionConsole from './lib/production-console';

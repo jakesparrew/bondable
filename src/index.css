@@ -32,13 +32,37 @@
 
     --border: 165 24% 89%;              /* #dbe8e6 */
     --input: 165 24% 89%;
-    --ring: 162 72% 42%;
+    --ring: 174 50% 30%;                /* teal focus ring — mint ring was leaking AI color app-wide */
 
-    --radius: 1rem;
+    --radius: 0.875rem;                 /* card tier (see radius scale) */
+    --radius-ctl: 0.5rem;               /* inputs, buttons, badges */
+    --radius-hero: 1.25rem;             /* marketing / Bond surfaces only */
 
-    /* Mint — AI surfaces ONLY (badges, agent UI) */
+    /* Semantic status — soft = tinted surface, DEFAULT = text/icon on soft */
+    --success: 152 42% 33%;             /* deep sage ~#316b52, distinct from mint */
+    --success-soft: 150 35% 93%;
+    --warning: 36 84% 40%;              /* burnt amber ~#bc7a0f */
+    --warning-soft: 40 78% 93%;
+    --info: 206 45% 38%;                /* slate blue ~#35618d */
+    --info-soft: 208 40% 94%;
+    --destructive-soft: 0 65% 96%;
+
+    /* Mint — AI surfaces ONLY (Bond, matcher, admin flagged chats) */
     --mint: 162 73% 44%;                /* #1ec291 */
     --mint-foreground: 174 64% 12%;
+    --mint-soft: 160 55% 93%;           /* AI surface tint */
+    --ring-ai: 162 72% 42%;             /* AI-only focus ring */
+
+    /* Elevation — overlays only at rest; raise is hover-only on cards */
+    --shadow-overlay: 0 12px 32px -8px hsl(174 62% 16% / 0.14), 0 2px 8px hsl(174 62% 16% / 0.06);
+    --shadow-raise: 0 4px 14px -4px hsl(174 62% 16% / 0.10);
+
+    /* Motion — 3 durations, one easing family */
+    --dur-micro: 120ms;
+    --dur-standard: 200ms;
+    --dur-overlay: 320ms;
+    --ease-out: cubic-bezier(0.2, 0, 0, 1);
+    --ease-in-out: cubic-bezier(0.45, 0, 0.15, 1);
 
     --sidebar-background: 187 53% 9%;   /* #0a1f22 deep teal */
     --sidebar-foreground: 168 18% 80%;  /* #d6e2e0 */
@@ -78,10 +102,20 @@
 
     --border: 185 28% 20%;
     --input: 185 28% 20%;
-    --ring: 162 70% 45%;
+    --ring: 174 45% 55%;
+
+    --success: 152 40% 55%;
+    --success-soft: 152 30% 16%;
+    --warning: 36 80% 58%;
+    --warning-soft: 36 40% 16%;
+    --info: 206 50% 62%;
+    --info-soft: 206 35% 18%;
+    --destructive-soft: 0 40% 18%;
 
     --mint: 162 72% 48%;
     --mint-foreground: 185 45% 10%;
+    --mint-soft: 162 40% 16%;
+    --ring-ai: 162 72% 48%;
 
     --sidebar-background: 185 45% 8%;
     --sidebar-foreground: 168 22% 88%;
@@ -121,7 +155,50 @@
 
   body {
     @apply bg-background text-foreground;
+    font-family: theme('fontFamily.sans');
+    font-size: 0.9375rem;               /* 15px calm base for dense dashboards */
+    line-height: 1.55;
     font-feature-settings: "rlig" 1, "calt" 1;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Fraunces is display-ONLY — never in body, tables, forms, chat, toasts. */
+  .font-display {
+    font-family: theme('fontFamily.display');
+    font-variation-settings: "opsz" 72, "SOFT" 50, "WONK" 0;
+    font-weight: 560;
+    letter-spacing: -0.01em;
+  }
+
+  /* Numeric alignment for stats, tables, times. */
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Section/dialog headings default to the display face; page titles opt in
+     explicitly via .font-display + text-display-lg so we stay disciplined. */
+  h1, h2 {
+    @apply font-display tracking-tight;
+  }
+}
+
+@layer utilities {
+  /* Enter pattern: fade + 4px rise for cards appearing after loading. */
+  @keyframes enter-rise {
+    from { opacity: 0; transform: translateY(4px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .animate-enter {
+    animation: enter-rise var(--dur-standard) var(--ease-out) both;
+  }
+
+  /* Bond "breathing" presence dot — the one signature AI motion. */
+  @keyframes bond-breath {
+    0%, 100% { transform: scale(1); opacity: 0.85; }
+    50%      { transform: scale(1.15); opacity: 1; }
+  }
+  .animate-breath {
+    animation: bond-breath 3.2s var(--ease-in-out) infinite;
   }
 }
 
