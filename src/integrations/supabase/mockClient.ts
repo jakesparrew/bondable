@@ -875,6 +875,8 @@ function buildSeed(): Record<string, any[]> {
   const provider_profiles = [
     {
       provider_id: THERAPIST_ID,
+      provider_type: 'clinical_psychologist',
+      verification_status: 'verified',
       headline: 'Klinisch psycholoog — angst, burn-out & stress',
       bio: 'Ik help volwassenen die vastlopen door piekeren, stress of een burn-out om opnieuw grip te krijgen. Warme, praktische aanpak.',
       specializations: ['anxiety', 'burnout', 'depression'],
@@ -896,6 +898,8 @@ function buildSeed(): Record<string, any[]> {
     },
     {
       provider_id: PROVIDER_ID_1,
+      provider_type: 'clinical_psychologist',
+      verification_status: 'verified',
       headline: 'Klinisch psycholoog — koppels & relaties',
       bio: 'Samen aan jullie relatie werken: communicatie, vertrouwen en verbinding herstellen in een veilige setting.',
       specializations: ['couples', 'anxiety'],
@@ -917,6 +921,8 @@ function buildSeed(): Record<string, any[]> {
     },
     {
       provider_id: PROVIDER_ID_2,
+      provider_type: 'psychotherapist',
+      verification_status: 'verified',
       headline: 'Psychotherapeut — trauma & rouw',
       bio: 'Gespecialiseerd in traumaverwerking en rouw. Ik werk op jouw tempo, met respect voor je verhaal.',
       specializations: ['trauma', 'grief', 'depression'],
@@ -938,6 +944,8 @@ function buildSeed(): Record<string, any[]> {
     },
     {
       provider_id: PROVIDER_ID_3,
+      provider_type: 'coach',
+      verification_status: 'verified',
       headline: 'Stress- & burn-outcoach',
       bio: 'Praktische coaching om uit de overlevingsstand te komen: energie, grenzen en focus terugvinden.',
       specializations: ['burnout', 'stress', 'adhd'],
@@ -959,6 +967,8 @@ function buildSeed(): Record<string, any[]> {
     },
     {
       provider_id: PROVIDER_ID_4,
+      provider_type: 'coach',
+      verification_status: 'unverified',
       headline: 'Life- & loopbaancoach',
       bio: 'Voor wie keuzes wil maken met meer rust en richting. Heldere doelen, haalbare stappen.',
       specializations: ['stress', 'burnout'],
@@ -980,6 +990,8 @@ function buildSeed(): Record<string, any[]> {
     },
     {
       provider_id: PROVIDER_ID_5,
+      provider_type: 'clinical_psychologist',
+      verification_status: 'pending',
       headline: 'Klinisch psycholoog — ADHD & depressie',
       bio: 'Ondersteuning bij ADHD, somberheid en zelfbeeld, voor jongvolwassenen en volwassenen.',
       specializations: ['adhd', 'depression', 'anxiety'],

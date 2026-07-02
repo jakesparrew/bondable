@@ -14,6 +14,8 @@
  */
 
 import { supabase } from '@/integrations/supabase/client';
+import type { ProviderType, VerificationStatus } from '@/lib/providerTypes';
+import { recomputeRegulated } from '@/lib/providerTypes';
 
 /* -------------------------------------------------------------------------- */
 /* Types                                                                       */
@@ -30,6 +32,10 @@ export interface Provider {
   fullName: string;
   /** Regulated clinician (therapist/psychologist) vs coach. */
   isRegulated: boolean;
+  /** Typed profession (drives the label + trust badge). */
+  providerType: ProviderType | null;
+  /** Credential-review state feeding the derived is_regulated + coach badge. */
+  verificationStatus: VerificationStatus | null;
   headline: string | null;
   bio: string | null;
   approach: string | null;
@@ -71,6 +77,8 @@ export interface FinderFilters {
   modality?: Modality;
   /** true = regulated clinicians only; false = coaches only; undefined = both. */
   regulated?: boolean;
+  /** Exact provider_type (e.g. 'coach', 'clinical_psychologist'). */
+  providerType?: string;
   city?: string;
   /** true = only providers currently accepting new clients. */
   acceptingNew?: boolean;
@@ -171,12 +179,20 @@ function fullNameOf(first: unknown, last: unknown): string {
 
 /** Merge a provider_profiles row with its profile row into a Provider. */
 function toProvider(pp: Row, profile: Row | null): Provider {
+  const providerType = (str(pp, 'provider_type') as ProviderType) ?? null;
+  const verificationStatus =
+    (str(pp, 'verification_status') as VerificationStatus) ?? null;
   return {
     id: String(pp.provider_id ?? ''),
     firstName: profile ? str(profile, 'first_name') : null,
     lastName: profile ? str(profile, 'last_name') : null,
     fullName: fullNameOf(profile?.first_name, profile?.last_name),
-    isRegulated: profile?.is_regulated === true,
+    // Derived per R8 when a type is known; legacy rows fall back to the flag.
+    isRegulated: providerType
+      ? recomputeRegulated(providerType, verificationStatus)
+      : profile?.is_regulated === true,
+    providerType,
+    verificationStatus,
     headline: str(pp, 'headline'),
     bio: str(pp, 'bio'),
     approach: str(pp, 'approach'),
@@ -255,6 +271,10 @@ export const finderService = {
 
     if (filters.regulated !== undefined) {
       providers = providers.filter((p) => p.isRegulated === filters.regulated);
+    }
+    if (filters.providerType) {
+      const want = normalize(filters.providerType);
+      providers = providers.filter((p) => normalize(p.providerType) === want);
     }
     if (filters.acceptingNew) {
       providers = providers.filter((p) => p.acceptingNewClients);

@@ -23,6 +23,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import type { FinderFilters as Filters } from '@/services/api/finderService';
+import { FINDER_PROVIDER_TYPES, providerLabel } from '@/lib/providerTypes';
 
 /** Sentinel for "no choice" in single-select dropdowns (Radix forbids ''). */
 const ANY = '__any__';
@@ -49,6 +50,7 @@ const FinderFilters = ({ filters, onChange, onReset, options }: FinderFiltersPro
     (filters.language ? 1 : 0) +
     (filters.modality ? 1 : 0) +
     (filters.regulated !== undefined ? 1 : 0) +
+    (filters.providerType ? 1 : 0) +
     (filters.city ? 1 : 0) +
     (filters.acceptingNew ? 1 : 0);
 
@@ -112,6 +114,29 @@ const FinderFilters = ({ filters, onChange, onReset, options }: FinderFiltersPro
               <SelectItem value="coach">
                 {t('finder_badge_coach', 'Coach')}
               </SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Discipline / profession (specific provider type) */}
+        <div className="space-y-1.5">
+          <Label className="text-xs font-medium text-foreground">
+            {t('finder_filter_discipline', 'Beroep')}
+          </Label>
+          <Select
+            value={filters.providerType ?? ANY}
+            onValueChange={(v) => set({ providerType: v === ANY ? undefined : v })}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder={t('finder_filter_any', 'Alle')} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value={ANY}>{t('finder_filter_any', 'Alle')}</SelectItem>
+              {FINDER_PROVIDER_TYPES.map((pt) => (
+                <SelectItem key={pt} value={pt}>
+                  {providerLabel(pt, t, { capitalize: true })}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>

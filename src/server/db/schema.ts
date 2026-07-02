@@ -47,6 +47,33 @@ import {
 
 export const userRole = pgEnum('user_role', ['therapist', 'client', 'admin']);
 
+// Provider generalization (docs/plan/02). `is_regulated` is DERIVED from
+// (provider_type, verification_status) via recomputeRegulated() — never set by
+// hand. See src/lib/providerTypes.ts for the canonical taxonomy/metadata.
+export const providerType = pgEnum('provider_type', [
+  'clinical_psychologist',
+  'clinical_orthopedagogue',
+  'psychotherapist',
+  'coach',
+  'counselor',
+  'other',
+]);
+export const verificationStatus = pgEnum('verification_status', [
+  'unverified',
+  'pending',
+  'verified',
+  'rejected',
+]);
+export const practiceRole = pgEnum('practice_role', ['owner', 'manager', 'staff']);
+export const credentialKind = pgEnum('credential_kind', [
+  'visum',
+  'erkenningsnummer',
+  'base_profession',
+  'psychotherapy_training',
+  'diploma',
+  'certificate',
+]);
+
 /* -------------------------------------------------------------------------- */
 /* Shared column helpers                                                       */
 /* -------------------------------------------------------------------------- */
@@ -548,6 +575,16 @@ export const providerProfiles = pgTable('provider_profiles', {
   providerId: uuid('provider_id')
     .primaryKey()
     .references(() => profiles.id, { onDelete: 'cascade' }),
+  // Typed profession + credential-review state. is_regulated (on profiles) is
+  // derived from these; the finder never ranks on either (dichotomieverbod).
+  providerType: providerType('provider_type').notNull().default('coach'),
+  verificationStatus: verificationStatus('verification_status')
+    .notNull()
+    .default('unverified'),
+  // Optional membership of a group practice (organizational layer only).
+  practiceId: uuid('practice_id').references(() => practices.id, {
+    onDelete: 'set null',
+  }),
   headline: text('headline'),
   bio: text('bio'),
   // string[] — e.g. ['anxiety','burnout','trauma']
@@ -590,10 +627,98 @@ export const providerRequests = pgTable('provider_requests', {
   topic: text('topic'),
   message: text('message'),
   preferredModality: text('preferred_modality'),
+  // Leads routed to a practice can be claimed/assigned to a member.
+  practiceId: uuid('practice_id').references(() => practices.id, {
+    onDelete: 'set null',
+  }),
+  assignedTo: uuid('assigned_to').references(() => profiles.id, {
+    onDelete: 'set null',
+  }),
   // CHECK IN ('pending','accepted','declined') — API-enforced.
   status: text('status').notNull().default('pending'),
   createdAt: timestamp('created_at', tz).notNull().defaultNow(),
   respondedAt: timestamp('responded_at', tz),
+});
+
+/* -------------------------------------------------------------------------- */
+/* Group practices (organizational layer) + credentials                        */
+/* ----------------------------------------------------------------------------*/
+/* Practices are organizational ONLY — care relationships stay person-to-person */
+/* so Bond supervision, note ownership and GDPR responsibility attach to a      */
+/* named human. Managers/owners see operations (load, leads, counts), never     */
+/* clinical content. Practice features are Practice-tier gated (workflow only,  */
+/* never finder visibility — P2B-safe).                                         */
+export const practices = pgTable('practices', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  name: text('name').notNull(),
+  slug: text('slug').notNull(),
+  city: text('city'),
+  country: text('country').default('BE'),
+  bio: text('bio'),
+  photoUrl: text('photo_url'),
+  seatLimit: integer('seat_limit').notNull().default(3),
+  isPublished: boolean('is_published').notNull().default(false),
+  createdBy: uuid('created_by')
+    .notNull()
+    .references(() => profiles.id, { onDelete: 'cascade' }),
+  createdAt: timestamp('created_at', tz).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', tz).notNull().defaultNow(),
+});
+
+export const practiceMembers = pgTable(
+  'practice_members',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    practiceId: uuid('practice_id')
+      .notNull()
+      .references(() => practices.id, { onDelete: 'cascade' }),
+    profileId: uuid('profile_id')
+      .notNull()
+      .references(() => profiles.id, { onDelete: 'cascade' }),
+    role: practiceRole('role').notNull().default('staff'),
+    status: text('status').notNull().default('active'), // active | suspended
+    joinedAt: timestamp('joined_at', tz).notNull().defaultNow(),
+  },
+  (t) => ({
+    uniqMember: uniqueIndex('practice_members_practice_profile_uidx').on(
+      t.practiceId,
+      t.profileId,
+    ),
+  }),
+);
+
+export const practiceInvites = pgTable('practice_invites', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  practiceId: uuid('practice_id')
+    .notNull()
+    .references(() => practices.id, { onDelete: 'cascade' }),
+  email: text('email').notNull(),
+  role: practiceRole('role').notNull().default('staff'),
+  token: text('token').notNull(),
+  invitedBy: uuid('invited_by')
+    .notNull()
+    .references(() => profiles.id, { onDelete: 'cascade' }),
+  expiresAt: timestamp('expires_at', tz),
+  acceptedAt: timestamp('accepted_at', tz),
+  createdAt: timestamp('created_at', tz).notNull().defaultNow(),
+});
+
+export const providerCredentials = pgTable('provider_credentials', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  providerId: uuid('provider_id')
+    .notNull()
+    .references(() => profiles.id, { onDelete: 'cascade' }),
+  kind: credentialKind('kind').notNull(),
+  reference: text('reference'), // visum nr / erkenningsnummer / cert id
+  issuer: text('issuer'), // FOD Volksgezondheid, VVKP, ICF, ...
+  fileUrl: text('file_url'),
+  status: verificationStatus('status').notNull().default('pending'),
+  reviewedBy: uuid('reviewed_by').references(() => profiles.id, {
+    onDelete: 'set null',
+  }),
+  reviewedAt: timestamp('reviewed_at', tz),
+  reviewNote: text('review_note'),
+  createdAt: timestamp('created_at', tz).notNull().defaultNow(),
 });
 
 /* -------------------------------------------------------------------------- */

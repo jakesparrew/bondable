@@ -15,13 +15,19 @@
 
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { MapPin, Star, ShieldCheck, BadgeCheck, CheckCircle2 } from 'lucide-react';
+import { MapPin, Star, ShieldCheck, CheckCircle2 } from 'lucide-react';
 
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 import type { Provider } from '@/services/api/finderService';
+import { providerBadge, providerLabel } from '@/lib/providerTypes';
 
 interface ProviderCardProps {
   provider: Provider;
@@ -52,8 +58,18 @@ const ProviderCard = ({ provider, onRequest }: ProviderCardProps) => {
   const visibleSpecs = provider.specializations.slice(0, MAX_SPEC_CHIPS);
   const extraSpecs = provider.specializations.length - visibleSpecs.length;
 
+  const badge = providerBadge(
+    {
+      providerType: provider.providerType,
+      verificationStatus: provider.verificationStatus,
+      isRegulated: provider.isRegulated,
+    },
+    t,
+  );
+  const typeLabel = providerLabel(provider.providerType, t, { capitalize: true });
+
   return (
-    <Card className="flex h-full flex-col overflow-hidden border-border transition-shadow hover:shadow-md">
+    <Card className="flex h-full flex-col overflow-hidden border-border transition-shadow hover:shadow-raise hover:border-primary/20">
       <CardContent className="flex-1 p-5">
         <div className="flex items-start gap-4">
           <Avatar className="h-16 w-16 border border-border">
@@ -72,22 +88,21 @@ const ProviderCard = ({ provider, onRequest }: ProviderCardProps) => {
               </h3>
             </div>
 
-            {/* Regulated clinician vs coach — transparency signal */}
-            <div className="mt-1.5">
-              {provider.isRegulated ? (
-                <Badge
-                  variant="secondary"
-                  className="gap-1 border-transparent bg-primary/10 text-primary hover:bg-primary/10"
-                >
-                  <ShieldCheck className="h-3.5 w-3.5" />
-                  {t('finder_badge_regulated', 'Erkende hulpverlener')}
-                </Badge>
-              ) : (
-                <Badge variant="outline" className="gap-1 text-muted-foreground">
-                  <BadgeCheck className="h-3.5 w-3.5" />
-                  {t('finder_badge_coach', 'Coach')}
-                </Badge>
-              )}
+            {/* Type label + trust badge — transparency signal, never a ranking */}
+            <div className="mt-1 flex flex-wrap items-center gap-2">
+              <span className="text-body-sm text-muted-foreground">{typeLabel}</span>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span>
+                    <Badge variant={badge.variant} className="gap-1">
+                      {badge.kind === 'regulated' && <ShieldCheck className="h-3.5 w-3.5" />}
+                      {badge.kind === 'verified_coach' && <CheckCircle2 className="h-3.5 w-3.5" />}
+                      {badge.label}
+                    </Badge>
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent className="max-w-xs">{badge.tooltip}</TooltipContent>
+              </Tooltip>
             </div>
 
             {/* Meta: city + rating */}
