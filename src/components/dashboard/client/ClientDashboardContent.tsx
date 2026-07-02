@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { useAuthManager } from "@/hooks/api/useAuthManager";
 import ClientQuickActions from "./ClientQuickActions";
+import WelcomeModal from "@/features/onboarding/WelcomeModal";
 import ClientKpis from "./ClientKpis";
 import MyHomework from "./MyHomework";
 import NextSessionCard from "./NextSessionCard";
@@ -41,6 +42,7 @@ const ClientDashboardContent = ({ headerSlot }: ClientDashboardContentProps) => 
   return (
     <DashboardLayout userType="client">
       <div className="space-y-2">
+        <WelcomeModal role="client" />
         {headerSlot}
 
         <div className="flex items-start justify-between gap-4">

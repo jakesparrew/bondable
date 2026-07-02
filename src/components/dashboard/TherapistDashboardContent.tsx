@@ -7,6 +7,8 @@ import DashboardKpis from "@/components/dashboard/DashboardKpis";
 import ClinicalQueue from "@/components/dashboard/ClinicalQueue";
 import ProviderLeads from "@/components/dashboard/therapist/ProviderLeads";
 import { CheckInAlerts } from "@/components/safety/BetweenSessionCheckIn";
+import SetupChecklist from "@/features/onboarding/SetupChecklist";
+import WelcomeModal from "@/features/onboarding/WelcomeModal";
 
 /**
  * Action-focused therapist dashboard main content. Rendered inside the shared
@@ -35,6 +37,8 @@ const TherapistDashboardContent = () => {
         </div>
 
         <div className="pt-4">
+          <WelcomeModal role="provider" />
+          <SetupChecklist />
           <QuickActions />
 
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">

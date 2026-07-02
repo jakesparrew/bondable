@@ -722,6 +722,49 @@ export const providerCredentials = pgTable('provider_credentials', {
 });
 
 /* -------------------------------------------------------------------------- */
+/* Onboarding + announcements (Phase 2 / R13)                                  */
+/* ----------------------------------------------------------------------------*/
+export const onboardingProgress = pgTable('onboarding_progress', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  profileId: uuid('profile_id')
+    .notNull()
+    .references(() => profiles.id, { onDelete: 'cascade' }),
+  role: text('role').notNull(), // provider | client
+  steps: jsonb('steps'), // Record<string, boolean>
+  activatedAt: timestamp('activated_at', tz),
+  createdAt: timestamp('created_at', tz).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', tz).notNull().defaultNow(),
+});
+
+// Canonical announcements schema (master-plan R13): authored in the owner
+// cockpit, rendered in the in-app changelog panel.
+export const announcements = pgTable('announcements', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  title: text('title').notNull(),
+  bodyMd: text('body_md'),
+  audience: jsonb('audience'), // { roles: string[], tiers: string[] }
+  style: text('style'), // info | feature | maintenance
+  startsAt: timestamp('starts_at', tz),
+  endsAt: timestamp('ends_at', tz),
+  publishedAt: timestamp('published_at', tz),
+  createdBy: uuid('created_by').references(() => profiles.id, {
+    onDelete: 'set null',
+  }),
+  createdAt: timestamp('created_at', tz).notNull().defaultNow(),
+});
+
+export const announcementReads = pgTable('announcement_reads', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  announcementId: uuid('announcement_id')
+    .notNull()
+    .references(() => announcements.id, { onDelete: 'cascade' }),
+  profileId: uuid('profile_id')
+    .notNull()
+    .references(() => profiles.id, { onDelete: 'cascade' }),
+  readAt: timestamp('read_at', tz).notNull().defaultNow(),
+});
+
+/* -------------------------------------------------------------------------- */
 /* Relations                                                                    */
 /* -------------------------------------------------------------------------- */
 

@@ -69,6 +69,9 @@ const ProviderProfilePublic = lazy(() => import("@/pages/ProviderProfilePublic")
 const ProviderPublicProfileEdit = lazy(() => import("@/pages/ProviderPublicProfileEdit"));
 // Public client self-onboarding via a therapist invite link.
 const InviteAccept = lazy(() => import("@/pages/InviteAccept"));
+// Role-aware first-run welcome flows (Phase 2 onboarding).
+const WelcomeClient = lazy(() => import("@/pages/WelcomeClient"));
+const WelcomeProvider = lazy(() => import("@/pages/WelcomeProvider"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 
@@ -411,6 +414,10 @@ const App = () => {
 
                 {/* Public client self-onboarding via a therapist invite link. */}
                 <Route path="/invite/:token" element={<InviteAccept />} />
+
+                {/* Role-aware first-run welcome flows (enter demo at the end). */}
+                <Route path="/welcome/client" element={<WelcomeClient />} />
+                <Route path="/welcome/provider" element={<WelcomeProvider />} />
 
                 <Route path="*" element={<NotFound />} />
               </Routes>
