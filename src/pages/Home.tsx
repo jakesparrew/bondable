@@ -205,6 +205,53 @@ const Home = () => {
           />
         </section>
 
+        {/* 10-second comprehension strip — how it works in three steps */}
+        <section className="border-y border-border bg-card">
+          <div className="mx-auto w-full max-w-[1200px] px-4 py-10 sm:px-6 sm:py-14">
+            <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              {t('home_how_eyebrow', 'Zo werkt het')}
+            </span>
+            <div className="mt-6 grid grid-cols-1 gap-8 sm:grid-cols-3">
+              {[
+                {
+                  n: '01',
+                  title: t('home_how_1_title', 'Praat met The Coach'),
+                  body: t(
+                    'home_how_1_body',
+                    'Begin vandaag, zonder wachtlijst. Bond luistert en helpt je ordenen, onder supervisie van een echte hulpverlener.',
+                  ),
+                },
+                {
+                  n: '02',
+                  title: t('home_how_2_title', 'Vind wie bij je past'),
+                  body: t(
+                    'home_how_2_body',
+                    'Zoek een coach of erkende hulpverlener op basis van fit: specialisatie, taal en plaats. Nooit op betaling.',
+                  ),
+                },
+                {
+                  n: '03',
+                  title: t('home_how_3_title', 'Werk samen verder'),
+                  body: t(
+                    'home_how_3_body',
+                    'Sessies, opdrachten en je dagboek op één plek. Wat je deelt, blijft tussen jou en je begeleider.',
+                  ),
+                },
+              ].map((step) => (
+                <div key={step.n} className="border-t border-border pt-4">
+                  <span className="font-display text-display-md tabular text-primary/60">
+                    {step.n}
+                  </span>
+                  <h3 className="mt-2 text-title font-semibold text-foreground">
+                    {step.title}
+                  </h3>
+                  <p className="mt-1.5 text-body-sm text-muted-foreground">{step.body}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
         {/* Feature grid — border-first cards, no shadow at rest */}
         <section className="mx-auto w-full max-w-[1200px] px-4 py-6 sm:px-6 sm:py-10">
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">

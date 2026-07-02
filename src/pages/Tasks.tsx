@@ -55,6 +55,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useProfileAvatar } from "@/hooks/ui/useProfileAvatar";
 import type { TaskStatus, TaskPriority, ClientTask } from "@/types/global";
 import { useTranslation } from "react-i18next";
+import EmptyState from "@/components/ui/empty-state";
+import LineSteps from "@/components/illustration/LineSteps";
 type SortField =
   | "id"
   | "title"
@@ -686,6 +688,37 @@ const Tasks = () => {
               </div>
             </div>
           </div>
+        )}
+
+        {/* Empty state — teaches what tasks are for (adopts the shared primitive) */}
+        {tasks.length === 0 && (userType === "client" || clients.length > 0) && (
+          <EmptyState
+            motif={<LineSteps className="h-28 w-28" />}
+            title={
+              userType === "client"
+                ? t("tasks_empty_client_title", "Nog geen opdrachten")
+                : t("tasks_empty_therapist_title", "Nog geen taken")
+            }
+            description={
+              userType === "client"
+                ? t(
+                    "tasks_empty_client_desc",
+                    "Je begeleider zet hier oefeningen klaar na jullie volgende gesprek.",
+                  )
+                : t(
+                    "tasks_empty_therapist_desc",
+                    "Wijs een eerste opdracht toe zodat je cliënt tussen de sessies door verder kan.",
+                  )
+            }
+            action={
+              userType === "therapist" ? (
+                <Button onClick={() => openDialog("add")}>
+                  <Plus className="mr-2 h-4 w-4" />
+                  {t("assign_task", "Taak toewijzen")}
+                </Button>
+              ) : undefined
+            }
+          />
         )}
 
         {/* Tasks Table - Desktop */}
