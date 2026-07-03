@@ -57,6 +57,13 @@ const AdminProfile = lazy(() => import("./pages/AdminProfile"));
 const AdminAllChats = lazy(() => import("./pages/AdminAllChats"));
 const AdminClients = lazy(() => import("./pages/AdminClients"));
 const AdminProviders = lazy(() => import("./pages/AdminProviders"));
+// Phase 5 owner cockpit: command dashboard, safety/verification queues, ops.
+const OwnerCommand = lazy(() => import("./pages/admin/OwnerCommand"));
+const SafetyQueue = lazy(() => import("./pages/admin/SafetyQueue"));
+const VerificationQueue = lazy(() => import("./pages/admin/VerificationQueue"));
+const RevenueOps = lazy(() => import("./pages/admin/RevenueOps"));
+const FeatureFlags = lazy(() => import("./pages/admin/FeatureFlags"));
+const GdprQueue = lazy(() => import("./pages/admin/GdprQueue"));
 const IntakeTemplates = lazy(() => import("@/pages/IntakeTemplates"));
 const IntakeTemplateBuilder = lazy(() => import("@/pages/IntakeTemplateBuilder"));
 const ClientIntake = lazy(() => import("@/pages/ClientIntake"));
@@ -402,6 +409,56 @@ const App = () => {
                     </RouteProtection>
                   } 
                 />
+                {/* Owner cockpit (Phase 5) */}
+                <Route
+                  path="/dashboard/admin/command"
+                  element={
+                    <RouteProtection requiredUserType="admin" isAdminRoute={true}>
+                      <OwnerCommand />
+                    </RouteProtection>
+                  }
+                />
+                <Route
+                  path="/dashboard/admin/safety"
+                  element={
+                    <RouteProtection requiredUserType="admin" isAdminRoute={true}>
+                      <SafetyQueue />
+                    </RouteProtection>
+                  }
+                />
+                <Route
+                  path="/dashboard/admin/verification"
+                  element={
+                    <RouteProtection requiredUserType="admin" isAdminRoute={true}>
+                      <VerificationQueue />
+                    </RouteProtection>
+                  }
+                />
+                <Route
+                  path="/dashboard/admin/revenue"
+                  element={
+                    <RouteProtection requiredUserType="admin" isAdminRoute={true}>
+                      <RevenueOps />
+                    </RouteProtection>
+                  }
+                />
+                <Route
+                  path="/dashboard/admin/flags"
+                  element={
+                    <RouteProtection requiredUserType="admin" isAdminRoute={true}>
+                      <FeatureFlags />
+                    </RouteProtection>
+                  }
+                />
+                <Route
+                  path="/dashboard/admin/gdpr"
+                  element={
+                    <RouteProtection requiredUserType="admin" isAdminRoute={true}>
+                      <GdprQueue />
+                    </RouteProtection>
+                  }
+                />
+
                 {/* Admin specific routes */}
                 <Route
                   path="/dashboard/admin/chats"

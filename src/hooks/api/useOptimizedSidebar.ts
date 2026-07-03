@@ -25,6 +25,7 @@ import {
   ShieldCheck,
   Building2,
   Receipt,
+  BadgeCheck,
 } from "lucide-react";
 
 interface NavigationItem {
@@ -302,6 +303,42 @@ export function useOptimizedSidebar(
             icon: Stethoscope,
             isActive: isRouteActive("/dashboard/admin/providers"),
             items: [],
+          },
+          {
+            title: t("admin_nav_command", "Command"),
+            url: "/dashboard/admin/command",
+            icon: Activity,
+            isActive: isRouteActive("/dashboard/admin/command"),
+            items: [],
+          },
+          {
+            title: t("admin_nav_safety", "Veiligheid"),
+            url: "/dashboard/admin/safety",
+            icon: ShieldCheck,
+            isActive: isRouteActive("/dashboard/admin/safety"),
+            items: [],
+          },
+          {
+            title: t("admin_nav_verification", "Verificatie"),
+            url: "/dashboard/admin/verification",
+            icon: BadgeCheck,
+            isActive: isRouteActive("/dashboard/admin/verification"),
+            items: [],
+          },
+          {
+            title: t("admin_nav_business", "Bedrijf"),
+            url: "#",
+            icon: CreditCard,
+            isActive: isRouteActive("#", [
+              { url: "/dashboard/admin/revenue" },
+              { url: "/dashboard/admin/flags" },
+              { url: "/dashboard/admin/gdpr" },
+            ]),
+            items: [
+              { title: t("admin_nav_revenue", "Inkomsten"), url: "/dashboard/admin/revenue" },
+              { title: t("admin_nav_flags", "Feature flags"), url: "/dashboard/admin/flags" },
+              { title: t("admin_nav_gdpr", "GDPR"), url: "/dashboard/admin/gdpr" },
+            ],
           },
           {
             title: t("settings"),
