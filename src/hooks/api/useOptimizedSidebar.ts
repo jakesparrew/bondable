@@ -17,7 +17,6 @@ import {
   Send,
   ClipboardList,
   MessageCircleHeart,
-  Search,
   MessagesSquare,
   Stethoscope,
   Activity,
@@ -522,18 +521,13 @@ export function useOptimizedSidebar(
           ai: true,
         },
         {
-          title: t("therapists"),
+          // "Hulpverleners" — the client's connected providers. The public
+          // finder ("Vind een hulpverlener") is reached via a button on this
+          // page rather than a separate nav item.
+          title: t("nav_my_providers", "Hulpverleners"),
           url: `/dashboard/${userType}/therapists`,
           icon: UsersRound,
           isActive: isRouteActive(`/dashboard/${userType}/therapists`),
-          items: [],
-        },
-        {
-          title: t("finder_nav_find", "Vind een hulpverlener"),
-          // Public Finder marketplace (lives outside /dashboard).
-          url: "/find",
-          icon: Search,
-          isActive: isRouteActive("/find"),
           items: [],
         },
         {

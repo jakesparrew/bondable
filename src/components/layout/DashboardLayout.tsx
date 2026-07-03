@@ -102,7 +102,11 @@ const DashboardLayout = ({ children, userType, contentClassName }: DashboardLayo
         const currentPage = pathSegments[pathSegments.length - 1];
         const pageKey = getPageTitleKey(currentPage);
         breadcrumbs.push({
-          title: t(pageKey),
+          // The client "therapists" route is surfaced as "Hulpverleners".
+          title:
+            currentPage === "therapists"
+              ? t("nav_my_providers", "Hulpverleners")
+              : t(pageKey),
           href: location.pathname,
           isPage: true
         });

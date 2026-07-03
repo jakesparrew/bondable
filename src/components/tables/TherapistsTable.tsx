@@ -28,11 +28,11 @@ const TherapistsTable = ({ therapists }: TherapistsTableProps) => {
 
   const actions = [
     {
-      label: t("disconnect"),
+      label: t("client_provider_disconnect", "Verbinding verbreken"),
       icon: <UserX className="mr-2 h-4 w-4" />,
       onClick: (therapist: ConnectedTherapist) =>
         handleDisconnect(therapist.id, therapist.name),
-      className: "text-red-400 focus:text-red-500 cursor-pointer",
+      className: "text-destructive focus:text-destructive cursor-pointer",
     },
   ];
 
@@ -62,8 +62,8 @@ const TherapistsTable = ({ therapists }: TherapistsTableProps) => {
         return <span className="text-muted-foreground">{therapist.specialization}</span>;
       case "status":
         return (
-          <Badge className="bg-green-900/30 text-green-400 border border-green-800 hover:bg-green-900/40">
-            {t("connected")}
+          <Badge variant="success">
+            {t("client_provider_connected", "Verbonden")}
           </Badge>
         );
       default:
@@ -76,8 +76,8 @@ const TherapistsTable = ({ therapists }: TherapistsTableProps) => {
       data={therapists}
       columns={columns}
       actions={actions}
-      searchPlaceholder={t("search_therapists")}
-      emptyMessage={t("no_therapists_connected")}
+      searchPlaceholder={t("client_search_providers", "Zoek hulpverleners…")}
+      emptyMessage={t("client_no_providers", "Nog geen hulpverleners verbonden.")}
       renderCell={renderCell}
       getItemKey={(therapist) => therapist.id}
     />
