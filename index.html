@@ -11,7 +11,10 @@
       name="description"
       content="Praat vandaag nog met The Coach, je AI-begeleider onder supervisie van een echte hulpverlener. En vind een coach of erkende therapeut die bij je past — op basis van fit, nooit op betaling."
     />
-    <link rel="canonical" href="https://bondable.be/" />
+    <!-- NOTE: no <link rel="canonical"> here on purpose. This one index.html is
+         rewritten to EVERY route, so a static canonical would point /find,
+         /pricing and every provider profile at the homepage and de-index them.
+         src/components/seo/Seo.tsx sets canonical + title + OG per route. -->
     <meta name="theme-color" content="#0f403c" />
     <link rel="manifest" href="/manifest.webmanifest" />
 

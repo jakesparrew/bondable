@@ -28,6 +28,7 @@ import {
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
+import Seo from '@/components/seo/Seo';
 import {
   isBypassAvailable,
   setDemoRole,
@@ -71,6 +72,11 @@ const Home = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground">
+      <Seo
+        path="/"
+        title="Bondable — mentale steun die je verbindt, niet vervangt"
+        description="Praat vandaag nog met The Coach, je AI-begeleider onder supervisie van een echte hulpverlener. En vind een coach of erkende therapeut die bij je past — op basis van fit, nooit op betaling."
+      />
       {/* Active-demo banner */}
       {activeRole && (
         <div className="bg-secondary/70 border-b border-border">

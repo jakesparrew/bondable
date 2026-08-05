@@ -890,8 +890,10 @@ function buildSeed(): Record<string, any[]> {
       credentials: 'Master klinische psychologie (KU Leuven), erkend psycholoog',
       years_experience: 12,
       photo_url: null,
-      rating: 4.8,
-      review_count: 41,
+      // No rating/review_count: Bondable has no review system yet, so publishing
+      // numbers here would be fabricated social proof (EU Omnibus/WER Boek VI).
+      rating: null,
+      review_count: null,
       is_published: true,
       created_at: dayOffsetISO(-180),
       updated_at: NOW_ISO,
@@ -913,8 +915,10 @@ function buildSeed(): Record<string, any[]> {
       credentials: 'Master klinische psychologie, EFT-gecertificeerd',
       years_experience: 15,
       photo_url: null,
-      rating: 4.9,
-      review_count: 58,
+      // No rating/review_count: Bondable has no review system yet, so publishing
+      // numbers here would be fabricated social proof (EU Omnibus/WER Boek VI).
+      rating: null,
+      review_count: null,
       is_published: true,
       created_at: dayOffsetISO(-200),
       updated_at: NOW_ISO,
@@ -936,8 +940,10 @@ function buildSeed(): Record<string, any[]> {
       credentials: 'Erkend psychotherapeut, EMDR-practitioner',
       years_experience: 10,
       photo_url: null,
-      rating: 4.7,
-      review_count: 33,
+      // No rating/review_count: Bondable has no review system yet, so publishing
+      // numbers here would be fabricated social proof (EU Omnibus/WER Boek VI).
+      rating: null,
+      review_count: null,
       is_published: true,
       created_at: dayOffsetISO(-160),
       updated_at: NOW_ISO,
@@ -959,8 +965,10 @@ function buildSeed(): Record<string, any[]> {
       credentials: 'Gecertificeerd loopbaan- & stresscoach (geen klinische erkenning)',
       years_experience: 6,
       photo_url: null,
-      rating: 4.6,
-      review_count: 22,
+      // No rating/review_count: Bondable has no review system yet, so publishing
+      // numbers here would be fabricated social proof (EU Omnibus/WER Boek VI).
+      rating: null,
+      review_count: null,
       is_published: true,
       created_at: dayOffsetISO(-140),
       updated_at: NOW_ISO,
@@ -982,8 +990,10 @@ function buildSeed(): Record<string, any[]> {
       credentials: 'ICF-gecertificeerd coach (geen klinische erkenning)',
       years_experience: 8,
       photo_url: null,
-      rating: 4.5,
-      review_count: 17,
+      // No rating/review_count: Bondable has no review system yet, so publishing
+      // numbers here would be fabricated social proof (EU Omnibus/WER Boek VI).
+      rating: null,
+      review_count: null,
       is_published: true,
       created_at: dayOffsetISO(-110),
       updated_at: NOW_ISO,
@@ -1005,8 +1015,10 @@ function buildSeed(): Record<string, any[]> {
       credentials: 'Master klinische psychologie (UGent), erkend psycholoog',
       years_experience: 9,
       photo_url: null,
-      rating: 4.8,
-      review_count: 29,
+      // No rating/review_count: Bondable has no review system yet, so publishing
+      // numbers here would be fabricated social proof (EU Omnibus/WER Boek VI).
+      rating: null,
+      review_count: null,
       is_published: true,
       created_at: dayOffsetISO(-95),
       updated_at: NOW_ISO,

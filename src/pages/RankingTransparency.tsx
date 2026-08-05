@@ -15,6 +15,7 @@
  */
 
 import { Link } from 'react-router-dom';
+import Seo from '@/components/seo/Seo';
 import { useTranslation } from 'react-i18next';
 import {
   ShieldCheck,
@@ -81,6 +82,11 @@ const RankingTransparency = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground">
+      <Seo
+        path="/how-ranking-works"
+        title="Hoe de finder rangschikt"
+        description="Bondable rangschikt hulpverleners alleen op fit: specialisatie, taal, plaats en beschikbaarheid. Betaling of abonnement heeft nooit invloed op je plaats in de resultaten."
+      />
       {/* ── Slim top nav (Home-style) ─────────────────────────────────────── */}
       <header className="sticky top-0 z-40 border-b border-border bg-card/80 backdrop-blur supports-[backdrop-filter]:bg-card/60">
         <div className="mx-auto flex h-16 w-full max-w-[1200px] items-center justify-between gap-4 px-4 sm:px-6">

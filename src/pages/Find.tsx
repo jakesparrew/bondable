@@ -18,6 +18,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
+import Seo from '@/components/seo/Seo';
 import { useTranslation } from 'react-i18next';
 import { Search, Sparkles, ShieldCheck, X, SlidersHorizontal } from 'lucide-react';
 
@@ -121,6 +122,11 @@ const Find = () => {
 
   return (
     <FinderLayout>
+      <Seo
+        path="/find"
+        title="Vind een hulpverlener in België"
+        description="Zoek een coach of erkende therapeut op basis van specialisatie, taal en plaats. Onafhankelijk gerangschikt op fit — nooit op betaling. Bekijk wie nieuwe cliënten aanneemt."
+      />
       {/* Hero — typography-led, border-first (no rest shadow) */}
       <section className="mb-8">
         <div className="rounded-card border border-border bg-card p-6 sm:p-8">

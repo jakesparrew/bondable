@@ -4,7 +4,7 @@
   and /dev/* are intentionally excluded (private, tokenised or dev-only).
   Update lastmod when a page's content materially changes.
 -->
-<urlset xmlns="http://www.sitemap.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://bondable.be/</loc>
     <changefreq>weekly</changefreq>
@@ -14,11 +14,6 @@
     <loc>https://bondable.be/find</loc>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://bondable.be/find/match</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
   </url>
   <url>
     <loc>https://bondable.be/pricing</loc>

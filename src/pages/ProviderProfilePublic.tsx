@@ -43,6 +43,7 @@ import {
 } from 'lucide-react';
 
 import FinderLayout from '@/components/finder/FinderLayout';
+import Seo from '@/components/seo/Seo';
 import RequestProviderDialog from '@/components/finder/RequestProviderDialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -206,6 +207,29 @@ const ProviderProfilePublic = () => {
 
   return (
     <FinderLayout>
+      {/* Per-provider head. Without this every profile inherits the homepage
+          title/canonical and none of them can ever rank or be shared. */}
+      {provider && (
+        <Seo
+          path={`/find/${provider.id}`}
+          title={`${provider.fullName} — ${providerLabel(provider.providerType, t, { capitalize: true })}${provider.city ? ` in ${provider.city}` : ''}`}
+          description={
+            provider.headline ||
+            `${provider.fullName} is ${providerLabel(provider.providerType, t)}${provider.city ? ` in ${provider.city}` : ''} op Bondable.${provider.acceptingNewClients ? ' Neemt momenteel nieuwe cliënten aan.' : ''}`
+          }
+          jsonLd={{
+            '@context': 'https://schema.org',
+            '@type': 'Person',
+            name: provider.fullName,
+            jobTitle: providerLabel(provider.providerType, t, { capitalize: true }),
+            url: `https://bondable.be/find/${provider.id}`,
+            ...(provider.city
+              ? { address: { '@type': 'PostalAddress', addressLocality: provider.city, addressCountry: 'BE' } }
+              : {}),
+            ...(provider.languages?.length ? { knowsLanguage: provider.languages } : {}),
+          }}
+        />
+      )}
       {loading ? (
         <ProfileSkeleton />
       ) : !provider ? (
