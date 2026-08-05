@@ -159,7 +159,7 @@ const FileUploadModal = ({ isOpen, onClose, onFilesSelect }: FileUploadModalProp
         <DialogHeader>
           <DialogTitle>{t("upload_files")}</DialogTitle>
         </DialogHeader>
-        
+
         <div className="space-y-4">
           {(fetchedLocal && localDocs.length === 0) ? (
             <>
@@ -185,7 +185,7 @@ const FileUploadModal = ({ isOpen, onClose, onFilesSelect }: FileUploadModalProp
                   <Button
                     variant="outline"
                     onClick={onClose}
-                    className="bg-transparent border-gray-600 text-muted-foreground hover:bg-gray-800 touch-manipulation"
+                    className="touch-manipulation"
                     style={{ touchAction: 'manipulation' }}
                   >
                     {t("cancel")}
@@ -231,7 +231,7 @@ const FileUploadModal = ({ isOpen, onClose, onFilesSelect }: FileUploadModalProp
                     <Button
                       variant="outline"
                       onClick={onClose}
-                      className="bg-transparent border-gray-600 text-muted-foreground hover:bg-gray-800 touch-manipulation"
+                      className="touch-manipulation"
                       style={{ touchAction: 'manipulation' }}
                     >
                       {t("cancel")}
@@ -301,7 +301,6 @@ const FileUploadModal = ({ isOpen, onClose, onFilesSelect }: FileUploadModalProp
                         <Button
                           variant="outline"
                           onClick={onClose}
-                          className="bg-transparent border-gray-600 text-muted-foreground hover:bg-gray-800"
                         >
                           {t('cancel')}
                         </Button>

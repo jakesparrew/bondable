@@ -51,7 +51,7 @@ const InviteCodeDialog = ({ open, onOpenChange }: InviteCodeDialogProps) => {
           <DialogTitle className="text-foreground mb-4">
             {t("client_invite_code")}
           </DialogTitle>
-          <div className="h-px w-full bg-gradient-to-r from-transparent via-[#3f3f3f] to-transparent" />
+          <div className="h-px w-full bg-border" />
         </DialogHeader>
         <div className="space-y-4 ">
           <div className="text-muted-foreground text-sm">
@@ -80,7 +80,6 @@ const InviteCodeDialog = ({ open, onOpenChange }: InviteCodeDialogProps) => {
             <Button
               variant="outline"
               onClick={() => onOpenChange(false)}
-              className="border-border bg-card hover:bg-muted text-muted-foreground hover:text-foreground"
             >
               {t("close")}
             </Button>

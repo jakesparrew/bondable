@@ -61,7 +61,7 @@ export const JournalEntryDialog = ({
       });
       return;
     }
-    
+
     if (!isPrivate && selectedTherapists.length === 0) {
       toast({
         title: "Missing Information",
@@ -127,7 +127,7 @@ export const JournalEntryDialog = ({
               {t("new_journal_entry")}
             </DialogTitle>
           </DialogHeader>
-          <div className="mt-1 h-px w-full bg-gradient-to-r from-transparent via-[#3f3f3f] to-transparent" />
+          <div className="mt-1 h-px w-full bg-border" />
 
           <div className="space-y-6">
             <div className="space-y-2">
@@ -146,7 +146,7 @@ export const JournalEntryDialog = ({
               <Label className="text-muted-foreground">
                 {t("attach_files_optional")}
                 {files.length > 0 && (
-                  <span className="text-sm text-blue-400">
+                  <span className="text-sm text-info">
                     ({files.length} file{files.length !== 1 ? "s" : ""} selected)
                   </span>
                 )}
@@ -173,7 +173,6 @@ export const JournalEntryDialog = ({
               <Button
                 variant="outline"
                 onClick={() => setOpen(false)}
-                className="border-border bg-card hover:bg-muted text-muted-foreground hover:text-foreground"
               >
                 {t("cancel")}
               </Button>

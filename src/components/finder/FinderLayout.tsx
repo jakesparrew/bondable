@@ -34,6 +34,13 @@ const FinderLayout = ({ children }: FinderLayoutProps) => {
             <Button asChild variant="ghost" size="sm" className="text-foreground">
               <Link to="/find">{t('finder_nav_find', 'Vind hulp')}</Link>
             </Button>
+            {/* De wachtlijstradar hoort in de hoofdnavigatie: het is voor veel
+                bezoekers de eerste vraag, nog vóór "wie past bij mij". */}
+            <Button asChild variant="ghost" size="sm" className="text-muted-foreground">
+              <Link to="/wachttijden">
+                {t('finder_nav_waittimes', 'Wachttijden')}
+              </Link>
+            </Button>
             <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex text-muted-foreground">
               <Link to="/">{t('finder_nav_home', 'Home')}</Link>
             </Button>
@@ -51,10 +58,27 @@ const FinderLayout = ({ children }: FinderLayoutProps) => {
 
       {/* Footer */}
       <footer className="border-t border-border bg-card">
-        <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 py-6 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p className="text-sm text-muted-foreground">
-            {t('finder_footer_powered', 'Powered by Bondable')}
-          </p>
+        <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 py-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <nav className="flex flex-wrap items-center gap-x-4 gap-y-2">
+            <Link
+              to="/wachttijden"
+              className="text-sm text-muted-foreground hover:text-foreground"
+            >
+              {t('finder_footer_waittimes', 'Wachttijden per stad')}
+            </Link>
+            <Link
+              to="/wachtruimte"
+              className="text-sm text-muted-foreground hover:text-foreground"
+            >
+              {t('finder_footer_wachtruimte', 'De Wachtruimte')}
+            </Link>
+            <Link
+              to="/how-ranking-works"
+              className="text-sm text-muted-foreground hover:text-foreground"
+            >
+              {t('finder_footer_ranking', 'Hoe we rangschikken')}
+            </Link>
+          </nav>
           <p className="text-xs text-muted-foreground">
             {t(
               'finder_footer_neutral',

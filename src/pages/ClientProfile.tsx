@@ -3,8 +3,12 @@ import { useOptimizedState, useOptimizedEffect } from '@/hooks/performance/useOp
 import console from "@/lib/production-console";
 import { useParams, useNavigate } from "react-router-dom";
 import DashboardLayout from "@/components/layout/DashboardLayout";
+import PageHeader from "@/components/layout/PageHeader";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+
+type StatusVariant = "success" | "warning" | "info" | "destructive" | "secondary";
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
@@ -205,58 +209,60 @@ export default function OptimizedClientProfile() {
     }
   };
 
-  // Badge color helpers
-  const getMoodBadgeColor = (mood: string) => {
+  // Semantic badge variants. The previous helpers returned a dark-theme
+  // palette that was unreadable on the light canvas; Badge variants carry a
+  // soft surface + on-color text instead.
+  const moodVariant = (mood: string): StatusVariant => {
     switch (mood) {
       case "Good":
-        return "bg-green-500/20 text-green-400 border-green-500/30 hover:bg-green-500/20";
+        return "success";
       case "Better":
-        return "bg-blue-500/20 text-blue-400 border-blue-500/30 hover:bg-blue-500/20";
+        return "info";
       case "Neutral":
-        return "bg-yellow-500/20 text-yellow-400 border-yellow-500/30 hover:bg-yellow-500/20 ";
+        return "warning";
       default:
-        return "bg-gray-500/20 text-gray-400 border-gray-500/30 hover:bg-gray-500/20";
+        return "secondary";
     }
   };
 
-  const getTaskStatusBadgeColor = (status: string) => {
+  const taskStatusVariant = (status: string): StatusVariant => {
     switch (status) {
       case "completed":
-        return "bg-green-500/20 text-green-400 border-green-500/30 hover:bg-green-500/20";
+        return "success";
       case "in progress":
-        return "bg-yellow-500/20 text-yellow-400 border-yellow-500/30 hover:bg-yellow-500/20";
+        return "warning";
       case "assigned":
-        return "bg-blue-500/20 text-blue-400 border-blue-500/30 hover:bg-blue-500/20";
+        return "info";
       case "overdue":
-        return "bg-red-500/20 text-red-400 border-red-500/30 hover:bg-red-500/20";
+        return "destructive";
       default:
-        return "bg-gray-500/20 text-gray-400 border-gray-500/30 hover:bg-gray-500/20";
+        return "secondary";
     }
   };
 
-  const getPriorityBadgeColor = (priority: string) => {
+  const priorityVariant = (priority: string): StatusVariant => {
     switch (priority) {
       case "high":
-        return "bg-red-500/20 text-red-400 border-red-500/30 hover:bg-red-500/20";
+        return "destructive";
       case "medium":
-        return "bg-yellow-500/20 text-yellow-400 border-yellow-500/30 hover:bg-yellow-500/20";
+        return "warning";
       case "low":
-        return "bg-green-500/20 text-green-400 border-green-500/30 hover:bg-green-500/20";
+        return "success";
       default:
-        return "bg-gray-500/20 text-gray-400 border-gray-500/30 hover:bg-gray-500/20";
+        return "secondary";
     }
   };
 
-  const getStatusBadgeColor = (status: string) => {
+  const statusVariant = (status: string): StatusVariant => {
     switch (status) {
       case "Active":
-        return "bg-green-500/20 text-green-400 border-green-500/30 hover:bg-green-500/20";
-      case "Inactive":
-        return "bg-gray-500/20 text-gray-400 border-gray-500/30 hover:bg-gray-500/20";
+        return "success";
       case "Pending":
-        return "bg-yellow-500/20 text-yellow-400 border-yellow-500/30 hover:bg-yellow-500/20";
+        return "warning";
+      case "Inactive":
+        return "secondary";
       default:
-        return "bg-gray-500/20 text-gray-400 border-gray-500/30 hover:bg-gray-500/20";
+        return "secondary";
     }
   };
 
@@ -357,7 +363,7 @@ export default function OptimizedClientProfile() {
     return (
       <DashboardLayout userType="therapist">
         <div className="flex items-center justify-center min-h-screen">
-          <div className="text-red-400">{error || t("client_not_found")}</div>
+          <div className="text-destructive">{error || t("client_not_found")}</div>
         </div>
       </DashboardLayout>
     );
@@ -378,72 +384,62 @@ export default function OptimizedClientProfile() {
           </Button>
         </div>
 
-        {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="flex flex-col md:flex-row md:items-center gap-4">
-            <Avatar className="h-12 w-12 md:h-16 md:w-16 self-start md:self-auto">
-              <AvatarImage
-                src={client.image}
-                alt={client.name}
-                className="non-invertable"
-              />
-              <AvatarFallback className="bg-card text-muted-foreground text-sm md:text-lg">
-                {client.name
-                  .split(" ")
-                  .map((n) => n[0])
-                  .join("")
-                  .slice(0, 2)}
-              </AvatarFallback>
-            </Avatar>
-            <div className="flex-1 min-w-0">
-              <h1 className="text-2xl md:text-3xl font-bold text-foreground break-words">
-                {client.name}
-              </h1>
-              <div className="flex flex-wrap items-center gap-2 md:gap-4 mt-2">
-                <Badge
-                  className={`${getStatusBadgeColor(client.status)} text-xs`}
-                >
+        {/* Header — the single page-title treatment */}
+        <div className="flex items-start gap-4">
+          <Avatar className="h-12 w-12 shrink-0 md:h-16 md:w-16">
+            <AvatarImage
+              src={client.image}
+              alt={client.name}
+              className="non-invertable"
+            />
+            <AvatarFallback className="bg-muted text-muted-foreground text-sm md:text-lg">
+              {client.name
+                .split(" ")
+                .map((n) => n[0])
+                .join("")
+                .slice(0, 2)}
+            </AvatarFallback>
+          </Avatar>
+          <PageHeader
+            className="mb-0 min-w-0 flex-1"
+            title={<span className="break-words">{client.name}</span>}
+            description={
+              <span className="flex flex-wrap items-center gap-3">
+                <Badge variant={statusVariant(client.status)}>
                   {client.status}
                 </Badge>
-                <span className="text-muted-foreground text-sm">
-                  {t("client_since", { date: client.joinDate })}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* Edit Controls */}
-          <div className="flex gap-2 self-start md:self-auto md:-mb-10">
-            {isEditing ? (
-              <>
-                <Button
-                  variant="outline"
-                  onClick={handleCancel}
-                  disabled={updateClientMutation.isPending}
-                  className="border-border bg-card hover:bg-muted text-muted-foreground hover:text-foreground text-sm md:text-base"
-                >
-                  <X className="w-4 h-4 mr-2" />
-                  {t("cancel")}
+                <span>{t("client_since", { date: client.joinDate })}</span>
+              </span>
+            }
+            actions={
+              isEditing ? (
+                <>
+                  <Button
+                    variant="outline"
+                    onClick={handleCancel}
+                    disabled={updateClientMutation.isPending}
+                  >
+                    <X className="w-4 h-4 mr-2" />
+                    {t("cancel")}
+                  </Button>
+                  <Button
+                    onClick={handleSave}
+                    disabled={updateClientMutation.isPending}
+                  >
+                    <Save className="w-4 h-4 mr-2" />
+                    {updateClientMutation.isPending
+                      ? t("saving", "Bezig met opslaan")
+                      : t("save")}
+                  </Button>
+                </>
+              ) : (
+                <Button onClick={handleEdit}>
+                  <Edit className="w-4 h-4 mr-2" />
+                  {t("edit_client")}
                 </Button>
-                <Button
-                  onClick={handleSave}
-                  disabled={updateClientMutation.isPending}
-                  className="bg-primary hover:bg-primary/90 text-primary-foreground text-sm md:text-base"
-                >
-                  <Save className="w-4 h-4 mr-2" />
-                  {updateClientMutation.isPending ? "Saving..." : t("save")}
-                </Button>
-              </>
-            ) : (
-              <Button
-                onClick={handleEdit}
-                className="bg-primary hover:bg-primary/90 text-primary-foreground text-sm md:text-base"
-              >
-                <Edit className="w-4 h-4 mr-2" />
-                {t("edit_client")}
-              </Button>
-            )}
-          </div>
+              )
+            }
+          />
         </div>
 
         {/* Contact Information with Notes - Full Width */}
@@ -468,7 +464,7 @@ export default function OptimizedClientProfile() {
                   />
                   <div className="space-y-2">
                     <label className="text-muted-foreground text-sm font-medium">
-                      {t("status")} <span className="text-red-400">*</span>
+                      {t("status")} <span className="text-destructive">*</span>
                     </label>
                     <Select
                       value={editForm.status}
@@ -528,7 +524,7 @@ export default function OptimizedClientProfile() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <label className="text-muted-foreground text-sm font-medium">
-                    {t("full_name")} <span className="text-red-400">*</span>
+                    {t("full_name")} <span className="text-destructive">*</span>
                   </label>
                   <div className="flex h-[2.5rem] w-full rounded-md border border-border bg-card px-3 py-2 text-muted-foreground text-[.9rem] break-words">
                     {client.name}
@@ -536,7 +532,7 @@ export default function OptimizedClientProfile() {
                 </div>
                 <div className="space-y-2">
                   <label className="text-muted-foreground text-sm font-medium">
-                    {t("status")} <span className="text-red-400">*</span>
+                    {t("status")} <span className="text-destructive">*</span>
                   </label>
                   <div className="flex h-[2.5rem] w-full rounded-md border border-border bg-card px-3 py-2 text-muted-foreground text-[.9rem]">
                     {client.status}
@@ -544,7 +540,7 @@ export default function OptimizedClientProfile() {
                 </div>
                 <div className="space-y-2">
                   <label className="text-muted-foreground text-sm font-medium">
-                    Email <span className="text-red-400">*</span>
+                    Email <span className="text-destructive">*</span>
                   </label>
                   <div className="relative">
                     <div className="flex h-[2.5rem] w-full rounded-md border border-border bg-card px-3 py-2 text-muted-foreground text-[.9rem] pl-9 break-all">
@@ -557,7 +553,7 @@ export default function OptimizedClientProfile() {
                 </div>
                 <div className="space-y-2">
                   <label className="text-muted-foreground text-sm font-medium">
-                    Phone <span className="text-red-400">*</span>
+                    Phone <span className="text-destructive">*</span>
                   </label>
                   <div className="flex h-[2.5rem] w-full rounded-md border border-border bg-card px-3 py-2 text-muted-foreground text-[.9rem]">
                     {client.phone}
@@ -744,11 +740,7 @@ export default function OptimizedClientProfile() {
                                   {session.duration}
                                 </TableCell>
                                 <TableCell>
-                                  <Badge
-                                    className={`${getStatusBadgeColor(
-                                      session.status
-                                    )} text-xs`}
-                                  >
+                                  <Badge variant={statusVariant(session.status)}>
                                     {translateSessionStatus(session.status)}
                                   </Badge>
                                 </TableCell>
@@ -800,7 +792,7 @@ export default function OptimizedClientProfile() {
                           {t('no_shared_journal_entries_desc')}
                         </p>
                         {!currentTherapistId && (
-                          <p className="text-sm text-amber-600">
+                          <p className="text-sm text-warning">
                             {t('unable_to_determine_therapist_id')}
                           </p>
                         )}
@@ -816,7 +808,7 @@ export default function OptimizedClientProfile() {
                               <h4 className="font-medium">{journal.title}</h4>
                               <div className="text-sm text-muted-foreground flex items-center gap-2">
                                 {format(new Date(journal.date), "PPP", { locale: getDateLocale() })}
-                                <Badge className={`${getMoodBadgeColor(journal.mood)} text-xs`}>
+                                <Badge variant={moodVariant(journal.mood)}>
                                   {journal.mood}
                                 </Badge>
                               </div>
@@ -899,20 +891,12 @@ export default function OptimizedClientProfile() {
                                     : "—"}
                                 </TableCell>
                                 <TableCell>
-                                  <Badge
-                                    className={`${getPriorityBadgeColor(
-                                      task.priority
-                                    )} text-xs`}
-                                  >
+                                  <Badge variant={priorityVariant(task.priority)}>
                                     {task.priority}
                                   </Badge>
                                 </TableCell>
                                 <TableCell>
-                                  <Badge
-                                    className={`${getTaskStatusBadgeColor(
-                                      task.status
-                                    )} text-xs`}
-                                  >
+                                  <Badge variant={taskStatusVariant(task.status)}>
                                     {task.status}
                                   </Badge>
                                 </TableCell>

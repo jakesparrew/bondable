@@ -108,7 +108,7 @@ const SessionFilterDialog = ({
       <DialogContent className="bg-card border-border text-foreground sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle className="text-foreground mb-4">{t("filter_sessions")}</DialogTitle>
-          <div className="h-px w-full bg-gradient-to-r from-transparent via-[#3f3f3f] to-transparent" />
+          <div className="h-px w-full bg-border" />
         </DialogHeader>
 
         <div className="space-y-6">
@@ -122,11 +122,11 @@ const SessionFilterDialog = ({
                 <SelectValue placeholder={`${t("select")} ${personLabel.toLowerCase()}`} />
               </SelectTrigger>
               <SelectContent className="bg-card border-border text-foreground">
-                <SelectItem value="all" className="text-muted-foreground data-[state=checked]:text-neutral-50 data-[highlighted]:!text-neutral-50">
+                <SelectItem value="all" className="text-muted-foreground">
                   {userType === "therapist" ? t("all_clients") : t("all_therapists")}
                 </SelectItem>
                 {availablePersons.map((option) => (
-                  <SelectItem key={option.value} value={option.value} className="text-muted-foreground data-[state=checked]:text-neutral-50 data-[highlighted]:!text-neutral-50">
+                  <SelectItem key={option.value} value={option.value} className="text-muted-foreground">
                     {option.label}
                   </SelectItem>
                 ))}
@@ -185,7 +185,7 @@ const SessionFilterDialog = ({
                       onCheckedChange={(checked) =>
                         handleCheckboxChange(filterKey, option.value, !!checked)
                       }
-                      className="border-gray-600 data-[state=checked]:bg-white data-[state=checked]:text-black"
+
                     />
                     <span className="text-sm text-muted-foreground">
                       {option.label}
@@ -201,7 +201,6 @@ const SessionFilterDialog = ({
           <Button
             variant="outline"
             onClick={handleClearAll}
-            className="border-border bg-card hover:bg-muted text-muted-foreground hover:text-foreground"
             >
               {t("clear_all")}
           </Button>
@@ -209,7 +208,6 @@ const SessionFilterDialog = ({
             <Button
               variant="outline"
               onClick={onClose}
-              className="border-border bg-card hover:bg-muted text-muted-foreground hover:text-foreground"
             >
               {t("cancel")}
             </Button>

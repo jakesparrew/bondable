@@ -92,7 +92,7 @@ const FeaturedProviders = () => {
               <Link
                 key={p.id}
                 to={`/find/${p.id}`}
-                className="group rounded-card border border-border bg-background p-5 transition-all hover:border-primary/20 hover:shadow-raise"
+                className="group flex h-full flex-col rounded-card border border-border bg-background p-5 transition-all hover:border-primary/20 hover:shadow-raise"
               >
                 <div className="flex items-start gap-3.5">
                   <Avatar className="h-14 w-14 border border-border">
@@ -105,23 +105,30 @@ const FeaturedProviders = () => {
                     <p className="truncate text-title font-semibold text-foreground">
                       {p.fullName}
                     </p>
-                    <p className="text-body-sm text-muted-foreground">
-                      {providerLabel(p.providerType, t, { capitalize: true })}
-                      {p.city ? (
-                        <span className="inline-flex items-center gap-1">
-                          {' · '}
-                          <MapPin className="h-3 w-3" />
-                          {p.city}
-                        </span>
-                      ) : null}
+                    <p className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-body-sm text-muted-foreground">
+                      <span className="truncate">
+                        {providerLabel(p.providerType, t, { capitalize: true })}
+                      </span>
+                      {p.city && (
+                        <>
+                          <span aria-hidden="true">·</span>
+                          <span className="inline-flex items-center gap-1">
+                            <MapPin className="h-3 w-3 shrink-0" />
+                            {p.city}
+                          </span>
+                        </>
+                      )}
                     </p>
-                    <div className="mt-1.5">
-                      <Badge variant={badge.variant} className="gap-1">
-                        {badge.kind === 'regulated' && <ShieldCheck className="h-3 w-3" />}
-                        {badge.kind === 'verified_coach' && <CheckCircle2 className="h-3 w-3" />}
-                        {badge.label}
-                      </Badge>
-                    </div>
+                    {/* Skip the badge when it would only repeat the discipline. */}
+                    {badge.kind !== 'plain' && (
+                      <div className="mt-1.5">
+                        <Badge variant={badge.variant} className="gap-1 whitespace-nowrap">
+                          {badge.kind === 'regulated' && <ShieldCheck className="h-3 w-3 shrink-0" />}
+                          {badge.kind === 'verified_coach' && <CheckCircle2 className="h-3 w-3 shrink-0" />}
+                          {badge.label}
+                        </Badge>
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -131,7 +138,9 @@ const FeaturedProviders = () => {
                   </p>
                 )}
 
-                <p className="mt-3 inline-flex items-center gap-1.5 text-label font-medium text-success">
+                {/* Pushes the availability line to the bottom so cards with and
+                    without a trust badge still line up. */}
+                <p className="mt-auto pt-3 inline-flex items-center gap-1.5 text-label font-medium text-success">
                   <CheckCircle2 className="h-3.5 w-3.5" />
                   {t('finder_card_accepting', 'Neemt nieuwe cliënten aan')}
                 </p>
@@ -141,7 +150,9 @@ const FeaturedProviders = () => {
         </div>
 
         <div className="mt-10 flex justify-center">
-          <Button asChild size="lg" className="h-13 rounded-ctl px-8 text-base">
+          {/* h-14 matches the hero CTAs. (`h-13` is not a Tailwind class, so the
+              button silently fell back to the default height and looked small.) */}
+          <Button asChild size="lg" className="h-14 rounded-ctl px-8 text-base">
             <Link to="/find">
               {t('home_featured_cta', 'Vind een hulpverlener die bij jou past')}
               <ArrowRight className="h-5 w-5" />

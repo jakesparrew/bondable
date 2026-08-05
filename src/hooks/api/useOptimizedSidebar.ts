@@ -4,6 +4,8 @@ import { useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { CacheManager } from "@/services/cache/CacheManager";
+import { practiceService } from "@/services/api/practiceService";
+import { useEntitlements } from "@/hooks/useEntitlements";
 import {
   LayoutDashboard,
   UsersRound,
@@ -213,6 +215,7 @@ export function useOptimizedSidebar(
 ) {
   const { t } = useTranslation();
   const location = useLocation();
+  const { can } = useEntitlements();
 
   // Helper function to check if a route or its children are active
   const isRouteActive = useCallback((url: string, items?: { url: string }[]) => {
@@ -257,6 +260,18 @@ export function useOptimizedSidebar(
     gcTime: 5 * 60 * 1000, // 5 minutes
     refetchInterval: 60 * 1000, // 1 minute
   });
+
+  // Group-practice membership. A solo provider has no practice and cannot use
+  // the team surfaces, so the "Praktijk" entry stays hidden for them.
+  const { data: practice } = useQuery({
+    queryKey: ["sidebar-my-practice", userId],
+    queryFn: () => practiceService.getMyPractice(),
+    enabled: !!userId && userType === "therapist",
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes
+  });
+
+  const showPracticeNav = !!practice || can("practice_staff_roles");
 
   // Calculate total unread messages
   const totalUnreadMessages = useMemo(() => {
@@ -400,13 +415,9 @@ export function useOptimizedSidebar(
         hasOptions: false,
         badge: totalUnreadMessages > 0 ? totalUnreadMessages.toString() : undefined,
       },
-      {
-        name: t("payments"),
-        url: `/dashboard/${userType}/payments`,
-        icon: CreditCard,
-        hasOptions: false,
-        disabled: true,
-      },
+      // No "Betalingen" entry: providers bill through "Facturatie"
+      // (/dashboard/therapist/invoicing, already in navMain) and clients have no
+      // billing surface. The old entry pointed at a removed page.
     ];
 
     if (userType === "therapist") {
@@ -427,13 +438,19 @@ export function useOptimizedSidebar(
             isActive: isRouteActive(`/dashboard/${userType}/clients`),
             items: [],
           },
-          {
-            title: t("nav_practice", "Praktijk"),
-            url: `/dashboard/${userType}/practice`,
-            icon: Building2,
-            isActive: isRouteActive(`/dashboard/${userType}/practice`),
-            items: [],
-          },
+          // Team nav only when there is a practice to manage (or the tier grants
+          // staff roles). Solo providers never see a surface they cannot use.
+          ...(showPracticeNav
+            ? [
+                {
+                  title: t("nav_practice", "Praktijk"),
+                  url: `/dashboard/${userType}/practice`,
+                  icon: Building2,
+                  isActive: isRouteActive(`/dashboard/${userType}/practice`),
+                  items: [],
+                },
+              ]
+            : []),
           {
             title: t("nav_invoicing", "Facturatie"),
             url: `/dashboard/${userType}/invoicing`,
@@ -625,7 +642,15 @@ export function useOptimizedSidebar(
       ],
       projects: commonProjects,
     };
-  }, [t, userType, userProfile, isRouteActive, taskCounts, totalUnreadMessages]);
+  }, [
+    t,
+    userType,
+    userProfile,
+    isRouteActive,
+    taskCounts,
+    totalUnreadMessages,
+    showPracticeNav,
+  ]);
 
   return {
     sidebarData,

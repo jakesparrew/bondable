@@ -236,8 +236,11 @@ const AddClient = () => {
                     setAddress={setAddress}
                     searchInput={searchInput}
                     setSearchInput={setSearchInput}
-                    dialogTitle="Address"
-                    placeholder="123 Main Street, City, State/Province, Postal Code, Country"
+                    dialogTitle={t("address", "Adres")}
+                    placeholder={t(
+                      "address_placeholder_be",
+                      "Grote Markt 12, 9000 Gent",
+                    )}
                     showInlineError={false}
                   />
                 </div>

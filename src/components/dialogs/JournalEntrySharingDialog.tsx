@@ -119,7 +119,7 @@ export const JournalEntrySharingDialog = ({
               Entry Sharing Settings
             </DialogTitle>
           </DialogHeader>
-          <div className="mt-1 h-px w-full bg-gradient-to-r from-transparent via-[#3f3f3f] to-transparent" />
+          <div className="mt-1 h-px w-full bg-border" />
 
           <div className="space-y-4">
             <div className="space-y-2">
@@ -193,8 +193,8 @@ export const JournalEntrySharingDialog = ({
                   </>
                 ) : (
                   <>
-                    <Users className="w-4 h-4 text-blue-400" />
-                    <span className="text-blue-400">
+                    <Users className="w-4 h-4 text-info" />
+                    <span className="text-info">
                       Shared with{" "}
                       {entry.sharedWithTherapists
                         ?.map((t) => t.name)

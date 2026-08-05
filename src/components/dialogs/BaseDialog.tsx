@@ -1,16 +1,16 @@
 /**
  * BaseDialog Component
- * 
+ *
  * A reusable dialog wrapper that provides consistent styling and behavior
  * across all dialog components in the application.
- * 
+ *
  * Features:
- * - Consistent dark theme styling
+ * - Consistent card surface + border-first styling
  * - Optional trigger element
  * - Customizable title and description
  * - Optional divider line
  * - Accessible keyboard navigation
- * 
+ *
  * @example
  * ```tsx
  * <BaseDialog
@@ -48,7 +48,7 @@ interface BaseDialogProps extends Omit<DialogProps, 'title'> {
 
 /**
  * Base dialog component with consistent styling and behavior
- * 
+ *
  * @param props - Component props
  * @returns JSX element representing the dialog
  */
@@ -69,15 +69,13 @@ const BaseDialog = ({
       <DialogContent className={className}>
         <DialogHeader>
           {title && (
-            <DialogTitle className="text-foreground mb-3">
+            <DialogTitle className="text-title text-foreground mb-3">
               {title}
             </DialogTitle>
           )}
-          {showDivider && (
-            <div className="h-px w-full bg-gradient-to-r from-transparent via-[#3f3f3f] to-transparent" />
-          )}
+          {showDivider && <div className="h-px w-full bg-border" />}
           {description && (
-            <p className="text-muted-foreground text-sm pt-2">
+            <p className="text-muted-foreground text-body-sm pt-2">
               {description}
             </p>
           )}

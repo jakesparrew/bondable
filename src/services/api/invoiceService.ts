@@ -110,6 +110,63 @@ export interface InvoiceTotals {
   grossCents: number;
 }
 
+/** One prestation line on a terugbetalingsattest. */
+export interface AttestLine {
+  /** ISO date (yyyy-mm-dd) of the session. */
+  date: string;
+  /** Neutral description — never a diagnosis or session topic. */
+  description: string;
+  amountCents: number;
+}
+
+/**
+ * A terugbetalingsattest — the paper a client hands to CM / Helan / Solidaris.
+ * Deliberately a plain data bag: the dialog renders it, the clipboard fallback
+ * serialises it, and neither needs to know where the numbers came from.
+ */
+export interface AttestPayload {
+  provider: {
+    name: string;
+    address: string;
+    enterpriseNumber: string;
+    /** Erkennings-/visumnummer — the field the ziekenfonds actually checks. */
+    recognitionNumber: string;
+    iban: string;
+  };
+  client: {
+    name: string;
+    /** Left blank unless the provider fills it in — never stored by default. */
+    nationalNumber: string;
+  };
+  lines: AttestLine[];
+  totalCents: number;
+  vatStatus: VatStatus;
+  /** The printed exemption clause matching vatStatus. */
+  vatClause: string;
+  /** Empty while the underlying invoice is still a draft (gapless numbering). */
+  invoiceNumber: string;
+  invoiceStatus: InvoiceStatus | null;
+  /** ISO date the attest is drawn up. */
+  issuedOn: string;
+  /** Place of signature, derived from the practice address ("Gent"). */
+  place: string;
+  /** Free-text line for the ziekenfonds (defaults to a neutral sentence). */
+  note: string;
+}
+
+/** Everything needed to bill — or attest — a single session. */
+export interface SessionBillingInput {
+  sessionId: string;
+  clientId: string;
+  clientName: string;
+  /** ISO date of the session; defaults to today. */
+  date?: string;
+  /** Defaults to 60. */
+  durationMin?: number;
+  /** Defaults to the provider's standard rate. */
+  amountCents?: number;
+}
+
 // ── Storage plumbing ─────────────────────────────────────────────────────────
 
 const SETTINGS_KEY = 'bondable_billing_settings';
@@ -149,8 +206,13 @@ function write(key: string, value: unknown): void {
 
 const DEMO_PROVIDER_ID = 'demo-provider';
 
+/**
+ * yyyy-mm-dd in LOCAL time. Deliberately not toISOString(): a session booked at
+ * 21:00 in Gent must not land on the next day's invoice because UTC rolled over.
+ */
 function isoDate(d: Date): string {
-  return d.toISOString().slice(0, 10);
+  const pad = (n: number): string => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 }
 
 function daysAgo(days: number): Date {
@@ -484,6 +546,236 @@ function markPaid(id: string): Invoice | null {
   return next;
 }
 
+// ── Session → factuur (the 90-second chain) ──────────────────────────────────
+
+/** The invoice a session already sits on, if any — guards double-billing. */
+function findInvoiceForSession(sessionId: string): Invoice | null {
+  return (
+    ensureInvoices().find((inv) =>
+      inv.lines.some((l) => l.sessionId === sessionId),
+    ) ?? null
+  );
+}
+
+/** Add a completed session to the unbilled pool. Idempotent on sessionId. */
+function addUnbilledSession(entry: UnbilledSession): UnbilledSession {
+  const all = ensureUnbilled();
+  const existing = all.find((u) => u.sessionId === entry.sessionId);
+  if (existing) return existing;
+  write(UNBILLED_KEY, [...all, entry]);
+  return entry;
+}
+
+/**
+ * The note→factuur step: one session in, one DRAFT invoice out. Safe to call
+ * twice — a session already on an invoice returns that invoice untouched with
+ * `alreadyBilled: true`, so the chain can never double-bill a client.
+ *
+ * The draft carries no number: Belgian gapless numbering allocates only at
+ * issue. Use `previewNextNumber()` to tell the provider which number it will
+ * get without burning a sequence slot.
+ */
+function createInvoiceForSession(input: SessionBillingInput): {
+  invoice: Invoice;
+  alreadyBilled: boolean;
+} {
+  const existing = findInvoiceForSession(input.sessionId);
+  if (existing) return { invoice: existing, alreadyBilled: true };
+
+  const settings = getSettings();
+  const durationMin =
+    input.durationMin && input.durationMin > 0 ? input.durationMin : 60;
+  const amountCents =
+    typeof input.amountCents === 'number' && input.amountCents > 0
+      ? input.amountCents
+      : settings.defaultRateCents;
+
+  addUnbilledSession({
+    sessionId: input.sessionId,
+    clientId: input.clientId,
+    clientName: input.clientName,
+    date: input.date || isoDate(new Date()),
+    durationMin,
+    amountCents,
+  });
+
+  return {
+    invoice: createInvoiceFromSessions([input.sessionId]),
+    alreadyBilled: false,
+  };
+}
+
+/**
+ * The number the NEXT issued invoice will carry. Read-only — it does not
+ * allocate, so showing it on a draft keeps the sequence gapless.
+ */
+function previewNextNumber(): string {
+  const settings = getSettings();
+  return `${settings.numberingPrefix}-${String(settings.nextNumber).padStart(4, '0')}`;
+}
+
+// ── Terugbetalingsattest ─────────────────────────────────────────────────────
+
+const DEFAULT_ATTEST_NOTE =
+  'Betaalde prestatie in het kader van individuele begeleiding.';
+
+/** Last address line minus the postcode → the place of signature ("Gent"). */
+function practicePlace(address: string): string {
+  const last =
+    address
+      .split('\n')
+      .map((l) => l.trim())
+      .filter(Boolean)
+      .pop() ?? '';
+  return last.replace(/^\d{4}\s*/, '').trim() || last;
+}
+
+function buildAttest(input: {
+  clientName: string;
+  nationalNumber?: string;
+  lines: AttestLine[];
+  invoiceNumber?: string;
+  invoiceStatus?: InvoiceStatus | null;
+  vatStatus?: VatStatus;
+  note?: string;
+}): AttestPayload {
+  const settings = getSettings();
+  const vatStatus = input.vatStatus ?? settings.vatStatus;
+  return {
+    provider: {
+      name: settings.legalName,
+      address: settings.practiceAddress,
+      enterpriseNumber: settings.enterpriseNumber,
+      recognitionNumber: settings.recognitionNumber,
+      iban: settings.iban,
+    },
+    client: {
+      name: input.clientName,
+      nationalNumber: input.nationalNumber?.trim() ?? '',
+    },
+    lines: input.lines,
+    totalCents: input.lines.reduce((sum, l) => sum + l.amountCents, 0),
+    vatStatus,
+    vatClause: vatClause(vatStatus),
+    invoiceNumber: input.invoiceNumber ?? '',
+    invoiceStatus: input.invoiceStatus ?? null,
+    issuedOn: isoDate(new Date()),
+    place: practicePlace(settings.practiceAddress),
+    note: input.note?.trim() ? input.note.trim() : DEFAULT_ATTEST_NOTE,
+  };
+}
+
+/**
+ * Attest for a single session. Picks up the invoice the session sits on (so a
+ * already-issued number prints), and falls back to the session's own figures
+ * when it is not billed yet — the attest never waits on the invoice.
+ */
+function buildAttestForSession(
+  input: SessionBillingInput & { nationalNumber?: string },
+): AttestPayload {
+  const settings = getSettings();
+  const invoice = findInvoiceForSession(input.sessionId);
+  const durationMin =
+    input.durationMin && input.durationMin > 0 ? input.durationMin : 60;
+  const invoiceLine = invoice?.lines.find(
+    (l) => l.sessionId === input.sessionId,
+  );
+  const amountCents =
+    invoiceLine != null
+      ? invoiceLine.qty * invoiceLine.unitCents
+      : typeof input.amountCents === 'number' && input.amountCents > 0
+        ? input.amountCents
+        : settings.defaultRateCents;
+
+  return buildAttest({
+    clientName: input.clientName,
+    nationalNumber: input.nationalNumber,
+    lines: [
+      {
+        date: input.date || isoDate(new Date()),
+        description: invoiceLine?.description ?? `Consultatie — ${durationMin} min`,
+        amountCents,
+      },
+    ],
+    invoiceNumber: invoice?.number ?? '',
+    invoiceStatus: invoice?.status ?? null,
+    vatStatus: invoice?.vatStatus,
+    note: invoice?.mutualiteitNote,
+  });
+}
+
+/** Attest covering every line of one invoice (a month of sessions at once). */
+function buildAttestForInvoice(
+  invoiceId: string,
+  opts?: { nationalNumber?: string },
+): AttestPayload | null {
+  const invoice = getInvoice(invoiceId);
+  if (!invoice) return null;
+  return buildAttest({
+    clientName: invoice.clientName,
+    nationalNumber: opts?.nationalNumber,
+    lines: invoice.lines.map((l) => ({
+      date: invoice.issueDate,
+      description: l.description,
+      amountCents: l.qty * l.unitCents,
+    })),
+    invoiceNumber: invoice.number,
+    invoiceStatus: invoice.status,
+    vatStatus: invoice.vatStatus,
+    note: invoice.mutualiteitNote,
+  });
+}
+
+/**
+ * Plain-text rendering of an attest — the "Kopieer gegevens" fallback for
+ * providers who paste into their own template or an e-mail to the ziekenfonds.
+ */
+function formatAttestText(attest: AttestPayload): string {
+  const date = (iso: string): string => {
+    const d = new Date(`${iso}T00:00:00`);
+    return Number.isNaN(d.getTime())
+      ? iso
+      : new Intl.DateTimeFormat('nl-BE', {
+          day: 'numeric',
+          month: 'long',
+          year: 'numeric',
+        }).format(d);
+  };
+
+  const rows = attest.lines
+    .map((l) => `${date(l.date)} — ${l.description} — ${formatEur(l.amountCents)}`)
+    .join('\n');
+
+  // `null` drops a line that has no content; '' is an intentional blank line.
+  return [
+    'ATTEST VOOR TERUGBETALING',
+    '',
+    'Zorgverstrekker',
+    attest.provider.name,
+    attest.provider.address,
+    `Ondernemingsnummer: ${attest.provider.enterpriseNumber}`,
+    `Erkennings-/visumnummer: ${attest.provider.recognitionNumber}`,
+    `IBAN: ${attest.provider.iban}`,
+    '',
+    'Cliënt',
+    attest.client.name,
+    `Rijksregisternummer: ${attest.client.nationalNumber || '…'}`,
+    '',
+    'Prestaties',
+    rows,
+    `Totaal betaald: ${formatEur(attest.totalCents)}`,
+    '',
+    attest.vatClause,
+    attest.invoiceNumber ? `Factuurnummer: ${attest.invoiceNumber}` : null,
+    attest.note,
+    'Dit attest bevestigt de betaalde prestatie. Of en hoeveel er wordt terugbetaald, beslist het ziekenfonds.',
+    '',
+    `${attest.place}, ${date(attest.issuedOn)}`,
+  ]
+    .filter((l): l is string => l !== null)
+    .join('\n');
+}
+
 // ── Formatting helpers (shared with the UI) ──────────────────────────────────
 
 /** EUR from cents, Belgian formatting (comma decimal, non-breaking space). */
@@ -513,6 +805,13 @@ export const invoiceService = {
   getInvoice,
   listUnbilled,
   createInvoiceFromSessions,
+  findInvoiceForSession,
+  addUnbilledSession,
+  createInvoiceForSession,
+  previewNextNumber,
+  buildAttestForSession,
+  buildAttestForInvoice,
+  formatAttestText,
   updateInvoice,
   issueInvoice,
   markPaid,

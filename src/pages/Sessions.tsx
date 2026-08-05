@@ -37,12 +37,36 @@ import PreSessionNudge from "@/components/sessions/PreSessionNudge";
 import SessionRecapCard from "@/components/sessions/SessionRecapCard";
 import PostSessionAllianceCheck from "@/components/sessions/PostSessionAllianceCheck";
 import { isSessionPast } from "@/components/sessions/sessionLoopUtils";
+import PageHeader from "@/components/layout/PageHeader";
 import EmptyState from "@/components/ui/empty-state";
 import LineSteps from "@/components/illustration/LineSteps";
 
+/**
+ * Session status -> semantic Badge variant. The old helper returned a
+ * hard-coded dark-theme palette that was illegible on the light canvas;
+ * semantic variants carry their own soft surface + on-color text and stay
+ * readable in both themes.
+ */
+type StatusVariant = "success" | "warning" | "info" | "destructive" | "secondary";
+
+const sessionStatusVariant = (status?: string): StatusVariant => {
+  switch (status) {
+    case "Confirmed":
+      return "success";
+    case "Pending":
+      return "warning";
+    case "Completed":
+      return "info";
+    case "Denied":
+      return "destructive";
+    default:
+      return "secondary";
+  }
+};
+
 // Separate component for session card to properly use hooks
-const SessionCard = ({ session, userType, onViewDetails, onConfirmSession, onCancelSession, onRequestUpdate }: { 
-  session: Session; 
+const SessionCard = ({ session, userType, onViewDetails, onConfirmSession, onCancelSession, onRequestUpdate }: {
+  session: Session;
   userType: string;
   onViewDetails: (session: Session) => void;
   onConfirmSession: (sessionId: string) => void;
@@ -53,21 +77,6 @@ const SessionCard = ({ session, userType, onViewDetails, onConfirmSession, onCan
   const { user } = useAuthManager();
   const personId = userType === "client" ? session.therapist?.id : session.client?.id;
   const { avatarUrl } = useProfileAvatar(personId);
-
-  const getStatusBadgeColor = (status: string) => {
-    switch (status) {
-      case "Confirmed":
-        return "bg-green-500/20 text-green-400 border-green-500/30 hover:bg-green-500/20";
-      case "Pending":
-        return "bg-yellow-500/20 text-yellow-400 border-yellow-500/30 hover:bg-yellow-500/20";
-      case "Completed":
-        return "bg-blue-500/20 text-blue-400 border-blue-500/30 hover:bg-blue-500/20";
-      case "Denied":
-        return "bg-red-500/20 text-red-400 border-red-500/30 hover:bg-red-500/20";
-      default:
-        return "bg-gray-500/20 text-gray-400 border-gray-500/30 hover:bg-gray-500/20";
-    }
-  };
 
   const getSessionTypeIcon = (type: string) => {
     switch (type) {
@@ -105,10 +114,10 @@ const SessionCard = ({ session, userType, onViewDetails, onConfirmSession, onCan
   // Completely new simple permissions logic
   const getSessionPermissions = () => {
     if (!user?.id) return { canConfirm: false, canEdit: false, canCancel: false, canRequestUpdate: false, canDelete: false, canDeny: false };
-    
+
     const isTherapist = session.therapist_id === user.id;
     const isClient = session.client_id === user.id;
-    
+
     // Simple rule: Check who made the current request using current_requester_id
     if (session.status === "Pending") {
       if (session.current_requester_id === user.id) {
@@ -122,10 +131,10 @@ const SessionCard = ({ session, userType, onViewDetails, onConfirmSession, onCan
       // CONFIRMED SESSIONS: Add request update button ONLY in view details mode (not in session list)
       return { canConfirm: false, canEdit: false, canCancel: false, canRequestUpdate: false, canDelete: false, canDeny: false };
     } else if (session.status === "Denied") {
-      // DENIED SESSIONS: ONLY VIEW DETAILS (no other buttons)  
+      // DENIED SESSIONS: ONLY VIEW DETAILS (no other buttons)
       return { canConfirm: false, canEdit: false, canCancel: false, canRequestUpdate: false, canDelete: false, canDeny: false };
     }
-    
+
     return { canConfirm: false, canEdit: false, canCancel: false, canRequestUpdate: false, canDelete: false, canDeny: false };
   };
 
@@ -154,7 +163,7 @@ const SessionCard = ({ session, userType, onViewDetails, onConfirmSession, onCan
               </p>
             </div>
           </div>
-          <Badge className={getStatusBadgeColor(session.status)}>
+          <Badge variant={sessionStatusVariant(session.status)}>
             {translateSessionStatus(session.status || 'Pending')}
           </Badge>
         </div>
@@ -213,7 +222,6 @@ const SessionCard = ({ session, userType, onViewDetails, onConfirmSession, onCan
             <Button
               size="sm"
               variant="outline"
-              className="border-border bg-muted hover:bg-muted text-muted-foreground hover:text-foreground"
               onClick={() => onConfirmSession(session.id)}
             >
               {t("confirm")}
@@ -223,7 +231,6 @@ const SessionCard = ({ session, userType, onViewDetails, onConfirmSession, onCan
             <Button
               size="sm"
               variant="destructive"
-              className="bg-red-500 hover:bg-red-600"
               onClick={() => onCancelSession(session.id)}
             >
               {t("deny")}
@@ -233,7 +240,6 @@ const SessionCard = ({ session, userType, onViewDetails, onConfirmSession, onCan
             <Button
               size="sm"
               variant="outline"
-              className="border-border bg-muted hover:bg-muted text-muted-foreground hover:text-foreground"
               onClick={() => onCancelSession(session.id)}
             >
               {t("cancel")}
@@ -243,7 +249,6 @@ const SessionCard = ({ session, userType, onViewDetails, onConfirmSession, onCan
             <Button
               size="sm"
               variant="outline"
-              className="border-border bg-muted hover:bg-muted text-muted-foreground hover:text-foreground"
               onClick={() => onRequestUpdate(session.id)}
             >
               {t("request_update")}
@@ -253,7 +258,6 @@ const SessionCard = ({ session, userType, onViewDetails, onConfirmSession, onCan
             <Button
               size="sm"
               variant="destructive"
-              className="bg-red-500 hover:bg-red-600"
               onClick={() => onCancelSession(session.id)}
             >
               {t("delete")}
@@ -290,12 +294,12 @@ const Sessions = () => {
   const clientNameFilter = searchParams.get("clientName");
 
   // Use optimized hooks for data fetching
-  const { 
-    data: allSessions = [], 
-    isLoading, 
-    error 
+  const {
+    data: allSessions = [],
+    isLoading,
+    error
   } = useOptimizedSessions(userType as 'client' | 'therapist');
-  
+
   const { data: filterPersons = [] } = useFilterPersons(userType as 'client' | 'therapist');
 
   // Use optimized mutation hooks
@@ -343,7 +347,7 @@ const Sessions = () => {
 
   const handleScheduleSession = async (newSession: Omit<Session, "id">, clientId?: string) => {
     console.log("handleScheduleSession called with:", { newSession, clientId, selectedClientId });
-    
+
     if (!user?.id) {
       toast.error("You must be logged in to schedule a session.");
       return;
@@ -358,7 +362,7 @@ const Sessions = () => {
       finalTherapistId = newSession.therapist_id;
     } else if (userType === "therapist") {
       finalTherapistId = user.id;
-      
+
       // Use the clientId passed from the dialog, or selectedClientId, or preselected client
       if (clientId) {
         finalClientId = clientId;
@@ -421,7 +425,7 @@ const Sessions = () => {
 
   const handleDeleteSession = async (sessionId: string) => {
     if (!editingSession || !user?.id) return;
-    
+
     // Always delete the session when cancel/deny is pressed from the session card
     deleteSessionMutation.mutate(sessionId);
   };
@@ -429,7 +433,7 @@ const Sessions = () => {
   const handleCancelSession = (sessionId: string) => {
     const session = allSessions.find(s => s.id === sessionId);
     if (!session || !user?.id) return;
-    
+
     // Simple cancel/deny/delete logic
     if (session.status === "Pending") {
       if (session.therapist_id === user.id) {
@@ -448,14 +452,14 @@ const Sessions = () => {
   const handleRequestUpdate = (sessionId: string) => {
     const session = allSessions.find(s => s.id === sessionId);
     if (!session || !user?.id) return;
-    
+
     // Change status to Pending and mark current user as the requester
-    updateSessionMutation.mutate({ 
-      sessionId, 
-      updates: { 
+    updateSessionMutation.mutate({
+      sessionId,
+      updates: {
         status: "Pending",
         current_requester_id: user.id
-      } 
+      }
     });
   };
 
@@ -541,7 +545,7 @@ const Sessions = () => {
       </div>
       <div className="grid gap-3">
          {sessions.map(session => (
-           <SessionCard 
+           <SessionCard
              key={session.id}
              session={session}
              userType={userType || "client"}
@@ -560,7 +564,7 @@ const Sessions = () => {
     return (
       <DashboardLayout userType={userType as "therapist" | "client"}>
         <div className="flex items-center justify-center h-64">
-          <div className="text-red-400">{t("error_loading_sessions")}</div>
+          <div className="text-destructive">{t("error_loading_sessions")}</div>
         </div>
       </DashboardLayout>
     );
@@ -569,61 +573,56 @@ const Sessions = () => {
   return (
     <DashboardLayout userType={userType as "therapist" | "client"}>
       <div className="space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-2xl font-semibold text-foreground mb-1">{t('sessions')}</h2>
-            <p className="text-muted-foreground text-sm">
-              {userType === "client"
-                ? t("view_manage_therapy_sessions")
-                : t("manage_client_sessions_appointments")}
-            </p>
-            {clientNameFilter && (
-              <div className="flex items-center gap-2 mt-2">
-                <Badge
+        {/* Header — one page-title treatment, one serif moment per view */}
+        <PageHeader
+          className="mb-0"
+          title={t("sessions")}
+          description={
+            userType === "client"
+              ? t("view_manage_therapy_sessions")
+              : t("manage_client_sessions_appointments")
+          }
+          actions={
+            !isMobile ? (
+              <>
+                <Button
                   variant="outline"
-                  className="text-foreground border-border bg-muted"
+                  size="sm"
+                  onClick={() => setShowFilterDialog(true)}
                 >
-                  {t("filtered_by")}: {decodeURIComponent(clientNameFilter)}
-                  <button
-                    onClick={clearClientFilter}
-                    className="ml-2 hover:text-red-400"
-                  >
-                    <X className="w-3 h-3" />
-                  </button>
-                </Badge>
-              </div>
-            )}
+                  <Filter className="w-4 h-4 mr-2" />
+                  {t("filter")}
+                </Button>
+                <Button size="sm" onClick={() => setShowScheduleDialog(true)}>
+                  <CalendarDays className="w-4 h-4 mr-2" />
+                  {userType === "client" ? t("request_session") : t("schedule_new")}
+                </Button>
+              </>
+            ) : undefined
+          }
+        />
+
+        {clientNameFilter && (
+          <div className="flex items-center gap-2">
+            <Badge variant="outline">
+              {t("filtered_by")}: {decodeURIComponent(clientNameFilter)}
+              <button
+                onClick={clearClientFilter}
+                className="ml-2 text-muted-foreground transition-colors hover:text-destructive"
+                aria-label={t("clear_filter", "Filter wissen")}
+              >
+                <X className="w-3 h-3" />
+              </button>
+            </Badge>
           </div>
-          {!isMobile && (
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                className="border-border bg-muted hover:bg-muted text-muted-foreground hover:text-foreground"
-                onClick={() => setShowFilterDialog(true)}
-              >
-                <Filter className="w-4 h-4 mr-2" />
-                {t("filter")}
-              </Button>
-              <Button
-                size="sm"
-                className="bg-primary hover:bg-primary/90 text-primary-foreground"
-                onClick={() => setShowScheduleDialog(true)}
-              >
-                <CalendarDays className="w-4 h-4 mr-2" />
-                {userType === "client" ? t("request_session") : t("schedule_new")}
-              </Button>
-            </div>
-          )}
-        </div>
+        )}
 
         {isMobile && (
           <div className="flex gap-2">
             <Button
               variant="outline"
               size="sm"
-              className="border-border bg-muted hover:bg-muted text-muted-foreground hover:text-foreground w-full"
+              className="w-full"
               onClick={() => setShowFilterDialog(true)}
             >
               <Filter className="w-4 h-4 mr-2" />
@@ -631,7 +630,7 @@ const Sessions = () => {
             </Button>
             <Button
               size="sm"
-              className="bg-primary hover:bg-primary/90 text-primary-foreground w-full"
+              className="w-full"
               onClick={() => setShowScheduleDialog(true)}
             >
               <CalendarDays className="w-4 h-4 mr-2" />

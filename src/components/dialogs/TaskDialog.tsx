@@ -130,7 +130,7 @@ export default function TaskDialog({
     };
 
     onSave(taskData);
-    
+
     // Add small delay before closing to ensure save operation completes
     setTimeout(() => {
       setOpen(false);
@@ -169,8 +169,8 @@ export default function TaskDialog({
       : t("task_details");
 
   return (
-    <Dialog 
-      open={open} 
+    <Dialog
+      open={open}
       onOpenChange={setOpen}
     >
       <DialogContent
@@ -183,7 +183,7 @@ export default function TaskDialog({
         <DialogHeader>
           <DialogTitle className="text-foreground">{title}</DialogTitle>
         </DialogHeader>
-        <div className="mt-2 h-px w-full bg-gradient-to-r from-transparent via-[#3f3f3f] to-transparent " />
+        <div className="mt-2 h-px w-full bg-border" />
         <div className="space-y-4 overflow-y-auto scrollbar-hide ">
           {mode === "view" && task && (
             <div className="grid grid-cols-2 gap-4 p-4 bg-card rounded-lg border border-border">
@@ -202,7 +202,7 @@ export default function TaskDialog({
 
           <div>
             <Label htmlFor="client" className="text-muted-foreground ">
-              {t("client")} <span className="text-red-400">*</span>
+              {t("client")} <span className="text-destructive">*</span>
             </Label>
             <Select
               value={formData.clientId}
@@ -218,7 +218,7 @@ export default function TaskDialog({
               <SelectContent className="bg-card border-border">
                 {safeClients.map((client) => (
                   <SelectItem
-                    className="text-muted-foreground data-[state=checked]:text-neutral-50 data-[highlighted]:!text-neutral-50"
+                    className="text-muted-foreground"
                     key={client.id}
                     value={client.id}
                   >
@@ -231,7 +231,7 @@ export default function TaskDialog({
 
           <div className="pb-2">
             <Label htmlFor="title" className="text-muted-foreground ">
-              {t("task_title")} <span className="text-red-400">*</span>
+              {t("task_title")} <span className="text-destructive">*</span>
             </Label>
             <Input
               id="title"
@@ -285,7 +285,7 @@ export default function TaskDialog({
                 ) : (
                   <Label className="text-muted-foreground">{t('priority')}</Label>
                 )}
-                
+
                 {(hasPriority || isReadOnly) && (
                   <div className="mt-2">
                     <Select
@@ -300,19 +300,19 @@ export default function TaskDialog({
                       </SelectTrigger>
                       <SelectContent className="bg-card border-border">
                         <SelectItem
-                          className="text-muted-foreground hover:!text-neutral-950 data-[state=checked]:text-neutral-50 data-[highlighted]:!text-neutral-950"
+                          className="text-muted-foreground"
                           value="low"
                         >
                           {t("low")}
                         </SelectItem>
                         <SelectItem
-                          className="text-muted-foreground hover:!text-neutral-950 data-[state=checked]:text-neutral-50 data-[highlighted]:!text-neutral-950"
+                          className="text-muted-foreground"
                           value="medium"
                         >
                           {t("medium")}
                         </SelectItem>
                         <SelectItem
-                          className="text-muted-foreground hover:!text-neutral-950 data-[state=checked]:text-neutral-50 data-[highlighted]:!text-neutral-950"
+                          className="text-muted-foreground"
                           value="high"
                         >
                           {t("high")}
@@ -322,7 +322,7 @@ export default function TaskDialog({
                   </div>
                 )}
               </div>
-              
+
               <div>
                 {!isReadOnly ? (
                   <div className="flex items-center space-x-2">
@@ -343,7 +343,7 @@ export default function TaskDialog({
                 ) : (
                   <Label className="text-muted-foreground">{t('due_date')}</Label>
                 )}
-                
+
                 {(hasDueDate || isReadOnly) && (
                   <div className="mt-2">
                     <SimpleDatePicker

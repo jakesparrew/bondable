@@ -73,19 +73,19 @@ const FormDialog = ({
       invalidateQueries.forEach(queryKey => {
         queryClient.invalidateQueries({ queryKey });
       });
-      
+
       if (successMessage) {
         toast.success(successMessage);
       }
-      
+
       onOpenChange(false);
       setFormData({});
     },
     onError: (error: unknown) => {
       console.error("Form submission error:", error);
-      const errorMessage = error instanceof Error ? error.message : 
-                          (error && typeof error === 'object' && 'message' in error ? 
-                           String((error as { message: unknown }).message) : 
+      const errorMessage = error instanceof Error ? error.message :
+                          (error && typeof error === 'object' && 'message' in error ?
+                           String((error as { message: unknown }).message) :
                            "An error occurred. Please try again.");
       toast.error(errorMessage);
     },
@@ -124,7 +124,7 @@ const FormDialog = ({
 
   const renderField = (field: FormField) => {
     const { component: Component, props = {}, ...fieldProps } = field;
-    
+
     if (Component) {
       return (
         <Component
@@ -162,13 +162,12 @@ const FormDialog = ({
     >
       <form onSubmit={handleSubmit} className="space-y-4">
         {fields.map(renderField)}
-        
+
         <div className="flex justify-end gap-3 pt-4">
           <Button
             type="button"
             variant="outline"
             onClick={() => onOpenChange(false)}
-            className="border-border bg-card hover:bg-muted text-muted-foreground hover:text-foreground"
           >
             {t("cancel")}
           </Button>

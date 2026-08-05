@@ -1,4 +1,5 @@
 import DashboardLayout from "@/components/layout/DashboardLayout";
+import PageHeader from "@/components/layout/PageHeader";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -40,6 +41,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
+
+type StatusVariant = "success" | "warning" | "info" | "destructive" | "secondary";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useOptimizedState, useOptimizedEffect } from '@/hooks/performance/useOptimizedComponents';
 import { useMemo, useState, useEffect } from 'react';
@@ -223,37 +226,18 @@ const Tasks = () => {
     );
   };
 
+  // Semantic badge variants — the old hard-coded dark-theme palette was
+  // illegible on the light canvas.
   const getStatusBadge = (status: TaskStatus) => {
-    const config = {
-      assigned: {
-        label: t("assigned"),
-        className: "bg-blue-500/20 text-blue-400 border-blue-500/30",
-      },
-      "in_progress": {
-        label: t("in_progress"),
-        className: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30",
-      },
-      completed: {
-        label: t("completed"),
-        className: "bg-green-500/20 text-green-400 border-green-500/30",
-      },
-      overdue: {
-        label: t("overdue"),
-        className: "bg-red-500/20 text-red-400 border-red-500/30",
-      },
-      denied: {
-        label: t("declined"),
-        className: "bg-red-500/20 text-red-400 border-red-500/30",
-      },
+    const config: Record<TaskStatus, { label: string; variant: StatusVariant }> = {
+      assigned: { label: t("assigned"), variant: "info" },
+      in_progress: { label: t("in_progress"), variant: "warning" },
+      completed: { label: t("completed"), variant: "success" },
+      overdue: { label: t("overdue"), variant: "destructive" },
+      denied: { label: t("declined"), variant: "destructive" },
     };
-    return (
-      <Badge
-        variant="outline"
-        className={`text-xs ${config[status].className}`}
-      >
-        {config[status].label}
-      </Badge>
-    );
+    const entry = config[status] ?? { label: String(status), variant: "secondary" as StatusVariant };
+    return <Badge variant={entry.variant}>{entry.label}</Badge>;
   };
 
   const getPriorityBadge = (priority: TaskPriority | null) => {
@@ -266,27 +250,17 @@ const Tasks = () => {
       );
     }
 
-    const config = {
-      low: {
-        icon: "↓",
-        className: "text-blue-400",
-      },
-      medium: {
-        icon: "→",
-        className: "text-yellow-400",
-      },
-      high: {
-        icon: "↑",
-        className: "text-red-400",
-      },
+    const config: Record<TaskPriority, { icon: string; variant: StatusVariant }> = {
+      low: { icon: "↓", variant: "info" },
+      medium: { icon: "→", variant: "warning" },
+      high: { icon: "↑", variant: "destructive" },
     };
+    const entry = config[priority] ?? { icon: "→", variant: "secondary" as StatusVariant };
     return (
-      <span
-        className={`flex items-center gap-1 text-xs ${config[priority].className}`}
-      >
-        <span>{config[priority].icon}</span>
+      <Badge variant={entry.variant}>
+        <span aria-hidden="true">{entry.icon}</span>
         {t(priority)}
-      </span>
+      </Badge>
     );
   };
 
@@ -453,7 +427,7 @@ const Tasks = () => {
         <div className="flex items-center justify-center h-64">
           <Card className="bg-card border-border max-w-md">
             <CardContent className="p-6 text-center">
-              <AlertTriangle className="h-12 w-12 text-red-400 mx-auto mb-4" />
+              <AlertTriangle className="h-12 w-12 text-destructive mx-auto mb-4" />
               <h3 className="text-lg font-medium text-foreground mb-2">
                 Access Denied
               </h3>
@@ -474,24 +448,27 @@ const Tasks = () => {
     <DashboardLayout userType={userType as "therapist" | "client"}>
       <div className="space-y-4 md:space-y-6">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-1 md:mb-2">
-              {userType === "client" ? t("your_tasks") : t("client_tasks")}
-            </h2>
-            <p className="text-muted-foreground text-sm">{userType === "client" ? t("track_assigned_tasks_progress") : t("assign_track_tasks_clients")}</p>
-          </div>
-          {userType === "therapist" && (
-            <Button
-              onClick={() => openDialog("add")}
-              disabled={clients.length === 0}
-              className="bg-primary text-primary-foreground hover:bg-primary/90 font-medium w-full sm:w-auto disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              {t("assign_task")}
-            </Button>
-          )}
-        </div>
+        <PageHeader
+          className="mb-0"
+          title={userType === "client" ? t("your_tasks") : t("client_tasks")}
+          description={
+            userType === "client"
+              ? t("track_assigned_tasks_progress")
+              : t("assign_track_tasks_clients")
+          }
+          actions={
+            userType === "therapist" ? (
+              <Button
+                onClick={() => openDialog("add")}
+                disabled={clients.length === 0}
+                className="w-full sm:w-auto"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                {t("assign_task")}
+              </Button>
+            ) : undefined
+          }
+        />
 
         {/* Show message if no clients available for therapist */}
         {userType === "therapist" && clients.length === 0 && (
@@ -1007,7 +984,7 @@ const Tasks = () => {
               <div>
                 <Label className="text-muted-foreground">
                   {t("decline_task_reason")}{" "}
-                  <span className="text-red-400">*</span>
+                  <span className="text-destructive">*</span>
                 </Label>
                 <Textarea
                   value={declineReason}

@@ -30,6 +30,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
+import PostSignChain from "@/components/notes/PostSignChain";
 import {
   noteService,
   type NoteTemplate,
@@ -60,6 +61,18 @@ export interface QuickCaptureSheetProps {
   providerId: string;
   clientId: string;
   clientName?: string;
+  /** ISO date (yyyy-mm-dd) of the session — feeds the invoice/attest chain. */
+  sessionDate?: string;
+  /** Session length in minutes; drives the invoice line description. */
+  durationMin?: number;
+  /** Overrides the provider's standard rate for this session. */
+  amountCents?: number;
+  /**
+   * Open straight on the post-sign chain (factuur → attest) when the note is
+   * already signed. Lets a provider come back to the paperwork later without
+   * re-reading a note they wrote themselves.
+   */
+  startInChain?: boolean;
   /** Called after a successful sign or draft-save (to refetch surfaces). */
   onSaved?: (note: SessionNote) => void;
 }
@@ -79,6 +92,10 @@ const QuickCaptureSheet: React.FC<QuickCaptureSheetProps> = ({
   providerId,
   clientId,
   clientName,
+  sessionDate,
+  durationMin,
+  amountCents,
+  startInChain = false,
   onSaved,
 }) => {
   const { t, i18n } = useTranslation();
@@ -98,6 +115,12 @@ const QuickCaptureSheet: React.FC<QuickCaptureSheetProps> = ({
   const [homework, setHomework] = React.useState<string[]>([]);
   const [homeworkDraft, setHomeworkDraft] = React.useState<string>("");
   const [busy, setBusy] = React.useState<"idle" | "saving" | "signing">("idle");
+  /**
+   * After a successful sign the sheet does NOT close: it hands over to the
+   * post-sign chain (factuur → attest) while the session is still in hand.
+   * `null` = the capture form; a number = tasks created on that sign.
+   */
+  const [chainTasks, setChainTasks] = React.useState<number | null>(null);
 
   // Load-or-create the draft when the sheet opens.
   React.useEffect(() => {
@@ -113,7 +136,10 @@ const QuickCaptureSheet: React.FC<QuickCaptureSheetProps> = ({
     setHomework([...existing.homework]);
     setHomeworkDraft("");
     setBusy("idle");
-  }, [open, sessionId, providerId, clientId]);
+    setChainTasks(
+      startInChain && existing.status === "signed" ? 0 : null,
+    );
+  }, [open, sessionId, providerId, clientId, startInChain]);
 
   const template: NoteTemplate | null = React.useMemo(
     () => templates.find((tmpl) => tmpl.id === templateId) ?? null,
@@ -205,16 +231,11 @@ const QuickCaptureSheet: React.FC<QuickCaptureSheetProps> = ({
         note.id,
         providerId,
       );
+      setNote(signed);
       onSaved?.(signed);
-      toast.success(
-        tasksCreated > 0
-          ? label(
-              `Notitie ondertekend. ${tasksCreated} ${tasksCreated === 1 ? "taak" : "taken"} aangemaakt.`,
-              `Note signed. ${tasksCreated} ${tasksCreated === 1 ? "task" : "tasks"} created.`,
-            )
-          : label("Notitie ondertekend.", "Note signed."),
-      );
-      onOpenChange(false);
+      // Hand over to the chain instead of closing: the session is still in the
+      // provider's head, which is the only moment invoicing costs no effort.
+      setChainTasks(tasksCreated);
     } catch {
       toast.error(label("Kon niet ondertekenen.", "Could not sign."));
     } finally {
@@ -262,7 +283,12 @@ const QuickCaptureSheet: React.FC<QuickCaptureSheetProps> = ({
             )}
           </div>
           <SheetDescription className="text-sm text-muted-foreground">
-            {clientName
+            {chainTasks !== null
+              ? label(
+                  "Nog twee kleine stappen, en de sessie is helemaal afgewerkt.",
+                  "Two small steps left and this session is fully wrapped up.",
+                )
+              : clientName
               ? label(
                   `Na de sessie met ${clientName}. Blijft privé — alleen jij ziet dit.`,
                   `After the session with ${clientName}. Stays private — only you see this.`,
@@ -274,6 +300,19 @@ const QuickCaptureSheet: React.FC<QuickCaptureSheetProps> = ({
           </SheetDescription>
         </SheetHeader>
 
+        {chainTasks !== null ? (
+          <PostSignChain
+            sessionId={sessionId}
+            clientId={clientId}
+            clientName={clientName}
+            sessionDate={sessionDate}
+            durationMin={durationMin}
+            amountCents={amountCents}
+            tasksCreated={chainTasks}
+            onDone={() => onOpenChange(false)}
+          />
+        ) : (
+          <>
         <div className="flex-1 space-y-5 px-5 py-5">
           {/* Template picker */}
           <div className="space-y-1.5">
@@ -478,6 +517,8 @@ const QuickCaptureSheet: React.FC<QuickCaptureSheetProps> = ({
             </>
           )}
         </div>
+          </>
+        )}
       </SheetContent>
     </Sheet>
   );

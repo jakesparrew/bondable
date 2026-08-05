@@ -179,11 +179,36 @@ export function toHHmm(mins: number): string {
   return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
 }
 
+/** Parse "yyyy-MM-dd" as a UTC-anchored Date — no DST / offset drift. */
+function isoToUtcDate(isoDate: string): Date {
+  const [y, m, d] = isoDate
+    .slice(0, 10)
+    .split("-")
+    .map((n) => Number(n));
+  return new Date(Date.UTC(y || 1970, (m || 1) - 1, d || 1));
+}
+
 /** ISO weekday (1..7) of an ISO date string. */
 export function weekdayOf(isoDate: string): Weekday {
-  const d = new Date(`${isoDate}T00:00:00`);
-  const js = d.getDay(); // 0 = Sunday
+  const js = isoToUtcDate(isoDate).getUTCDay(); // 0 = Sunday
   return (js === 0 ? 7 : js) as Weekday;
+}
+
+/**
+ * "yyyy-MM-ddTHH:mm" for the *local* clock. Availability is wall-clock, so a
+ * UTC `toISOString()` would put the "not before now" floor an hour or two off
+ * in Belgium — and offer moments that already passed.
+ */
+export function localNowIso(): string {
+  const d = new Date();
+  return new Date(d.getTime() - d.getTimezoneOffset() * 60_000)
+    .toISOString()
+    .slice(0, 16);
+}
+
+/** Today's date on the local clock, "yyyy-MM-dd". */
+export function localTodayIso(): string {
+  return localNowIso().slice(0, 10);
 }
 
 /** Which daypart a "HH:mm" falls in (morning <12, afternoon <17, else evening). */
@@ -200,8 +225,8 @@ export function formatMatches(a: SessionFormat, b: SessionFormat): boolean {
 }
 
 function addDaysIso(isoDate: string, days: number): string {
-  const d = new Date(`${isoDate}T00:00:00`);
-  d.setDate(d.getDate() + days);
+  const d = isoToUtcDate(isoDate);
+  d.setUTCDate(d.getUTCDate() + days);
   return d.toISOString().slice(0, 10);
 }
 
@@ -420,6 +445,354 @@ function getAvailabilitySummary(providerId: string): AvailabilitySummary {
 }
 
 /* -------------------------------------------------------------------------- */
+/* Open slots — the derivation that turns painted availability into booking    */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * A block of time that is NOT bookable because something already sits there.
+ * Kept deliberately dumb (date + wall-clock range) so any caller can build it:
+ * from sessions, from a calendar sync, from a hold.
+ */
+export interface BusyBlock {
+  /** ISO date "yyyy-MM-dd". */
+  date: string;
+  /** Inclusive start "HH:mm". */
+  startTime: string;
+  /** Exclusive end "HH:mm". */
+  endTime: string;
+}
+
+/** One concrete, offerable moment. */
+export interface OpenSlot {
+  /** Stable list key: `${date}T${time}`. */
+  id: string;
+  date: string;
+  weekday: Weekday;
+  /** Inclusive start "HH:mm". */
+  time: string;
+  /** Exclusive end "HH:mm". */
+  endTime: string;
+  durationMinutes: number;
+  format: SessionFormat;
+  location: string | null;
+  daypart: WaitlistDaypart;
+}
+
+/** Open slots grouped per day, so the picker never has to regroup. */
+export interface OpenSlotDay {
+  date: string;
+  weekday: Weekday;
+  slots: OpenSlot[];
+}
+
+export interface OpenSlotsOptions {
+  /** Session length. Default 50 (the Belgian standard consult). */
+  durationMinutes?: number;
+  /** Start-time granularity inside a block. Default 30. */
+  stepMinutes?: number;
+  /** Only offer slots compatible with this format. Default "both". */
+  format?: SessionFormat;
+  /** Already-taken time. Build with `busyFromSessions`. */
+  busy?: BusyBlock[];
+  /** Keep the list calm — cap slots shown per day. Default 6. */
+  maxPerDay?: number;
+  /**
+   * Drop slots starting before this instant. LOCAL wall-clock ISO datetime —
+   * use `localNowIso()`, not `new Date().toISOString()`. Default: none.
+   */
+  notBefore?: string;
+  /** Include days with zero open slots (default false = only real options). */
+  includeEmptyDays?: boolean;
+}
+
+/** Tolerates "HH:mm", "HH:mm:ss" and stray whitespace. Returns "HH:mm". */
+export function normalizeHHmm(value: string | null | undefined): string {
+  if (!value) return "00:00";
+  const m = /^(\d{1,2}):(\d{2})/.exec(String(value).trim());
+  if (!m) return "00:00";
+  return `${m[1].padStart(2, "0")}:${m[2]}`;
+}
+
+/** The minimal shape `busyFromSessions` needs — matches the sessions row. */
+export interface SessionLike {
+  session_date: string;
+  session_time?: string | null;
+  duration_minutes?: number | null;
+  status?: string | null;
+}
+
+const FREED_STATUSES = new Set(["cancelled", "canceled", "denied", "no show", "no_show"]);
+
+/**
+ * Map session rows to busy blocks. Cancelled / denied / no-show sessions release
+ * their time again. Pure.
+ */
+function busyFromSessions(sessions: SessionLike[]): BusyBlock[] {
+  const out: BusyBlock[] = [];
+  for (const s of sessions ?? []) {
+    if (!s?.session_date) continue;
+    const status = (s.status ?? "").toString().trim().toLowerCase();
+    if (FREED_STATUSES.has(status)) continue;
+    const start = normalizeHHmm(s.session_time ?? "00:00");
+    const mins = toMinutes(start);
+    const dur = Math.max(15, Number(s.duration_minutes) || 50);
+    out.push({
+      date: s.session_date.slice(0, 10),
+      startTime: start,
+      endTime: toHHmm(Math.min(24 * 60, mins + dur)),
+    });
+  }
+  return out;
+}
+
+interface Span {
+  s: number;
+  e: number;
+  format: SessionFormat;
+  location: string | null;
+}
+
+const overlaps = (aS: number, aE: number, bS: number, bE: number) =>
+  aS < bE && aE > bS;
+
+/**
+ * The booking derivation: weekly availability rules, MINUS verlof/closures,
+ * MINUS what is already booked, sliced into session-length slots and grouped
+ * per day.
+ *
+ * Pure over (stored rules + stored exceptions + the `busy` you hand in) — it
+ * never writes and never fetches, so it is safe to call on every render and
+ * trivial to test.
+ *
+ * @param providerId whose availability to read
+ * @param fromISO    ISO date (or datetime — the date part is used) to start at
+ * @param days       how many calendar days to scan forward, inclusive of `from`
+ */
+function getOpenSlots(
+  providerId: string,
+  fromISO: string,
+  days = 14,
+  options: OpenSlotsOptions = {},
+): OpenSlotDay[] {
+  const durationMinutes = Math.max(15, options.durationMinutes ?? 50);
+  const stepMinutes = Math.max(5, options.stepMinutes ?? 30);
+  const wantFormat = options.format ?? "both";
+  const maxPerDay = Math.max(1, options.maxPerDay ?? 6);
+  const busy = options.busy ?? [];
+
+  const from = (fromISO || localTodayIso()).slice(0, 10);
+  const notBeforeDate = options.notBefore ? options.notBefore.slice(0, 10) : null;
+  const notBeforeMins = options.notBefore
+    ? toMinutes(normalizeHHmm(options.notBefore.slice(11, 16)))
+    : 0;
+
+  const rules = listRules(providerId);
+  const exceptions = listExceptions(providerId);
+
+  const out: OpenSlotDay[] = [];
+
+  for (let i = 0; i < Math.max(0, days); i++) {
+    const date = addDaysIso(from, i);
+    if (notBeforeDate && date < notBeforeDate) continue;
+
+    const weekday = weekdayOf(date);
+    const dayExceptions = exceptions.filter((e) => e.date === date);
+
+    // Verlof for the whole day removes everything.
+    if (
+      dayExceptions.some(
+        (e) => e.kind === "closed" && !e.startTime && !e.endTime,
+      )
+    ) {
+      if (options.includeEmptyDays) out.push({ date, weekday, slots: [] });
+      continue;
+    }
+
+    // Candidate coverage = weekly rules for this weekday + one-off extra hours.
+    const spans: Span[] = [
+      ...rules
+        .filter(
+          (r) =>
+            r.weekday === weekday &&
+            formatMatches(r.format, wantFormat) &&
+            isWithin(date, r.validFrom, r.validUntil),
+        )
+        .map((r) => ({
+          s: toMinutes(r.startTime),
+          e: toMinutes(r.endTime),
+          format: r.format,
+          location: r.location,
+        })),
+      ...dayExceptions
+        .filter((e) => e.kind === "extra" && e.startTime && e.endTime)
+        .map((e) => ({
+          s: toMinutes(e.startTime as string),
+          e: toMinutes(e.endTime as string),
+          format: "both" as SessionFormat,
+          location: null,
+        })),
+    ].sort((a, b) => a.s - b.s);
+
+    const closes = dayExceptions
+      .filter((e) => e.kind === "closed" && e.startTime && e.endTime)
+      .map((e) => ({
+        s: toMinutes(e.startTime as string),
+        e: toMinutes(e.endTime as string),
+      }));
+
+    const dayBusy = busy
+      .filter((b) => b.date === date)
+      .map((b) => ({ s: toMinutes(b.startTime), e: toMinutes(b.endTime) }));
+
+    const floor =
+      notBeforeDate && date === notBeforeDate ? notBeforeMins : -Infinity;
+
+    const seen = new Set<number>();
+    const slots: OpenSlot[] = [];
+
+    for (const span of spans) {
+      for (let s = span.s; s + durationMinutes <= span.e; s += stepMinutes) {
+        const e = s + durationMinutes;
+        if (s < floor) continue;
+        if (seen.has(s)) continue;
+        if (closes.some((c) => overlaps(s, e, c.s, c.e))) continue;
+        if (dayBusy.some((b) => overlaps(s, e, b.s, b.e))) continue;
+
+        seen.add(s);
+        const time = toHHmm(s);
+        slots.push({
+          id: `${date}T${time}`,
+          date,
+          weekday,
+          time,
+          endTime: toHHmm(e),
+          durationMinutes,
+          format: span.format,
+          location: span.location,
+          daypart: daypartOf(time),
+        });
+      }
+    }
+
+    slots.sort((a, b) => toMinutes(a.time) - toMinutes(b.time));
+
+    // Cap by sampling ACROSS the day, not by truncating it. Taking the first N
+    // would hide every afternoon behind a full morning, and a client who only
+    // works mornings would think their begeleider never has an evening free.
+    let capped = slots;
+    if (slots.length > maxPerDay) {
+      if (maxPerDay === 1) {
+        capped = [slots[0]];
+      } else {
+        const picked: OpenSlot[] = [];
+        for (let k = 0; k < maxPerDay; k++) {
+          const s = slots[Math.round((k * (slots.length - 1)) / (maxPerDay - 1))];
+          if (s && (picked.length === 0 || picked[picked.length - 1].id !== s.id)) {
+            picked.push(s);
+          }
+        }
+        capped = picked;
+      }
+    }
+
+    if (capped.length > 0 || options.includeEmptyDays) {
+      out.push({ date, weekday, slots: capped });
+    }
+  }
+
+  return out;
+}
+
+/**
+ * Double-book guard. Re-checks a chosen moment right before it is written —
+ * availability may have changed while a dialog was open, or two people may have
+ * picked the same chip. Pure; hand in the same `busy` you derived the slot from.
+ */
+function isSlotStillFree(
+  providerId: string,
+  slot: {
+    date: string;
+    time: string;
+    durationMinutes?: number;
+    format?: SessionFormat;
+  },
+  busy: BusyBlock[] = [],
+): boolean {
+  const start = normalizeHHmm(slot.time);
+  const startMins = toMinutes(start);
+  const dur = Math.max(15, slot.durationMinutes ?? 50);
+  const end = toHHmm(startMins + dur);
+
+  if (!isAvailable(providerId, slot.date, start, end, slot.format ?? "both")) {
+    return false;
+  }
+  return !busy.some(
+    (b) =>
+      b.date === slot.date &&
+      overlaps(startMins, startMins + dur, toMinutes(b.startTime), toMinutes(b.endTime)),
+  );
+}
+
+/**
+ * First open slot that fits a waitlist preference — the engine behind
+ * "stel dit moment voor". Pure over the days you already derived.
+ */
+function findSlotForPreference(
+  preference: WaitlistPreference,
+  days: OpenSlotDay[],
+): OpenSlot | null {
+  for (const day of days) {
+    for (const slot of day.slots) {
+      if (!formatMatches(preference.format, slot.format)) continue;
+      if (
+        preference.weekdays.length > 0 &&
+        !preference.weekdays.includes(slot.weekday)
+      ) {
+        continue;
+      }
+      if (
+        preference.dayparts.length > 0 &&
+        !preference.dayparts.includes(slot.daypart)
+      ) {
+        continue;
+      }
+      return slot;
+    }
+  }
+  return null;
+}
+
+/**
+ * Demo seed: a plausible Flemish practice week, written ONLY when the provider
+ * has never painted anything. Keeps the explorable demo from showing an empty
+ * booking surface, and disappears the moment a real grid is saved.
+ */
+function seedDemoAvailability(providerId: string): AvailabilityRule[] {
+  const existing = listRules(providerId);
+  if (existing.length > 0) return existing;
+
+  const morning = { startTime: "09:00", endTime: "12:30" };
+  const afternoon = { startTime: "13:30", endTime: "17:00" };
+  const base = {
+    format: "both" as SessionFormat,
+    location: "Praktijk De Brug",
+    validFrom: null,
+    validUntil: null,
+  };
+
+  return setRules(providerId, [
+    { weekday: 1, ...morning, ...base },
+    { weekday: 1, ...afternoon, ...base },
+    { weekday: 2, ...morning, ...base },
+    { weekday: 2, ...afternoon, ...base },
+    { weekday: 3, ...morning, ...base },
+    { weekday: 4, ...morning, ...base },
+    { weekday: 4, ...afternoon, ...base },
+    { weekday: 5, startTime: "09:00", endTime: "15:00", ...base },
+  ]);
+}
+
+/* -------------------------------------------------------------------------- */
 /* Recurring session series                                                    */
 /* -------------------------------------------------------------------------- */
 
@@ -577,6 +950,12 @@ export const scheduleService = {
   // availability queries
   isAvailable,
   getAvailabilitySummary,
+  // booking (open slots)
+  getOpenSlots,
+  isSlotStillFree,
+  busyFromSessions,
+  findSlotForPreference,
+  seedDemoAvailability,
   // recurrence
   nextOccurrences,
   listSeries,
@@ -593,6 +972,9 @@ export const scheduleService = {
   weekdayOf,
   daypartOf,
   formatMatches,
+  normalizeHHmm,
+  localNowIso,
+  localTodayIso,
 };
 
 export default scheduleService;

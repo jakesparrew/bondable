@@ -4,19 +4,22 @@ import DashboardLayout from "@/components/layout/DashboardLayout";
 import QuickActions from "@/components/dashboard/QuickActions";
 import ActiveClientsTable from "@/components/dashboard/ActiveClientsTable";
 import DashboardKpis from "@/components/dashboard/DashboardKpis";
-import ClinicalQueue from "@/components/dashboard/ClinicalQueue";
 import ProviderLeads from "@/components/dashboard/therapist/ProviderLeads";
 import ActionInbox from "@/components/dashboard/therapist/ActionInbox";
 import TodayPrepRow from "@/components/dashboard/therapist/TodayPrepRow";
 import { CheckInAlerts } from "@/components/safety/BetweenSessionCheckIn";
 import SetupChecklist from "@/features/onboarding/SetupChecklist";
 import WelcomeModal from "@/features/onboarding/WelcomeModal";
+import { TrialBanner } from "@/components/monetization";
 
 /**
  * Action-focused therapist dashboard main content. Rendered inside the shared
- * DashboardLayout (sidebar + header come from the app shell). Reproduces the
- * approved design: title + date, Quick Actions, Active Clients & Tasks table,
- * condensed KPIs, and a right column (clinical queue + AI system alerts).
+ * DashboardLayout (sidebar + header come from the app shell): title + date,
+ * ActionInbox, today's prep row, Quick Actions, Active Clients & Tasks table,
+ * condensed KPIs, and a right column (Finder leads + unacknowledged check-ins).
+ *
+ * Every block here reads real data. Nothing renders a placeholder agenda or a
+ * standing alert that is not backed by a record.
  */
 const TherapistDashboardContent = () => {
   const { t, i18n } = useTranslation();
@@ -40,6 +43,8 @@ const TherapistDashboardContent = () => {
 
         <div className="pt-4">
           <WelcomeModal role="provider" />
+          {/* Self-hides when no trial is active — safe to mount unconditionally. */}
+          <TrialBanner />
           <SetupChecklist />
 
           {/* Today view additions (T-PX-2 + light T-PX-1): a slim, severity-sorted
@@ -75,7 +80,6 @@ const TherapistDashboardContent = () => {
                 onMessage={() => navigate("/dashboard/therapist/messages")}
                 onView={() => navigate("/dashboard/therapist/clients")}
               />
-              <ClinicalQueue />
             </div>
           </div>
         </div>

@@ -42,6 +42,26 @@ import { useIsMobile } from "@/hooks/ui/use-mobile";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+
+type StatusVariant = "success" | "warning" | "info" | "destructive" | "secondary";
+
+/**
+ * Client status -> semantic Badge variant. Replaces the old dark-theme
+ * palette, which was unreadable on the light canvas.
+ */
+const clientStatusVariant = (status: string): StatusVariant => {
+  switch (status) {
+    case "Active":
+      return "success";
+    case "Pending":
+      return "warning";
+    case "Inactive":
+      return "secondary";
+    default:
+      return "secondary";
+  }
+};
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -218,19 +238,7 @@ export default function ClientsTable() {
       cell: ({ row }) => {
         const status = row.getValue("status") as string;
         return (
-          <Badge
-            className={cn(
-              "text-xs",
-              status === "Active" &&
-                "bg-green-500/20 text-green-400 border-green-500/30 hover:bg-green-500/20",
-              status === "Inactive" &&
-                "bg-gray-500/20 text-gray-400 border-gray-500/30 hover:bg-gray-500/20",
-              status === "Pending" &&
-                "bg-yellow-500/20 text-yellow-400 border-yellow-500/30 hover:bg-yellow-500/20"
-            )}
-          >
-            {t(status)}
-          </Badge>
+          <Badge variant={clientStatusVariant(status)}>{t(status)}</Badge>
         );
       },
       size: 100,
@@ -478,7 +486,7 @@ export default function ClientsTable() {
   if (error) {
     return (
       <div className="text-center py-8">
-        <p className="text-red-400">Error loading clients: {error.message}</p>
+        <p className="text-destructive">{t("error_loading_clients", "Clienten laden lukte niet")}: {error.message}</p>
       </div>
     );
   }
@@ -672,8 +680,7 @@ export default function ClientsTable() {
                   </AlertDialogCancel>
                   <AlertDialogAction
                     onClick={handleDeleteRows}
-                    className="bg-red-600 hover:bg-red-700"
-                  >
+                                      >
                     Disconnect
                   </AlertDialogAction>
                 </AlertDialogFooter>
@@ -975,8 +982,7 @@ export default function ClientsTable() {
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDeleteSingleClient}
-              className="bg-red-600 hover:bg-red-700"
-            >
+                          >
               Disconnect Client
             </AlertDialogAction>
           </AlertDialogFooter>
@@ -1052,7 +1058,7 @@ function RowActions({
         </DropdownMenuGroup>
         <DropdownMenuSeparator className="bg-border" />
         <DropdownMenuItem
-          className="text-red-400 focus:text-red-500 cursor-pointer"
+          className="text-destructive focus:text-destructive cursor-pointer"
           onSelect={() => onDeleteClient(row.original)}
         >
           <span>{t('disconnect_client')}</span>

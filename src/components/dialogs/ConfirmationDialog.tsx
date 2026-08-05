@@ -38,7 +38,7 @@ const ConfirmationDialog = ({
   isLoading = false,
 }: ConfirmationDialogProps) => {
   const { t } = useTranslation();
-  
+
   const defaultConfirmText = confirmText || t("confirm");
   const defaultCancelText = cancelText || t("cancel");
   const handleConfirm = async () => {
@@ -60,8 +60,7 @@ const ConfirmationDialog = ({
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel 
-              className="border-border bg-card hover:bg-muted text-muted-foreground hover:text-foreground"
+            <AlertDialogCancel
             >
               {defaultCancelText}
             </AlertDialogCancel>
@@ -70,7 +69,7 @@ const ConfirmationDialog = ({
               disabled={isLoading}
               className={
                 variant === "destructive"
-                  ? "bg-red-600 hover:bg-red-700 text-white"
+                  ? "bg-destructive text-destructive-foreground hover:bg-destructive/90"
                   : "bg-primary text-primary-foreground hover:bg-primary/90"
               }
             >
@@ -94,8 +93,7 @@ const ConfirmationDialog = ({
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel 
-            className="border-border bg-card hover:bg-muted text-muted-foreground hover:text-foreground"
+          <AlertDialogCancel
           >
             {defaultCancelText}
           </AlertDialogCancel>
@@ -104,7 +102,7 @@ const ConfirmationDialog = ({
             disabled={isLoading}
             className={
               variant === "destructive"
-                ? "bg-red-600 hover:bg-red-700 text-white"
+                ? "bg-destructive text-destructive-foreground hover:bg-destructive/90"
                 : "bg-primary text-primary-foreground hover:bg-primary/90"
             }
           >

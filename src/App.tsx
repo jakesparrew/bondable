@@ -6,7 +6,8 @@
  * All page components are lazy loaded to reduce initial bundle size.
  */
 
-import { Toaster } from "@/components/ui/toaster";
+// ONE toast system: sonner (ink surface). The parallel shadcn Toaster is gone —
+// two mounted systems meant double portals and inconsistent styling.
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -43,7 +44,11 @@ const Sessions = lazy(() => import("./pages/Sessions"));
 const SessionDetail = lazy(() => import("./pages/SessionDetail"));
 const Tasks = lazy(() => import("./pages/Tasks"));
 const Messages = lazy(() => import("./pages/Messages"));
-const Payments = lazy(() => import("./pages/Payments"));
+// Provider signup + the wachtlijst products (Phase "build it all").
+const SignupProvider = lazy(() => import("@/pages/SignupProvider"));
+const Wachttijden = lazy(() => import("./pages/Wachttijden"));
+const WachttijdenStad = lazy(() => import("./pages/WachttijdenStad"));
+const WachtruimtePage = lazy(() => import("./features/wachtruimte/WachtruimtePage"));
 const Journal = lazy(() => import("./pages/Journal"));
 const Settings = lazy(() => import("./pages/Settings"));
 const Profile = lazy(() => import("./pages/Profile"));
@@ -171,7 +176,6 @@ const App = () => {
           <ThemeProvider>
             <TooltipProvider>
               <ErrorBoundary>
-                  <Toaster />
                   <Sonner />
                   <BrowserRouter>
                     <Suspense fallback={<RouteSkeleton />}>
@@ -385,16 +389,12 @@ const App = () => {
                     </RouteProtection>
                   } 
                 />
-                <Route 
-                  path="/dashboard/:userType/payments" 
-                  element={
-                    <RouteProtection>
-                      <Payments />
-                    </RouteProtection>
-                  } 
-                />
-                <Route 
-                  path="/dashboard/:userType/settings" 
+                {/* /payments is gone: it showed US bank details to Belgian
+                    providers. Belgian invoicing lives at /dashboard/therapist/
+                    invoicing; the provider's own subscription comes with Stripe
+                    in Phase 4. */}
+                <Route
+                  path="/dashboard/:userType/settings"
                   element={
                     <RouteProtection>
                       <Settings />
@@ -547,6 +547,15 @@ const App = () => {
                 {/* Public pricing + ranking-transparency. */}
                 <Route path="/pricing" element={<Pricing />} />
                 <Route path="/how-ranking-works" element={<RankingTransparency />} />
+
+                {/* Provider signup (public — the €39 funnel finally has a door). */}
+                <Route path="/signup/provider" element={<SignupProvider />} />
+
+                {/* Wachtlijst products: the public wait-time index + the
+                    "start while you wait" surface (public, indexable). */}
+                <Route path="/wachttijden" element={<Wachttijden />} />
+                <Route path="/wachttijden/:stad" element={<WachttijdenStad />} />
+                <Route path="/wachtruimte" element={<WachtruimtePage />} />
 
                 <Route path="*" element={<NotFound />} />
               </Routes>

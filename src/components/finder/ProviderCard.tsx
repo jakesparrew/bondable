@@ -82,37 +82,47 @@ const ProviderCard = ({ provider, onRequest }: ProviderCardProps) => {
           </Avatar>
 
           <div className="min-w-0 flex-1">
-            <div className="flex items-start justify-between gap-2">
-              <h3 className="truncate text-base font-semibold text-foreground">
-                {provider.fullName}
-              </h3>
-            </div>
+            <h3 className="truncate text-base font-semibold text-foreground">
+              {provider.fullName}
+            </h3>
 
-            {/* Type label + trust badge — transparency signal, never a ranking */}
-            <div className="mt-1 flex flex-wrap items-center gap-2">
-              <span className="text-body-sm text-muted-foreground">{typeLabel}</span>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <span>
-                    <Badge variant={badge.variant} className="gap-1">
-                      {badge.kind === 'regulated' && <ShieldCheck className="h-3.5 w-3.5" />}
-                      {badge.kind === 'verified_coach' && <CheckCircle2 className="h-3.5 w-3.5" />}
-                      {badge.label}
-                    </Badge>
-                  </span>
-                </TooltipTrigger>
-                <TooltipContent className="max-w-xs">{badge.tooltip}</TooltipContent>
-              </Tooltip>
-            </div>
-
-            {/* Meta: city + rating */}
-            <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
+            {/* Discipline · plaats on one quiet meta line. */}
+            <p className="mt-0.5 flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-body-sm text-muted-foreground">
+              <span className="truncate">{typeLabel}</span>
               {provider.city && (
-                <span className="inline-flex items-center gap-1">
-                  <MapPin className="h-3.5 w-3.5" />
-                  {provider.city}
-                </span>
+                <>
+                  <span aria-hidden="true">·</span>
+                  <span className="inline-flex items-center gap-1">
+                    <MapPin className="h-3.5 w-3.5 shrink-0" />
+                    {provider.city}
+                  </span>
+                </>
               )}
+            </p>
+
+            {/* Trust badge on its OWN row so a long label ("Verificatie in
+                behandeling") can never wrap mid-phrase and knock the cards out
+                of alignment. Skipped for `plain`, where the badge would only
+                repeat the discipline already shown above ("Coach Coach"). */}
+            {badge.kind !== 'plain' && (
+              <div className="mt-2">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span>
+                      <Badge variant={badge.variant} className="gap-1 whitespace-nowrap">
+                        {badge.kind === 'regulated' && <ShieldCheck className="h-3.5 w-3.5 shrink-0" />}
+                        {badge.kind === 'verified_coach' && <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />}
+                        {badge.label}
+                      </Badge>
+                    </span>
+                  </TooltipTrigger>
+                  <TooltipContent className="max-w-xs">{badge.tooltip}</TooltipContent>
+                </Tooltip>
+              </div>
+            )}
+
+            {/* Rating, when a real review system eventually populates it. */}
+            <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
               {provider.rating != null && (
                 <span className="inline-flex items-center gap-1">
                   <Star className="h-3.5 w-3.5 fill-current text-primary" />
@@ -173,14 +183,18 @@ const ProviderCard = ({ provider, onRequest }: ProviderCardProps) => {
         )}
       </CardContent>
 
+      {/* Buttons carry `whitespace-nowrap`, so in a 3-column grid a long label
+          ("Contact / Aanvraag") could not shrink and spilled outside the card.
+          `min-w-0` lets the flex children actually shrink, and the label is now
+          one word so it fits at every column width. */}
       <CardFooter className="gap-2 border-t border-border bg-muted/30 p-3">
-        <Button asChild variant="outline" className="flex-1">
-          <Link to={`/find/${provider.id}`}>
+        <Button asChild variant="outline" className="min-w-0 flex-1">
+          <Link to={`/find/${provider.id}`} className="truncate">
             {t('finder_card_view', 'Bekijk profiel')}
           </Link>
         </Button>
-        <Button className="flex-1" onClick={() => onRequest(provider)}>
-          {t('finder_card_contact', 'Contact / Aanvraag')}
+        <Button className="min-w-0 flex-1 truncate" onClick={() => onRequest(provider)}>
+          {t('finder_card_contact_short', 'Contact')}
         </Button>
       </CardFooter>
     </Card>

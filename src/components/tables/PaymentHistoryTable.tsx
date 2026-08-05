@@ -186,16 +186,22 @@ const mockPayments: Payment[] = [
   },
 ];
 
-const getStatusColor = (status: Payment["status"]) => {
+type StatusVariant = "success" | "warning" | "info" | "destructive" | "secondary";
+
+/**
+ * Payment status -> semantic Badge variant. The old helper returned a
+ * dark-theme palette that was unreadable on the light canvas.
+ */
+const paymentStatusVariant = (status: Payment["status"]): StatusVariant => {
   switch (status) {
     case "paid":
-      return "bg-green-500/20 text-green-400 border-green-500/30 hover:bg-green-500/20";
+      return "success";
     case "pending":
-      return "bg-yellow-500/20 text-yellow-400 border-yellow-500/30 hover:bg-yellow-500/20";
+      return "warning";
     case "overdue":
-      return "bg-red-500/20 text-red-400 border-red-500/30 hover:bg-red-500/20";
+      return "destructive";
     default:
-      return "bg-gray-600";
+      return "secondary";
   }
 };
 
@@ -625,11 +631,7 @@ export default function PaymentHistoryTable({
                                 ${payment.amount.toFixed(2)}
                               </div>
                               <div className="flex items-center justify-between">
-                                <Badge
-                                  className={`${getStatusColor(
-                                    payment.status
-                                  )} text-xs `}
-                                >
+                                <Badge variant={paymentStatusVariant(payment.status)}>
                                   {payment.status.charAt(0).toUpperCase() +
                                     payment.status.slice(1)}
                                 </Badge>
@@ -681,9 +683,8 @@ export default function PaymentHistoryTable({
                           </TableCell>
                           <TableCell>
                             <Badge
-                              className={`${getStatusColor(
-                                payment.status
-                              )} hover:bg-inherit hover:text-inherit pointer-events-none`}
+                              variant={paymentStatusVariant(payment.status)}
+                              className="pointer-events-none"
                             >
                               {payment.status.charAt(0).toUpperCase() +
                                 payment.status.slice(1)}
@@ -692,7 +693,7 @@ export default function PaymentHistoryTable({
                           <TableCell className="text-muted-foreground">
                             {payment.dueDate}
                             {payment.paidDate && (
-                              <div className="text-xs text-green-500/70">
+                              <div className="text-xs text-success">
                                 Paid: {payment.paidDate}
                               </div>
                             )}

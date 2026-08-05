@@ -11,6 +11,7 @@ export { FeaturePeek } from './FeaturePeek';
 export { UpgradeMoment } from './UpgradeMoment';
 export { UsageMeter } from './UsageMeter';
 export { NudgeStrip } from './NudgeStrip';
+export { default as TrialBanner } from './TrialBanner';
 export {
   UPGRADE_COPY,
   interpolate,

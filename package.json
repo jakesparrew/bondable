@@ -10,7 +10,8 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "ios-dev": "npm run build && npx cap sync ios && npx cap open ios",
-    "android-dev": "npm run build && npx cap sync android && npx cap open android"
+    "android-dev": "npm run build && npx cap sync android && npx cap open android",
+    "og": "node scripts/generate-og-image.mjs"
   },
   "dependencies": {
     "@capacitor-firebase/messaging": "^7.3.0",
@@ -105,6 +106,7 @@
     "lovable-tagger": "^1.1.7",
     "postcss": "^8.4.47",
     "rollup-plugin-visualizer": "^6.0.3",
+    "sharp": "^0.33.5",
     "tailwindcss": "^3.4.11",
     "typescript": "^5.5.3",
     "typescript-eslint": "^8.0.1",

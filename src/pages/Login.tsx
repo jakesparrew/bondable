@@ -644,6 +644,17 @@ const Login = () => {
                   ? t('already_account')
                   : t('dont_have_account')}
               </button>
+              {/* Providers who land here need a way into the real funnel. */}
+              <p className="mt-2 text-sm text-muted-foreground">
+                {t('login_provider_hint', 'Hulpverlener?')}{' '}
+                <button
+                  type="button"
+                  onClick={() => navigate('/signup/provider')}
+                  className="font-semibold text-primary underline-offset-4 hover:underline"
+                >
+                  {t('login_provider_signup', 'Maak je praktijkaccount aan')}
+                </button>
+              </p>
             </div>
 
             <p className="text-xs text-muted-foreground text-center leading-relaxed">

@@ -175,10 +175,12 @@
     font-variant-numeric: tabular-nums;
   }
 
-  /* Section/dialog headings default to the display face; page titles opt in
-     explicitly via .font-display + text-display-lg so we stay disciplined. */
-  h1, h2 {
-    @apply font-display tracking-tight;
+  /* NOTE: the serif is OPT-IN only. There is deliberately no h1/h2 rule here —
+     a global `h1, h2 { @apply font-display }` forced Fraunces onto 13px
+     sub-labels and section eyebrows. Use className="font-display" together
+     with a display size (text-display-xl / -lg / -md) instead. */
+  h1, h2, h3 {
+    @apply tracking-tight;
   }
 }
 
@@ -202,42 +204,27 @@
   }
 }
 
+/* Hide the PAGE scrollbar only. Scoped to html/body on purpose: a global `*`
+   rule hid the scrollbar inside dialogs, tables and scroll areas, so those
+   surfaces gave no signal that there was more content below. */
 html,
 body {
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none; /* IE and Edge */
 }
+html::-webkit-scrollbar,
 body::-webkit-scrollbar {
   display: none; /* Chrome, Safari */
 }
 
+/* Opt-in utility for the few surfaces that genuinely want no scrollbar
+   (horizontal chip rails, the sidebar nav). */
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
 .scrollbar-hide {
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
-}
-
-* {
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE 10+ */
-}
-
-*::-webkit-scrollbar {
-  display: none; /* Chrome, Safari, Edge */
-}
-
-/* 1) invert everything when <html> has both "light" + "invert" */
-html.light.invert {
-  filter: invert(1) hue-rotate(180deg);
-}
-
-/* 2) cancel that inversion on .non-invertable and its descendants */
-html.light.invert .non-invertable,
-html.light.invert .non-invertable * {
-  /* re-apply the same filter to double-invert */
-  filter: invert(1) hue-rotate(180deg);
 }
 
 /* Mobile optimizations */

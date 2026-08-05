@@ -22,11 +22,11 @@ export const ImagePreviewDialog = ({
   const { t } = useTranslation();
   // If src is a blob URL or actual image URL, use it; otherwise use placeholder
   const imageSrc = src && src !== "/placeholder.svg" ? src : "/placeholder.svg";
-  
+
   return (
     <Dialog>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
-      <DialogContent className="bg-card border-border p-4 rounded shadow-lg max-w-lg w-full" disableCloseButton >
+      <DialogContent className="bg-card border-border p-4 rounded-card max-w-lg w-full" disableCloseButton >
         {/* Top row with close button aligned right */}
         <div className="flex justify-end ">
           <DialogClose asChild>

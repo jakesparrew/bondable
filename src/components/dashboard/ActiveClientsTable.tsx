@@ -28,18 +28,24 @@ import type { Client } from "@/types/client";
 
 type StatusTone = "stabilizing" | "action" | "maintenance" | "intake";
 
+type BadgeVariant = "success" | "info" | "secondary" | "destructive";
+
 interface DerivedStatus {
   tone: StatusTone;
   labelKey: string;
-  badgeClass: string;
+  labelDefault: string;
+  badgeVariant: BadgeVariant;
   trendIcon: LucideIcon;
   trendClass: string;
 }
 
 /**
- * Maps a real client's relationship status to the design's clinical-status
- * badge + outcome-trend pairing. "Active" clients are treated as stabilizing,
- * "Pending" clients as post-intake, and anything else as action-required.
+ * Maps a real client's relationship status to the clinical-status badge +
+ * outcome-trend pairing. "Active" clients are treated as stabilizing, "Pending"
+ * clients as post-intake, and anything else as action-required.
+ *
+ * Tones use the semantic badge variants only. Mint is reserved for Bond/AI
+ * surfaces and must never appear on a clinical status.
  */
 const deriveStatus = (client: Client): DerivedStatus => {
   switch (client.status) {
@@ -47,15 +53,17 @@ const deriveStatus = (client: Client): DerivedStatus => {
       return {
         tone: "stabilizing",
         labelKey: "status_stabilizing",
-        badgeClass: "border-mint/30 bg-mint/15 text-mint",
+        labelDefault: "Stabiliserend",
+        badgeVariant: "success",
         trendIcon: TrendingUp,
-        trendClass: "text-mint",
+        trendClass: "text-success",
       };
     case "Pending":
       return {
         tone: "intake",
         labelKey: "status_post_intake",
-        badgeClass: "border-border bg-muted text-muted-foreground",
+        labelDefault: "Na intake",
+        badgeVariant: "info",
         trendIcon: Minus,
         trendClass: "text-muted-foreground",
       };
@@ -63,7 +71,8 @@ const deriveStatus = (client: Client): DerivedStatus => {
       return {
         tone: "maintenance",
         labelKey: "status_maintenance",
-        badgeClass: "border-border bg-secondary text-secondary-foreground",
+        labelDefault: "Onderhoud",
+        badgeVariant: "secondary",
         trendIcon: TrendingDown,
         trendClass: "text-muted-foreground",
       };
@@ -71,7 +80,8 @@ const deriveStatus = (client: Client): DerivedStatus => {
       return {
         tone: "action",
         labelKey: "status_action_required",
-        badgeClass: "border-destructive/30 bg-destructive/15 text-destructive",
+        labelDefault: "Actie nodig",
+        badgeVariant: "destructive",
         trendIcon: AlertCircle,
         trendClass: "text-destructive",
       };
@@ -192,11 +202,8 @@ const ActiveClientsTable = () => {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Badge
-                        variant="outline"
-                        className={`rounded-full px-2 py-0.5 text-[9px] font-bold uppercase ${status.badgeClass}`}
-                      >
-                        {t(status.labelKey)}
+                      <Badge variant={status.badgeVariant}>
+                        {t(status.labelKey, status.labelDefault)}
                       </Badge>
                     </TableCell>
                     <TableCell className="text-[11px] text-muted-foreground">

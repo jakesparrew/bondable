@@ -37,8 +37,8 @@ const VideoPreviewDialog = ({ isOpen, onClose, videoUrl, fileName }: VideoPrevie
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent 
-        className="bg-card border-border p-4 rounded shadow-lg max-w-4xl w-full"
+      <DialogContent
+        className="bg-card border-border p-4 rounded-card max-w-4xl w-full"
         disableCloseButton
       >
         <VisuallyHidden>
@@ -54,7 +54,7 @@ const VideoPreviewDialog = ({ isOpen, onClose, videoUrl, fileName }: VideoPrevie
             </button>
           </DialogClose>
         </div>
-        
+
         <div className="relative">
           {/* Video player */}
           <div className="w-full">

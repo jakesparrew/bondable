@@ -59,7 +59,7 @@ export default function ProfileEditDialog({ userType, children }: ProfileEditDia
     maxLength: limit,
   } = useCharacterLimit({
     maxLength,
-    initialValue: userType === "therapist" 
+    initialValue: userType === "therapist"
       ? "Licensed therapist specializing in cognitive behavioral therapy and mindfulness-based interventions."
       : "Looking forward to my therapy journey and personal growth.",
   })
@@ -85,7 +85,7 @@ export default function ProfileEditDialog({ userType, children }: ProfileEditDia
             <form className="space-y-4">
               <div className="flex flex-col gap-4 sm:flex-row">
                 <div className="flex-1 space-y-2">
-                  <Label htmlFor={`${id}-first-name`} className="text-muted-foreground">{t("first_name")}</Label> <span className="text-red-400">*</span>
+                  <Label htmlFor={`${id}-first-name`} className="text-muted-foreground">{t("first_name")}</Label> <span className="text-destructive">*</span>
                   <Input
                     id={`${id}-first-name`}
                     placeholder={t("john")}
@@ -96,7 +96,7 @@ export default function ProfileEditDialog({ userType, children }: ProfileEditDia
                   />
                 </div>
                 <div className="flex-1 space-y-2">
-                  <Label htmlFor={`${id}-last-name`} className="text-muted-foreground">{t("last_name")}</Label> <span className="text-red-400">*</span>
+                  <Label htmlFor={`${id}-last-name`} className="text-muted-foreground">{t("last_name")}</Label> <span className="text-destructive">*</span>
                   <Input
                     id={`${id}-last-name`}
                     placeholder={t("doe")}
@@ -107,7 +107,7 @@ export default function ProfileEditDialog({ userType, children }: ProfileEditDia
                   />
                 </div>
               </div>
-              
+
               {userType === "therapist" && (
                 <>
                   <div className="space-y-2">
@@ -137,7 +137,7 @@ export default function ProfileEditDialog({ userType, children }: ProfileEditDia
                 </Label>
                 <Textarea
                   id={`${id}-bio`}
-                  placeholder={userType === "therapist" 
+                  placeholder={userType === "therapist"
                     ? t("share_professional_background")
                     : t("share_about_yourself")
                   }
@@ -202,7 +202,7 @@ function ProfileBg() {
         <div className="absolute inset-0 flex items-center justify-center gap-2">
           <button
             type="button"
-            className="focus-visible:border-ring focus-visible:ring-ring/50 z-50 flex size-10 cursor-pointer items-center justify-center rounded-full bg-black/60 text-white transition-[color,box-shadow] outline-none hover:bg-black/80 focus-visible:ring-[3px]"
+            className="focus-visible:border-ring focus-visible:ring-ring/50 z-50 flex size-10 cursor-pointer items-center justify-center rounded-full bg-[hsl(174_62%_16%_/_0.6)] text-primary-foreground transition-[color,box-shadow] outline-none hover:bg-[hsl(174_62%_16%_/_0.8)] focus-visible:ring-[3px]"
             onClick={openFileDialog}
             aria-label={currentImage ? t("change_image") : t("upload_image")}
           >
@@ -211,7 +211,7 @@ function ProfileBg() {
           {currentImage && (
             <button
               type="button"
-              className="focus-visible:border-ring focus-visible:ring-ring/50 z-50 flex size-10 cursor-pointer items-center justify-center rounded-full bg-black/60 text-white transition-[color,box-shadow] outline-none hover:bg-black/80 focus-visible:ring-[3px]"
+              className="focus-visible:border-ring focus-visible:ring-ring/50 z-50 flex size-10 cursor-pointer items-center justify-center rounded-full bg-[hsl(174_62%_16%_/_0.6)] text-primary-foreground transition-[color,box-shadow] outline-none hover:bg-[hsl(174_62%_16%_/_0.8)] focus-visible:ring-[3px]"
               onClick={() => removeFile(files[0]?.id)}
               aria-label={t("remove_image")}
             >
@@ -252,7 +252,7 @@ function Avatar() {
         )}
         <button
           type="button"
-          className="focus-visible:border-ring focus-visible:ring-ring/50 absolute flex size-8 cursor-pointer items-center justify-center rounded-full bg-black/60 text-white transition-[color,box-shadow] outline-none hover:bg-black/80 focus-visible:ring-[3px]"
+          className="focus-visible:border-ring focus-visible:ring-ring/50 absolute flex size-8 cursor-pointer items-center justify-center rounded-full bg-[hsl(174_62%_16%_/_0.6)] text-primary-foreground transition-[color,box-shadow] outline-none hover:bg-[hsl(174_62%_16%_/_0.8)] focus-visible:ring-[3px]"
           onClick={openFileDialog}
           aria-label={t("change_profile_picture")}
         >

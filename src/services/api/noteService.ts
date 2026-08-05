@@ -160,7 +160,9 @@ const SHARED_TAIL: NoteTemplateField[] = [
   },
 ];
 
-const SYSTEM_TEMPLATES: NoteTemplate[] = [
+// The literal is asserted before `.map` so the field `type` strings stay narrow
+// (`'text' | 'scale' | 'chips'`) instead of widening to `string`.
+const SYSTEM_TEMPLATES: NoteTemplate[] = ([
   {
     id: 'tmpl-soap',
     ownerId: null,
@@ -207,7 +209,10 @@ const SYSTEM_TEMPLATES: NoteTemplate[] = [
       { key: 'volgende', labelNl: 'Volgende stap', labelEn: 'Next step', type: 'text', promptNl: 'De eerstvolgende stap.', promptEn: 'The next step.' },
     ],
   },
-].map((tmpl) => ({ ...tmpl, fields: [...tmpl.fields, ...SHARED_TAIL] }));
+] as NoteTemplate[]).map((tmpl) => ({
+  ...tmpl,
+  fields: [...tmpl.fields, ...SHARED_TAIL],
+}));
 
 // ── Template store ───────────────────────────────────────────────────────────
 

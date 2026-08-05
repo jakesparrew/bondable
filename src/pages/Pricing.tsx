@@ -305,7 +305,7 @@ const Pricing = () => {
               blurb={t('pricing_free_blurb', 'Een volledige praktijk voor wie klein start — tot 3 actieve cliënten.')}
               cta={
                 <Button asChild variant="outline" className="w-full rounded-ctl">
-                  <Link to="/login">{t('pricing_free_cta', 'Gratis beginnen')}</Link>
+                  <Link to="/signup/provider">{t('pricing_free_cta', 'Gratis beginnen')}</Link>
                 </Button>
               }
             />
@@ -332,7 +332,7 @@ const Pricing = () => {
               blurb={t('pricing_pro_blurb', 'Onbeperkte cliënten, uitkomsten, de Bond-supervisieconsole en facturatie.')}
               cta={
                 <Button asChild className="w-full rounded-ctl" onClick={() => startCheckout('pro')}>
-                  <Link to="/login">
+                  <Link to="/signup/provider">
                     {t('pricing_pro_cta', 'Start 14-daagse proef')}
                     <ArrowRight className="h-4 w-4" />
                   </Link>
@@ -359,7 +359,7 @@ const Pricing = () => {
                   className="w-full rounded-ctl"
                   onClick={() => startCheckout('practice')}
                 >
-                  <Link to="/login">{t('pricing_practice_cta', 'Praktijk opzetten')}</Link>
+                  <Link to="/signup/provider">{t('pricing_practice_cta', 'Praktijk opzetten')}</Link>
                 </Button>
               }
             />

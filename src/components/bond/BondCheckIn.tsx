@@ -4,9 +4,10 @@ import { Check, ChevronLeft, X } from "lucide-react";
 
 import { analyticsService } from "@/services/api/analyticsService";
 import { ANALYTICS_EVENTS } from "@/config/analyticsEvents";
+import { checkinService, type CheckIn } from "@/services/api/checkinService";
 
 /**
- * BondCheckIn — the structured daily check-in (ticket T-CX-8).
+ * BondCheckIn — the structured daily check-in.
  *
  * A three-step, entirely tappable micro-flow that completes in under ~25 seconds
  * and lives INSIDE Bond (so mint is allowed). Deliberately NOT a mood tracker with
@@ -17,53 +18,21 @@ import { ANALYTICS_EVENTS } from "@/config/analyticsEvents";
  *   2. Tags — one-tap themes (max 3), slaap / energie / stress / contact / piekeren…
  *   3. Note — one optional sentence.
  *
- * On submit the check-in is persisted to localStorage (mock, key
- * `bondable_bond_checkins`), an analytics event is emitted (no check-in event
- * exists in the registry yet, so we fall back to `bond_message_sent` with only
- * structural, non-clinical properties — never the mood value or note text), and a
- * calm acknowledgement is shown.
+ * Persistence lives in `checkinService`, NOT here. That indirection is the whole
+ * point: one save now echoes in four places (dashboard order, Bond's opener, a
+ * gentle reading suggestion, the consent-gated provider summary) instead of
+ * disappearing into a component-local localStorage key.
+ *
+ * Analytics carries only structural facts — never the mood value, never the tags,
+ * never the note text.
  */
 
-export const CHECKINS_STORAGE_KEY = "bondable_bond_checkins";
-
-export interface BondCheckInRecord {
-  /** 1–5 mood. Kept local only; never sent to analytics. */
-  mood: number;
-  /** Tag ids chosen (max 3). */
-  tags: string[];
-  /** Optional free-text sentence. */
-  note: string;
-  /** ISO 8601 timestamp. */
-  createdAt: string;
-}
-
-/** Read the persisted check-ins (oldest-first). Safe on SSR / private mode. */
-export function readCheckIns(): BondCheckInRecord[] {
-  if (typeof window === "undefined") return [];
-  try {
-    const raw = window.localStorage.getItem(CHECKINS_STORAGE_KEY);
-    if (!raw) return [];
-    const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? (parsed as BondCheckInRecord[]) : [];
-  } catch {
-    return [];
-  }
-}
-
-function writeCheckIns(records: BondCheckInRecord[]): void {
-  if (typeof window === "undefined") return;
-  try {
-    // Cap to a sensible window so localStorage never grows unbounded.
-    const capped = records.length > 120 ? records.slice(records.length - 120) : records;
-    window.localStorage.setItem(CHECKINS_STORAGE_KEY, JSON.stringify(capped));
-  } catch {
-    /* silent-fail (quota / private mode) */
-  }
-}
+/** Re-exported for callers that still speak the old record name. */
+export type BondCheckInRecord = CheckIn;
 
 interface BondCheckInProps {
   /** Called after a successful submit (parent refreshes ribbon, closes flow). */
-  onComplete?: (record: BondCheckInRecord) => void;
+  onComplete?: (record: CheckIn) => void;
   /** Called when the client dismisses the flow without submitting. */
   onCancel?: () => void;
 }
@@ -77,7 +46,7 @@ const BondCheckIn = ({ onComplete, onCancel }: BondCheckInProps) => {
   const [mood, setMood] = useState<number | null>(null);
   const [tags, setTags] = useState<string[]>([]);
   const [note, setNote] = useState("");
-  const [saved, setSaved] = useState<BondCheckInRecord | null>(null);
+  const [saved, setSaved] = useState<CheckIn | null>(null);
 
   // Mood scale: five neutral, labelled dots. Ink-tint only — no red/green.
   const moodScale = useMemo(
@@ -117,13 +86,9 @@ const BondCheckIn = ({ onComplete, onCancel }: BondCheckInProps) => {
 
   const handleSubmit = () => {
     if (mood == null) return;
-    const record: BondCheckInRecord = {
-      mood,
-      tags,
-      note: note.trim(),
-      createdAt: new Date().toISOString(),
-    };
-    writeCheckIns([...readCheckIns(), record]);
+    // One call, four echoes. checkinService notifies every subscriber, so the
+    // dashboard reorders, the ribbon fills in and Bond's memory updates together.
+    const record = checkinService.save({ mood, tags, note });
 
     // Analytics: NO health data. There is no check-in event in the registry, so we
     // fall back to `bond_message_sent` and carry only structural facts (tag count,
@@ -340,10 +305,15 @@ const BondCheckIn = ({ onComplete, onCancel }: BondCheckInProps) => {
             {t("checkin_done_title", "Genoteerd. Dank je wel")}
           </h2>
           <p className="mx-auto mt-1 max-w-xs text-xs text-muted-foreground">
-            {t(
-              "checkin_done_body",
-              "Fijn dat je even stilstond. Je vindt dit terug in je overzicht.",
-            )}
+            {saved.mood <= 2
+              ? t(
+                  "checkin_done_body_low",
+                  "Ik hou het bij. Je overzicht zet steun even vooraan, en ik neem het mee in ons gesprek.",
+                )
+              : t(
+                  "checkin_done_body",
+                  "Ik hou het bij. Je overzicht schikt zich hierop, en ik neem het mee in ons gesprek.",
+                )}
           </p>
           <button
             type="button"

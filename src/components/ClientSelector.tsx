@@ -7,6 +7,9 @@ import { Input } from "@/components/ui/input";
 import { useTranslation } from "react-i18next";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+
+type StatusVariant = "success" | "warning" | "info" | "destructive" | "secondary";
+
 import { Search, Plus } from "lucide-react";
 import {
   DropdownMenu,
@@ -221,16 +224,17 @@ const loadLastActivityMap = async (therapistId: string) => {
     client.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const getStatusColor = (status: string) => {
+  // Semantic variants — the old dark palette was illegible on the light canvas.
+  const statusVariant = (status: string): StatusVariant => {
     switch (status) {
       case "Active":
-        return "bg-green-500/20 text-green-400 border-green-500/30";
+        return "success";
       case "Inactive":
-        return "bg-red-500/20 text-red-400 border-red-500/30";
+        return "secondary";
       case "Pending":
-        return "bg-yellow-500/20 text-yellow-400 border-yellow-500/30";
+        return "warning";
       default:
-        return "bg-gray-500/20 text-gray-400 border-gray-500/30";
+        return "secondary";
     }
   };
 
@@ -322,10 +326,7 @@ const loadLastActivityMap = async (therapistId: string) => {
                         <h3 className="text-foreground font-medium text-sm truncate">
                           {client.name}
                         </h3>
-                        <Badge
-                          variant="outline"
-                          className={`text-xs ${getStatusColor(client.status)}`}
-                        >
+                        <Badge variant={statusVariant(client.status)}>
                           {getStatusText(client.status)}
                         </Badge>
                       </div>

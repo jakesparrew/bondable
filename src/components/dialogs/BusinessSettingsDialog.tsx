@@ -124,7 +124,7 @@ export default function BusinessSettingsDialog() {
             </DialogTitle>
           </DialogHeader>
 
-          <div className="mt-2 h-px w-full bg-gradient-to-r from-transparent via-[#3f3f3f] to-transparent -mb-1" />
+          <div className="mt-2 -mb-1 h-px w-full bg-border" />
 
           <div className="space-y-4 mt-2">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -148,7 +148,7 @@ export default function BusinessSettingsDialog() {
             </div>
             <div className="space-y-2">
               <Label className="text-sm font-medium text-muted-foreground">
-                {t("address")} <span className="text-red-400">*</span>
+                {t("address")} <span className="text-destructive">*</span>
               </Label>
               <AddressAutoComplete
                 address={address}
@@ -204,7 +204,7 @@ export default function BusinessSettingsDialog() {
                           <SelectItem
                             key={bank}
                             value={bank}
-                            className="text-muted-foreground hover:!text-neutral-950 data-[state=checked]:text-neutral-50 data-[highlighted]:!text-neutral-950"
+                            className="text-muted-foreground"
                           >
                             {bank}
                           </SelectItem>

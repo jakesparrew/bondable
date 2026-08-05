@@ -35,6 +35,7 @@ import {
 import FinderLayout from '@/components/finder/FinderLayout';
 import MatchResultCard from '@/components/finder/MatchResultCard';
 import RequestProviderDialog from '@/components/finder/RequestProviderDialog';
+import FinderDeadEnd from '@/features/wachtruimte/FinderDeadEnd';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -531,31 +532,28 @@ const FindMatch = () => {
         )}
 
         {!error && results.length === 0 && (
-          <Card className="rounded-2xl border-dashed border-border bg-card p-8 text-center">
-            <span className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-muted text-muted-foreground">
-              <Search className="h-6 w-6" aria-hidden="true" />
-            </span>
-            <p className="text-sm font-medium text-foreground">
-              {t('finder_results_empty_title', 'Nog geen passende match')}
-            </p>
-            <p className="mx-auto mt-1 max-w-sm text-sm text-muted-foreground">
-              {t(
-                'finder_results_empty_body',
-                'Pas je antwoorden aan of bekijk de volledige lijst met hulpverleners.',
-              )}
-            </p>
-            <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
-              <Button onClick={restart} variant="outline" className="gap-1.5">
-                <RotateCcw className="h-4 w-4" aria-hidden="true" />
-                {t('finder_results_adjust', 'Antwoorden aanpassen')}
-              </Button>
-              <Button asChild>
+          /* Geen match is geen doodlopend spoor meer: The Coach, een
+             e-mailopvang en de wachttijden in de buurt (track 5). We geven
+             alleen het FACETLABEL door — vrije tekst blijft hier. */
+          <div className="space-y-4">
+            <FinderDeadEnd
+              source="find_no_match"
+              cityName={intake.city.trim() || null}
+              specialization={
+                topicOptions.find((o) => o.value === intake.topic)?.label ?? null
+              }
+              hasFilters
+              onReset={restart}
+              resetLabel={t('finder_results_adjust', 'Antwoorden aanpassen')}
+            />
+            <div className="flex justify-center">
+              <Button asChild variant="outline">
                 <Link to="/find">
                   {t('finder_results_browse_all', 'Bekijk alle hulpverleners')}
                 </Link>
               </Button>
             </div>
-          </Card>
+          </div>
         )}
 
         {/* footer actions */}

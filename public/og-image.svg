@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="og-title">
+  <title id="og-title">Bondable — Mentale steun die je verbindt, niet vervangt</title>
+
+  <!-- Canvas: the app's soft off-white-green -->
+  <rect width="1200" height="630" fill="#f4f8f7"/>
+
+  <!-- Continuous-line motif: two strokes that curve toward each other and meet.
+       Same LineMeet language as the in-app empty states. Single weight, no fill. -->
+  <g transform="translate(792 132)" fill="none" stroke="#0f403c" stroke-opacity="0.28"
+     stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 40 C 78 46, 112 128, 168 168 C 224 208, 258 290, 324 296"/>
+    <path d="M324 40 C 258 46, 224 128, 168 168 C 112 208, 78 290, 12 296"/>
+  </g>
+  <!-- The meeting point -->
+  <circle cx="960" cy="300" r="7" fill="#0f403c" fill-opacity="0.55"/>
+
+  <!-- Wordmark -->
+  <g transform="translate(88 96)">
+    <circle cx="9" cy="-9" r="9" fill="#1ec291"/>
+    <text x="30" y="0" font-family="'Instrument Sans Variable', 'Instrument Sans', 'Segoe UI', system-ui, sans-serif"
+          font-size="27" font-weight="600" letter-spacing="0.02em" fill="#0f403c">Bondable</text>
+  </g>
+
+  <!-- The line -->
+  <text x="88" y="316" font-family="'Fraunces Variable', 'Fraunces', Georgia, 'Times New Roman', serif"
+        font-size="72" font-weight="600" letter-spacing="-0.01em" fill="#0f403c">Mentale steun die je</text>
+  <text x="88" y="398" font-family="'Fraunces Variable', 'Fraunces', Georgia, 'Times New Roman', serif"
+        font-size="72" font-weight="600" letter-spacing="-0.01em" fill="#0f403c">verbindt, niet vervangt</text>
+
+  <!-- Supporting line -->
+  <text x="88" y="462" font-family="'Instrument Sans Variable', 'Instrument Sans', 'Segoe UI', system-ui, sans-serif"
+        font-size="24" fill="#5a7674">Gesuperviseerde AI-steun en een neutrale hulpverlener-finder.</text>
+
+  <!-- Baseline keyline + footer -->
+  <rect x="88" y="522" width="1024" height="1" fill="#dbe8e6"/>
+  <text x="88" y="566" font-family="'Instrument Sans Variable', 'Instrument Sans', 'Segoe UI', system-ui, sans-serif"
+        font-size="19" letter-spacing="0.04em" fill="#5a7674">bondable.be</text>
+  <text x="1112" y="566" text-anchor="end"
+        font-family="'Instrument Sans Variable', 'Instrument Sans', 'Segoe UI', system-ui, sans-serif"
+        font-size="19" letter-spacing="0.04em" fill="#5a7674">Belgie · Nederland</text>
+</svg>

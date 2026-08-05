@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useId } from "react";
 import console from "@/lib/production-console";
-import { 
-  useOptimizedState, 
-  useOptimizedEffect, 
-  useOptimizedCallback 
+import {
+  useOptimizedState,
+  useOptimizedEffect,
+  useOptimizedCallback
 } from "@/hooks/performance/useOptimizedComponents";
 import {
   Dialog,
@@ -74,14 +74,17 @@ const EventDialog = ({
 
   const [searchInput, setSearchInput] = useOptimizedState("");
 
+  // Calendar category colours. This is the ONE place a categorical (non-semantic)
+  // palette is legitimate: the value is user data persisted on the event, not
+  // product chrome. Values are literal class names so Tailwind emits them.
   const colorOptions = [
-    { value: "bg-blue-600", color: "blue-500", label: "Blue" },
-    { value: "bg-yellow-600", color: "amber-500", label: "Amber" },
-    { value: "bg-pink-300", color: "pink-300", label: "Pink" },
-    { value: "bg-red-600", color: "red-500", label: "Red" },
-    { value: "bg-green-600", color: "emerald-500", label: "Emerald" },
-    { value: "bg-orange-600", color: "orange-500", label: "Orange" },
-    { value: "bg-indigo-300", color: "indigo-300", label: "Indigo" },
+    { value: "bg-teal-600", label: t("event_color_teal", "Teal") },
+    { value: "bg-sky-600", label: t("event_color_blue", "Blauw") },
+    { value: "bg-violet-500", label: t("event_color_violet", "Violet") },
+    { value: "bg-amber-500", label: t("event_color_amber", "Amber") },
+    { value: "bg-rose-500", label: t("event_color_rose", "Rose") },
+    { value: "bg-emerald-600", label: t("event_color_green", "Groen") },
+    { value: "bg-slate-500", label: t("event_color_slate", "Grijs") },
   ];
 
   useOptimizedEffect(() => {
@@ -114,7 +117,7 @@ const EventDialog = ({
         endDate: timeSlotData.dateString,
         startTime: timeSlotData.startTime,
         endTime: timeSlotData.endTime,
-        color: prev.color || "bg-blue-600",
+        color: prev.color || "bg-teal-600",
       }));
     } else if (selectedDate) {
       // Format date as YYYY-MM-DD in local timezone to avoid offset issues
@@ -136,7 +139,7 @@ const EventDialog = ({
         endDate: dateString,
         startTime: "09:00",
         endTime: "10:00",
-        color: prev.color || "bg-blue-600",
+        color: prev.color || "bg-teal-600",
       }));
     } else {
       // Reset to defaults when no event or date is selected
@@ -148,7 +151,7 @@ const EventDialog = ({
         startTime: "09:00",
         endTime: "10:00",
         location: "",
-        color: "bg-blue-600",
+        color: "bg-teal-600",
       });
     }
   }, [event, selectedDate, timeSlotData]);
@@ -177,7 +180,7 @@ const EventDialog = ({
       startTime: "09:00",
       endTime: "10:00",
       location: "",
-      color: "bg-blue-600",
+      color: "bg-teal-600",
     });
     setAddress({
       address1: "",
@@ -207,7 +210,7 @@ const EventDialog = ({
           <DialogHeader className="relative">
             <DialogTitle className="text-left text-lg font-semibold text-foreground">
               {event ? t("edit_event") : t("create_event")}
-              <div className="mt-4 h-px w-full bg-gradient-to-r from-transparent via-[#3f3f3f] to-transparent" />
+              <div className="mt-4 h-px w-full bg-border" />
             </DialogTitle>
           </DialogHeader>
 
@@ -217,7 +220,7 @@ const EventDialog = ({
                 htmlFor={`title-${id}`}
                 className="text-sm font-medium text-muted-foreground"
               >
-                {t("title")} <span className="text-red-400">*</span>
+                {t("title")} <span className="text-destructive">*</span>
               </Label>
               <Input
                 id={`title-${id}`}
@@ -256,7 +259,7 @@ const EventDialog = ({
               <div className="grid grid-cols-2 gap-4 ">
                 <div className="space-y-1">
                   <Label className="text-muted-foreground text-sm font-medium">
-                    {t("start_date")} <span className="text-red-400">*</span>
+                    {t("start_date")} <span className="text-destructive">*</span>
                   </Label>
                   <SimpleDatePicker
                     defaultValue={formData.startDate}
@@ -269,7 +272,7 @@ const EventDialog = ({
                 </div>
                 <div className="space-y-1">
                   <Label className="text-muted-foreground text-sm font-medium">
-                    {t("start_time")} <span className="text-red-400">*</span>
+                    {t("start_time")} <span className="text-destructive">*</span>
                   </Label>
                   <TimePicker
                     value={formData.startTime}
@@ -284,7 +287,7 @@ const EventDialog = ({
               <div className="grid grid-cols-2 gap-4 ">
                 <div className="space-y-1">
                   <Label className="text-muted-foreground text-sm font-medium">
-                    {t("end_date")} <span className="text-red-400">*</span>
+                    {t("end_date")} <span className="text-destructive">*</span>
                   </Label>
                   <SimpleDatePicker
                     label=""
@@ -298,7 +301,7 @@ const EventDialog = ({
                 </div>
                 <div className="space-y-1">
                   <Label className="text-muted-foreground text-sm font-medium">
-                    {t("end_time")} <span className="text-red-400">*</span>
+                    {t("end_time")} <span className="text-destructive">*</span>
                   </Label>
                   <TimePicker
                     label=""
@@ -340,7 +343,7 @@ const EventDialog = ({
                     key={option.value}
                     value={option.value}
                     aria-label={option.label}
-                    className={`size-6 border-neutral-500 bg-${option.color} shadow-none data-[state=checked]:border-neutral-500 data-[state=checked]:bg-${option.color}`}
+                    className={`size-6 border border-transparent shadow-none ring-offset-2 ring-offset-card data-[state=checked]:ring-2 data-[state=checked]:ring-ring ${option.value}`}
                   />
                 ))}
               </RadioGroup>
@@ -352,15 +355,12 @@ const EventDialog = ({
                   type="button"
                   variant="outline"
                   onClick={onClose}
-                  className="border-border bg-card hover:bg-muted text-muted-foreground hover:text-foreground"
                 >
                   {t("cancel")}
                 </Button>
                 <Button
                   type="submit"
-                  className={`bg-primary text-primary-foreground hover:bg-primary/90 ${
-                    event && onDelete ? "" : "-mr-2"
-                  }`}
+                  className={event && onDelete ? undefined : "-mr-2"}
                 >
                   {event ? t("update") : t("save")}
                 </Button>
@@ -370,7 +370,6 @@ const EventDialog = ({
                       type="button"
                       variant="destructive"
                       onClick={handleDelete}
-                      className="bg-red-500 hover:bg-red-900"
                     >
                       <Trash2 />
                     </Button>

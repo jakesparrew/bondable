@@ -26,6 +26,7 @@ import FinderLayout from '@/components/finder/FinderLayout';
 import ProviderCard from '@/components/finder/ProviderCard';
 import FinderFilters from '@/components/finder/FinderFilters';
 import RequestProviderDialog from '@/components/finder/RequestProviderDialog';
+import FinderDeadEnd from '@/features/wachtruimte/FinderDeadEnd';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -264,7 +265,16 @@ const Find = () => {
               ))}
             </div>
           ) : providers.length === 0 ? (
-            <EmptyState onReset={handleResetAll} hasFilters={hasActiveFilters} />
+            /* Geen dood spoor meer: The Coach, een e-mailopvang en de
+               wachttijden in de buurt (track 5 — De Wachtruimte). */
+            <FinderDeadEnd
+              source="find_zero_results"
+              cityName={filters.city ?? null}
+              specialization={filters.specialization ?? null}
+              hasFilters={hasActiveFilters}
+              onReset={handleResetAll}
+              resetLabel={t('finder_empty_reset', 'Filters wissen')}
+            />
           ) : (
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
               {providers.map((p) => (
@@ -284,43 +294,6 @@ const Find = () => {
         />
       )}
     </FinderLayout>
-  );
-};
-
-/* -------------------------------------------------------------------------- */
-
-interface EmptyStateProps {
-  hasFilters: boolean;
-  onReset: () => void;
-}
-
-const EmptyState = ({ hasFilters, onReset }: EmptyStateProps) => {
-  const { t } = useTranslation();
-  return (
-    <div className="flex flex-col items-center justify-center rounded-card border border-dashed border-border bg-card px-6 py-16 text-center">
-      <Search className="h-8 w-8 text-muted-foreground" strokeWidth={1.5} />
-      <h3 className="mt-4 text-base font-semibold text-foreground">
-        {hasFilters
-          ? t('finder_empty_filtered_title', 'Geen hulpverleners gevonden')
-          : t('finder_empty_title', 'Nog geen hulpverleners beschikbaar')}
-      </h3>
-      <p className="mt-1 max-w-sm text-sm text-muted-foreground">
-        {hasFilters
-          ? t(
-              'finder_empty_filtered_desc',
-              'Pas je zoekopdracht of filters aan om meer resultaten te zien.',
-            )
-          : t(
-              'finder_empty_desc',
-              'Er zijn op dit moment geen profielen om te tonen. Kom binnenkort terug.',
-            )}
-      </p>
-      {hasFilters && (
-        <Button variant="outline" className="mt-5" onClick={onReset}>
-          {t('finder_empty_reset', 'Filters wissen')}
-        </Button>
-      )}
-    </div>
   );
 };
 

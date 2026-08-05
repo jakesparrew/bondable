@@ -193,16 +193,21 @@ export function NavUser({ user, userType }: NavUserProps) {
                     />
                     <span>{t("account")}</span>
                   </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => navigate(`/dashboard/${userType}/payments`)}
-                    className="gap-2 px-3 py-2 hover:!bg-muted hover:!text-muted-foreground group cursor-pointer"
-                  >
-                    <CreditCard
-                      strokeWidth={1}
-                      className="h-5 w-5 text-foreground group-hover:text-muted-foreground"
-                    />
-                    <span>{t("billing")}</span>
-                  </DropdownMenuItem>
+                  {/* Providers bill through Facturatie. Clients have no billing
+                      surface, so the entry is provider-only rather than a link
+                      to a page that no longer exists. */}
+                  {userType === "therapist" && (
+                    <DropdownMenuItem
+                      onClick={() => navigate("/dashboard/therapist/invoicing")}
+                      className="gap-2 px-3 py-2 hover:!bg-muted hover:!text-muted-foreground group cursor-pointer"
+                    >
+                      <CreditCard
+                        strokeWidth={1}
+                        className="h-5 w-5 text-foreground group-hover:text-muted-foreground"
+                      />
+                      <span>{t("nav_invoicing", "Facturatie")}</span>
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuItem className="gap-2 px-3 py-2 hover:!bg-muted hover:!text-muted-foreground group cursor-pointer">
                     <Bell
                       strokeWidth={1}

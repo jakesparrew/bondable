@@ -58,10 +58,10 @@ const AddClientDialog = ({ children }: AddClientDialogProps) => {
       // Force immediate query invalidation and refetch
       queryClient.invalidateQueries({ queryKey: ["therapist-clients"] });
       queryClient.invalidateQueries({ queryKey: ["therapist-clients", user?.id] });
-      
+
       // Force an immediate refetch to update the UI
       queryClient.refetchQueries({ queryKey: ["therapist-clients", user?.id] });
-      
+
       toast.success(
         `Invitation sent to ${newClient.firstName} ${newClient.lastName}!`
       );
@@ -70,7 +70,7 @@ const AddClientDialog = ({ children }: AddClientDialogProps) => {
     },
     onError: (error: any) => {
       console.error("Error creating client and sending invitation:", error);
-      
+
       // Check if it's an email sending error
       if (error.message?.includes("email") || error.message?.includes("invitation")) {
         toast.error("Client added but failed to send invitation email. Please try resending the invitation.");
@@ -103,7 +103,7 @@ const AddClientDialog = ({ children }: AddClientDialogProps) => {
 
     if (!session?.access_token) {
       toast.error("Authentication session is invalid. Please sign in again.");
-      return;  
+      return;
     }
 
     // Create the client data object with therapist_id - status will be Pending by default
@@ -130,13 +130,13 @@ const AddClientDialog = ({ children }: AddClientDialogProps) => {
     >
 
         <form onSubmit={handleSubmit} className="space-y-4 pt-0">
-          <div className="bg-blue-50 dark:bg-neutral-400/20 border border-neutral-200 dark:border-neutral-600 p-4 rounded-lg">
+          <div className="rounded-card border border-border bg-info-soft p-4">
             <div className="flex items-start gap-3">
               <div>
-                <p className="text-sm font-medium text-neutral-800 dark:text-neutral-200 flex gap-2 items-center">
-                  {t("how_it_works")}<CornerRightDown className="w-4 h-4 text-neutral-600 dark:text-neutral-400 mt-0.5 flex-shrink-0" />
+                <p className="flex items-center gap-2 text-sm font-medium text-foreground">
+                  {t("how_it_works")}<CornerRightDown className="w-4 h-4 mt-0.5 shrink-0 text-muted-foreground" />
                 </p>
-                <p className="text-xs text-neutral-700 dark:text-neutral-300 mt-1">
+                <p className="mt-1 text-xs text-muted-foreground">
                   {t("email_invitation_instructions")}
                 </p>
               </div>
@@ -181,7 +181,6 @@ const AddClientDialog = ({ children }: AddClientDialogProps) => {
               type="button"
               variant="outline"
               onClick={() => setOpen(false)}
-              className="border-border bg-card hover:bg-muted text-muted-foreground hover:text-foreground"
             >
               {t("cancel")}
             </Button>

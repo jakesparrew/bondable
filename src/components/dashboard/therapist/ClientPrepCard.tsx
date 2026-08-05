@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next";
 import {
   ArrowDownRight,
   ArrowUpRight,
+  Check,
   Minus,
   Monitor,
   MapPin,
@@ -65,6 +66,12 @@ export interface ClientPrepData {
   checkInPending?: boolean;
   /** 1-based ordinal of this session in the relationship ("12e sessie"). */
   sessionNumber?: number | null;
+  /**
+   * State of THIS session's clinical note — drives the post-session affordance:
+   * no note → "Notitie starten", a draft → "Klad afwerken", signed → a quiet
+   * confirmation instead of a button.
+   */
+  noteStatus?: "draft" | "signed" | null;
 }
 
 export interface ClientPrepCardProps {
@@ -91,6 +98,23 @@ const formatTime = (time?: string): string => {
   const [h, m] = time.split(":");
   if (h == null) return time;
   return `${h}:${m ?? "00"}`;
+};
+
+/**
+ * Has this session's slot passed? A session is "post-session" the moment its
+ * end time is behind us — providers rarely flip the status to Completed before
+ * they write the note, so waiting for that status would hide the one action
+ * they came for.
+ */
+const sessionEnded = (session: Session): boolean => {
+  if (!session.session_date) return false;
+  const day = session.session_date.slice(0, 10);
+  const raw = session.session_time || "00:00";
+  const time = raw.length === 5 ? `${raw}:00` : raw.slice(0, 8);
+  const start = new Date(`${day}T${time}`);
+  if (Number.isNaN(start.getTime())) return false;
+  const end = start.getTime() + (session.duration_minutes || 60) * 60_000;
+  return end <= Date.now();
 };
 
 const clientName = (session: Session): string =>
@@ -168,10 +192,15 @@ const ClientPrepCard = ({
     (session.session_type || "").toLowerCase().includes("online");
   const isPending = session.status === "Pending";
 
-  // A post-session card (end time passed) offers "Notitie starten"; otherwise
-  // the primary action is "Voorbereiden". We keep this cheap: the caller can
-  // pass onStartNote to force the note affordance for completed sessions.
-  const showStartNote = Boolean(onStartNote) && session.status === "Completed";
+  // A post-session card offers the note affordance; otherwise the primary
+  // action is "Voorbereiden". Completed sessions always count as post-session,
+  // and so does a confirmed session whose slot has passed.
+  const isPostSession =
+    session.status === "Completed" ||
+    (session.status === "Confirmed" && sessionEnded(session));
+  const noteSigned = prep?.noteStatus === "signed";
+  const showStartNote = Boolean(onStartNote) && isPostSession && !noteSigned;
+  const showNoteSigned = isPostSession && noteSigned;
 
   const flags = prep?.flags?.filter(Boolean) ?? [];
   const hasHomework =
@@ -325,16 +354,36 @@ const ClientPrepCard = ({
               </Button>
             ) : null}
           </>
+        ) : showNoteSigned ? (
+          <>
+            <span className="inline-flex items-center gap-1.5 text-body-sm text-muted-foreground">
+              <Check className="h-4 w-4 text-success" aria-hidden="true" />
+              {t("prep_note_signed", "Notitie ondertekend")}
+            </span>
+            {onStartNote ? (
+              <Button
+                type="button"
+                size="sm"
+                variant="ghost"
+                onClick={() => onStartNote(session)}
+                className="h-auto rounded-ctl px-2 py-1 text-body-sm"
+              >
+                {t("prep_finish_admin", "Administratie afronden")}
+              </Button>
+            ) : null}
+          </>
         ) : showStartNote ? (
           <Button
             type="button"
             size="sm"
-            variant="outline"
+            variant={prep?.noteStatus === "draft" ? "outline" : "default"}
             onClick={() => onStartNote?.(session)}
             className="gap-1"
           >
             <FileText className="h-4 w-4" aria-hidden="true" />
-            {t("prep_start_note", "Notitie starten")}
+            {prep?.noteStatus === "draft"
+              ? t("prep_finish_note", "Klad afwerken")
+              : t("prep_start_note", "Notitie starten")}
           </Button>
         ) : onPrepare ? (
           <Button

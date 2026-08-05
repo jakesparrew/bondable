@@ -6,6 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+
+type StatusVariant = "success" | "warning" | "info" | "destructive" | "secondary";
+
 import { Search, Plus } from "lucide-react";
 import {
   DropdownMenu,
@@ -220,16 +223,17 @@ const loadLastActivityMap = async (clientId: string) => {
       therapist.specialty.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const getStatusColor = (status: string) => {
+  // Semantic variants — the old dark palette was illegible on the light canvas.
+  const statusVariant = (status: string): StatusVariant => {
     switch (status) {
       case "Available":
-        return "bg-green-500/20 text-green-400 border-green-500/30";
+        return "success";
       case "Busy":
-        return "bg-red-500/20 text-red-400 border-red-500/30";
+        return "destructive";
       case "Away":
-        return "bg-yellow-500/20 text-yellow-400 border-yellow-500/30";
+        return "warning";
       default:
-        return "bg-gray-500/20 text-gray-400 border-gray-500/30";
+        return "secondary";
     }
   };
 
@@ -324,10 +328,8 @@ const loadLastActivityMap = async (clientId: string) => {
                               {therapist.name}
                             </h3>
                             <Badge
-                              variant="outline"
-                              className={`text-xs ml-2 ${getStatusColor(
-                                therapist.status
-                              )}`}
+                              variant={statusVariant(therapist.status)}
+                              className="ml-2"
                             >
                               {getStatusTranslation(therapist.status)}
                             </Badge>
@@ -390,12 +392,7 @@ const loadLastActivityMap = async (clientId: string) => {
                         <h3 className="text-foreground font-medium text-sm truncate">
                           {therapist.name}
                         </h3>
-                        <Badge
-                          variant="outline"
-                            className={`text-xs ${getStatusColor(
-                            therapist.status
-                          )}`}
-                          >
+                        <Badge variant={statusVariant(therapist.status)}>
                             {getStatusTranslation(therapist.status)}
                         </Badge>
                       </div>

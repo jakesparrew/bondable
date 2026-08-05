@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Public, indexable Bondable routes only. Dashboard, /welcome/*, /invite/:token
-  and /dev/* are intentionally excluded (private, tokenised or dev-only).
-  Update lastmod when a page's content materially changes.
+  Public, indexable Bondable routes. Dashboard, /welcome/*, /invite/:token and
+  /dev/* are intentionally excluded (private, tokenised or dev-only). The
+  /wachttijden city list mirrors CITY_SLUGS in src/services/api/waitTimeService.ts
+  — keep them in sync when cities are added.
 -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
@@ -16,7 +17,31 @@
     <priority>0.9</priority>
   </url>
   <url>
+    <loc>https://bondable.be/wachttijden</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url><loc>https://bondable.be/wachttijden/gent</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://bondable.be/wachttijden/antwerpen</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://bondable.be/wachttijden/leuven</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://bondable.be/wachttijden/brugge</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://bondable.be/wachttijden/hasselt</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://bondable.be/wachttijden/mechelen</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://bondable.be/wachttijden/kortrijk</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://bondable.be/wachttijden/oostende</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://bondable.be/wachttijden/brussel</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url>
+    <loc>https://bondable.be/wachtruimte</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://bondable.be/pricing</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://bondable.be/signup/provider</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>

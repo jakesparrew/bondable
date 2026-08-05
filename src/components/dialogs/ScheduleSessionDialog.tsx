@@ -1,9 +1,9 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import console from "@/lib/production-console";
-import { 
-  useOptimizedState, 
-  useOptimizedEffect 
+import {
+  useOptimizedState,
+  useOptimizedEffect
 } from "@/hooks/performance/useOptimizedComponents";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -35,6 +35,11 @@ import { therapistClientService } from "@/services/api";
 import { clientTherapistService } from "@/services/api";
 import { useAuthManager } from "@/hooks/api/useAuthManager";
 import { useTranslation } from "react-i18next";
+import SlotPicker from "@/components/scheduling/SlotPicker";
+import { scheduleService } from "@/services/api/scheduleService";
+import type { SessionFormat } from "@/services/api/scheduleService";
+import { useOptimizedSessions } from "@/hooks/api/useOptimizedSessions";
+import { useToast } from "@/hooks/ui/use-toast";
 
 interface ScheduleSessionDialogProps {
   isOpen: boolean;
@@ -57,6 +62,35 @@ const ScheduleSessionDialog = ({
 }: ScheduleSessionDialogProps) => {
   const { t } = useTranslation();
   const { user } = useAuthManager();
+  const { toast } = useToast();
+
+  /**
+   * Booking from painted availability (track 4).
+   *
+   * The provider no longer types a time into the void — they pick from the
+   * moments their own weekly grid actually leaves open (rules MINUS verlof
+   * MINUS what is already booked). `manualTime` is the deliberate escape
+   * hatch: an existing appointment being edited, or a moment outside the grid
+   * (a client in crisis, an evening favour) must never become impossible.
+   */
+  const isProvider = userType === "therapist";
+  const [manualTime, setManualTime] = useState(false);
+  /** Location painted on the chosen availability block, e.g. "Praktijk De Brug". */
+  const [slotLocation, setSlotLocation] = useState<string | null>(null);
+
+  // The provider's own agenda → busy blocks the picker subtracts.
+  const { data: providerSessions = [] } = useOptimizedSessions(
+    "therapist",
+    isOpen && isProvider,
+  );
+  const busy = useMemo(
+    () =>
+      scheduleService.busyFromSessions(
+        (providerSessions ?? []).filter((s) => s.id !== editingSession?.id),
+      ),
+    [providerSessions, editingSession?.id],
+  );
+
   const [formData, setFormData] = useOptimizedState({
     clientId: "",
     clientName: "",
@@ -124,6 +158,10 @@ const ScheduleSessionDialog = ({
 
   // Pre-fill form when editing or when preselected client is provided
   useOptimizedEffect(() => {
+    // An existing appointment already owns its moment — keep the plain pickers.
+    // A new appointment starts from the open slots.
+    setManualTime(!!editingSession || !isProvider);
+    setSlotLocation(null);
     if (editingSession) {
       setFormData({
         clientId: editingSession.client_id,
@@ -219,6 +257,14 @@ const ScheduleSessionDialog = ({
     }
   };
 
+  // What the slot picker should slice and filter on.
+  const slotDuration =
+    formData.duration === "custom"
+      ? parseInt(formData.customDuration) || 50
+      : parseInt(formData.duration) || 50;
+  const slotFormat: SessionFormat =
+    formData.sessionType === "Video" ? "online" : "in_person";
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -245,7 +291,33 @@ const ScheduleSessionDialog = ({
       return;
     }
 
-    const finalDuration = formData.duration === "custom" 
+    // Double-book guard — only for moments taken from the open-slot list. A
+    // manually chosen moment stays possible on purpose; the provider is the
+    // one deciding to overbook, and they see their own agenda.
+    if (isProvider && !manualTime) {
+      const stillFree = scheduleService.isSlotStillFree(
+        user.id,
+        {
+          date: formData.date,
+          time: formData.time,
+          durationMinutes: slotDuration,
+          format: slotFormat,
+        },
+        busy,
+      );
+      if (!stillFree) {
+        toast({
+          title: t("schedule_slot_taken_title", "Dat moment is net bezet"),
+          description: t(
+            "schedule_slot_taken_desc",
+            "Kies een ander vrij moment, of plan het handmatig in.",
+          ),
+        });
+        return;
+      }
+    }
+
+    const finalDuration = formData.duration === "custom"
       ? parseInt(formData.customDuration) || 50
       : parseInt(formData.duration);
 
@@ -256,7 +328,11 @@ const ScheduleSessionDialog = ({
       session_type: formData.type,
       therapy_type: formData.type,
       session_format: formData.sessionType,
-      location: address.formattedAddress || (formData.sessionType === "Video" ? "Video Call" : "Office"),
+      location:
+        address.formattedAddress ||
+        (formData.sessionType === "Video"
+          ? "Video Call"
+          : slotLocation || "Office"),
       status: "Pending", // Always set to pending when creating/editing
       notes: formData.notes,
       therapist_id: userType === "therapist" ? user.id : formData.therapistId,
@@ -281,7 +357,7 @@ const ScheduleSessionDialog = ({
   // Determine if client dropdown should be read-only
   const isViewingMode = editingSession && editingSession.status === "Confirmed";
   const shouldShowClientReadOnly = isViewingMode || (editingSession && editingSession.status !== "Pending");
-  
+
   // Add request update functionality for confirmed sessions in view details
   const canRequestUpdate = editingSession?.status === "Confirmed" && user?.id;
 
@@ -298,7 +374,7 @@ const ScheduleSessionDialog = ({
               ? t("request_new_session")
               : t("schedule_new_session")}
           </DialogTitle>
-          <div className="h-px w-full bg-gradient-to-r from-transparent via-[#3f3f3f] to-transparent" />
+          <div className="h-px w-full bg-border" />
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -376,29 +452,7 @@ const ScheduleSessionDialog = ({
           ) : null}
 
           <div className="bg-card border border-border p-4 rounded-xl space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <SimpleDatePicker
-                  label={t("date")}
-                  value={formData.date}
-                  className="flex-1 "
-                  onChange={handleDateChange}
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <TimePicker
-                  label={t("time")}
-                  value={formData.time}
-                  onChange={(time) =>
-                    setFormData((prev) => ({ ...prev, time }))
-                  }
-                  required
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label className="text-muted-foreground text-sm">{t("duration_minutes")}<span className="text-red-400">&nbsp;*</span></Label>
                 <Select
@@ -468,6 +522,82 @@ const ScheduleSessionDialog = ({
                   </SelectContent>
                 </Select>
               </div>
+            </div>
+
+            {/* Moment — from the painted grid, with a manual escape hatch. */}
+            <div className="space-y-2">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <Label className="text-muted-foreground text-sm">
+                  {t("schedule_moment_label", "Moment")}
+                </Label>
+                {isProvider && !editingSession && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="h-auto px-2 py-1 text-label text-muted-foreground hover:text-foreground"
+                    onClick={() => setManualTime((m) => !m)}
+                  >
+                    {manualTime
+                      ? t("schedule_use_open_slots", "Toon vrije momenten")
+                      : t("schedule_other_moment", "Kies een ander moment")}
+                  </Button>
+                )}
+              </div>
+
+              {isProvider && !manualTime ? (
+                <SlotPicker
+                  providerId={user?.id ?? "demo-provider"}
+                  value={
+                    formData.date
+                      ? { date: formData.date, time: formData.time }
+                      : null
+                  }
+                  onSelect={(slot) => {
+                    setSlotLocation(slot.location);
+                    setFormData((prev) => ({
+                      ...prev,
+                      date: slot.date,
+                      time: slot.time,
+                    }));
+                  }}
+                  durationMinutes={slotDuration}
+                  format={slotFormat}
+                  busy={busy}
+                  emptyAction={
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setManualTime(true)}
+                    >
+                      {t("schedule_other_moment", "Kies een ander moment")}
+                    </Button>
+                  }
+                />
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <SimpleDatePicker
+                      label={t("date")}
+                      value={formData.date}
+                      className="flex-1 "
+                      onChange={handleDateChange}
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <TimePicker
+                      label={t("time")}
+                      value={formData.time}
+                      onChange={(time) =>
+                        setFormData((prev) => ({ ...prev, time }))
+                      }
+                      required
+                    />
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
@@ -553,7 +683,7 @@ const ScheduleSessionDialog = ({
                 {t("request_update")}
               </Button>
             )}
-            
+
             <div className="flex gap-2 ml-auto">
               <Button
                 type="button"

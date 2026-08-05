@@ -72,7 +72,7 @@ const EditClientDialog = ({
       phone: formData.phone.trim() || t("no_phone_provided"),
       status: formData.status,
     };
-    
+
     console.log("Saving client with data:", updatedClient);
     onSave(updatedClient);
     onOpenChange(false);
@@ -197,7 +197,6 @@ const EditClientDialog = ({
               <Button
                 variant="outline"
                 onClick={() => onOpenChange(false)}
-                className="border-border bg-card hover:bg-muted text-muted-foreground hover:text-foreground"
                 >
                   {t("cancel")}
                 </Button>

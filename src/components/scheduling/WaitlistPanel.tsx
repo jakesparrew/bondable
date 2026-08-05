@@ -25,11 +25,15 @@ import { Plus, Send, X, CalendarClock } from "lucide-react";
 import { useToast } from "@/hooks/ui/use-toast";
 import { scheduleService } from "@/services/api/scheduleService";
 import type {
+  BusyBlock,
+  OpenSlot,
   WaitlistEntry,
   WaitlistDaypart,
   SessionFormat,
   Weekday,
 } from "@/services/api/scheduleService";
+import { format as formatDate, parseISO } from "date-fns";
+import { nl } from "date-fns/locale";
 
 /**
  * WaitlistPanel — the provider's waitlist surface (T-PX-13). A list of waiting
@@ -78,8 +82,14 @@ export interface WaitlistPanelProps {
   /**
    * Optional concrete slot to match against (e.g. a gap on Today). When present,
    * the panel highlights matching entries and enables "stel dit moment voor".
+   * When absent, the panel derives open slots itself from the painted grid and
+   * proposes the first one that fits each entry's preference.
    */
   slot?: { date: string; time: string; format: SessionFormat };
+  /** Already-booked time, so derived suggestions never land on a taken hour. */
+  busy?: BusyBlock[];
+  /** How far ahead to look for a matching gap. Default 21 days. */
+  lookaheadDays?: number;
   /**
    * Called when the provider proposes a slot to a waiting client. The parent
    * turns this into a pending session via the existing state machine. When no
@@ -111,14 +121,30 @@ const statusBadge = (
   }
 };
 
+/** "do 13 aug om 14:00" — compact, so it fits a button on 360px. */
+const momentLabel = (date: string, time: string, isNl: boolean): string => {
+  try {
+    const d = parseISO(date);
+    const day = isNl
+      ? formatDate(d, "EEE d MMM", { locale: nl })
+      : formatDate(d, "EEE d MMM");
+    return `${day} ${isNl ? "om" : "at"} ${time}`;
+  } catch {
+    return `${date} ${time}`;
+  }
+};
+
 const WaitlistPanel: React.FC<WaitlistPanelProps> = ({
   providerId,
   clients,
   slot,
+  busy,
+  lookaheadDays = 21,
   onProposeSlot,
   className,
 }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isNl = i18n.language !== "en";
   const { toast } = useToast();
 
   const clientOptions = clients && clients.length > 0 ? clients : DEMO_CLIENTS;
@@ -150,6 +176,27 @@ const WaitlistPanel: React.FC<WaitlistPanelProps> = ({
         .map((m) => m.entry.id),
     );
   }, [providerId, slot, entries]);
+
+  /**
+   * When the parent did not hand us a concrete gap, derive one: read the open
+   * slots off the painted grid (minus verlof, minus what is booked) and find
+   * the first that fits each waiting client's preference. That is what turns a
+   * waitlist from a dead list into an action.
+   */
+  const openDays = useMemo(() => {
+    if (slot || !providerId) return [];
+    return scheduleService.getOpenSlots(
+      providerId,
+      scheduleService.localTodayIso(),
+      lookaheadDays,
+      { busy, notBefore: scheduleService.localNowIso(), maxPerDay: 4 },
+    );
+  }, [providerId, slot, busy, lookaheadDays]);
+
+  const suggestionFor = (entry: WaitlistEntry): OpenSlot | null => {
+    if (slot || entry.status !== "active") return null;
+    return scheduleService.findSlotForPreference(entry.preference, openDays);
+  };
 
   const resetForm = () => {
     setClientId("");
@@ -201,23 +248,24 @@ const WaitlistPanel: React.FC<WaitlistPanelProps> = ({
     });
   };
 
-  const handlePropose = (entry: WaitlistEntry) => {
-    if (!slot) return;
+  const handlePropose = (
+    entry: WaitlistEntry,
+    proposed: { date: string; time: string },
+  ) => {
     scheduleService.updateWaitlistStatus(providerId, entry.id, "offered", {
-      date: slot.date,
-      time: slot.time,
+      date: proposed.date,
+      time: proposed.time,
     });
     refresh();
-    onProposeSlot?.(entry, { date: slot.date, time: slot.time });
+    onProposeSlot?.(entry, { date: proposed.date, time: proposed.time });
     toast({
       title: t("wl_proposed_title", "Moment voorgesteld"),
       description: t(
-        "wl_proposed_desc",
-        "{{name}} krijgt een voorstel voor {{date}} om {{time}}. Zij bevestigt zelf.",
+        "wl_proposed_desc2",
+        "{{name}} krijgt een voorstel voor {{moment}}. Zij bevestigt zelf.",
       )
         .replace("{{name}}", entry.clientName)
-        .replace("{{date}}", slot.date)
-        .replace("{{time}}", slot.time),
+        .replace("{{moment}}", momentLabel(proposed.date, proposed.time, isNl)),
     });
   };
 
@@ -428,6 +476,7 @@ const WaitlistPanel: React.FC<WaitlistPanelProps> = ({
             {activeEntries.map((entry) => {
               const badge = statusBadge(entry.status, t);
               const isMatch = matchIds.has(entry.id);
+              const suggestion = suggestionFor(entry);
               return (
                 <li
                   key={entry.id}
@@ -473,7 +522,12 @@ const WaitlistPanel: React.FC<WaitlistPanelProps> = ({
                         <Button
                           size="sm"
                           variant={isMatch ? "default" : "outline"}
-                          onClick={() => handlePropose(entry)}
+                          onClick={() =>
+                            handlePropose(entry, {
+                              date: slot.date,
+                              time: slot.time,
+                            })
+                          }
                         >
                           <Send className="h-3.5 w-3.5 mr-1.5" />
                           {t("wl_propose", "Stel voor")}
@@ -490,6 +544,32 @@ const WaitlistPanel: React.FC<WaitlistPanelProps> = ({
                       </Button>
                     </div>
                   </div>
+
+                  {/* A gap that fits this preference just opened up. */}
+                  {!slot && suggestion && (
+                    <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-border pt-3">
+                      <span className="text-label text-muted-foreground">
+                        {t("wl_gap_found", "Vrij:")}{" "}
+                        <span className="tabular text-foreground">
+                          {momentLabel(suggestion.date, suggestion.time, isNl)}
+                        </span>
+                      </span>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="ml-auto"
+                        onClick={() =>
+                          handlePropose(entry, {
+                            date: suggestion.date,
+                            time: suggestion.time,
+                          })
+                        }
+                      >
+                        <Send className="h-3.5 w-3.5 mr-1.5" />
+                        {t("wl_propose_this", "Stel dit moment voor")}
+                      </Button>
+                    </div>
+                  )}
                 </li>
               );
             })}

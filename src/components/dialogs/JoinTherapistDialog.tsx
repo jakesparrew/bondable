@@ -41,7 +41,7 @@ const JoinTherapistDialog = ({ children, onTherapistConnected }: JoinTherapistDi
     try {
       // First validate the code
       const validationResponse = await validateCode(inviteCode.trim());
-      
+
       if (!validationResponse.isValid) {
         toast({
           title: "Invalid Invite Code",
@@ -54,17 +54,17 @@ const JoinTherapistDialog = ({ children, onTherapistConnected }: JoinTherapistDi
 
       // Connect to the therapist
       const result = await clientTherapistService.connectToTherapist(inviteCode.trim(), user.id);
-      
+
       if (result.success) {
         toast({
           title: "Successfully Connected!",
           description: `You are now connected to ${result.therapistName}`,
         });
-        
+
         // Close dialog and reset form
         setOpen(false);
         setInviteCode("");
-        
+
         // Trigger refresh of the therapists list
         if (onTherapistConnected) {
           onTherapistConnected();
@@ -113,10 +113,10 @@ const JoinTherapistDialog = ({ children, onTherapistConnected }: JoinTherapistDi
               disabled={isValidating || isConnecting}
             />
             {validationResult?.error && (
-              <p className="text-sm text-red-400">{validationResult.error}</p>
+              <p className="text-sm text-destructive">{validationResult.error}</p>
             )}
             {validationResult?.isValid && !isConnecting && (
-              <p className="text-sm text-green-400">
+              <p className="text-sm text-success">
                 {t("ready_to_connect_with", { therapistName: validationResult.therapistName })}
               </p>
             )}

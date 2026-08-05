@@ -173,16 +173,19 @@ const mockInvoiceData = {
   }
 };
 
-const getStatusColor = (status: string) => {
+type StatusVariant = "success" | "warning" | "info" | "destructive" | "secondary";
+
+/** Invoice status -> semantic Badge variant (was an illegible dark palette). */
+const invoiceStatusVariant = (status: string): StatusVariant => {
   switch (status) {
     case "paid":
-      return "bg-green-500/20 text-green-400 border-green-500/30";
+      return "success";
     case "pending":
-      return "bg-yellow-500/20 text-yellow-400 border-yellow-500/30";
+      return "warning";
     case "overdue":
-      return "bg-red-500/20 text-red-400 border-red-500/30";
+      return "destructive";
     default:
-      return "bg-gray-500/20 text-gray-400 border-gray-500/30";
+      return "secondary";
   }
 };
 
@@ -202,9 +205,9 @@ const getPaymentMethodIcon = (method: string) => {
 export default function InvoiceViewDialog({ isOpen, onClose, invoiceNumber }: InvoiceViewDialogProps) {
   const { t } = useTranslation();
   const [internalOpen, setInternalOpen] = useOptimizedState(false);
-  
+
   console.log("InvoiceViewDialog rendered:", { isOpen, invoiceNumber });
-  
+
   const invoice = mockInvoiceData[invoiceNumber as keyof typeof mockInvoiceData];
 
   console.log("Invoice data found:", invoice);
@@ -269,18 +272,18 @@ export default function InvoiceViewDialog({ isOpen, onClose, invoiceNumber }: In
                   </div>
                   <div className="text-right">
                     <div className="text-2xl font-bold text-foreground mb-1">${invoice.amount.toFixed(2)}</div>
-                    <Badge className={`${getStatusColor(invoice.status)} text-xs`}>
+                    <Badge variant={invoiceStatusVariant(invoice.status)}>
                       {invoice.status.charAt(0).toUpperCase() + invoice.status.slice(1)}
                     </Badge>
                   </div>
                 </div>
 
-                <div className="mb-6 h-px w-full bg-gradient-to-r from-transparent via-[#3f3f3f] to-transparent" />
+                <div className="mb-6 h-px w-full bg-border" />
 
                 {/* Compact Info Grid */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
   {/* Client */}
-  <div className="flex items-start gap-3 bg-background border border-border rounded-xl p-4 hover:border-gray-600 transition">
+  <div className="flex items-start gap-3 bg-background border border-border rounded-xl p-4 hover:border-border transition">
     <User className="h-4 w-4 text-muted-foreground mt-1" />
                      <div>
                        <p className="text-muted-foreground text-xs">{t("client")}</p>
@@ -289,7 +292,7 @@ export default function InvoiceViewDialog({ isOpen, onClose, invoiceNumber }: In
   </div>
 
   {/* Service Date */}
-  <div className="flex items-start gap-3 bg-background border border-border rounded-xl p-4 hover:border-gray-600 transition">
+  <div className="flex items-start gap-3 bg-background border border-border rounded-xl p-4 hover:border-border transition">
     <Calendar className="h-4 w-4 text-muted-foreground mt-1" />
                      <div>
                        <p className="text-muted-foreground text-xs">{t("service_date")}</p>
@@ -298,7 +301,7 @@ export default function InvoiceViewDialog({ isOpen, onClose, invoiceNumber }: In
   </div>
 
   {/* Duration */}
-  <div className="flex items-start gap-3 bg-background border border-border rounded-xl p-4 hover:border-gray-600 transition">
+  <div className="flex items-start gap-3 bg-background border border-border rounded-xl p-4 hover:border-border transition">
     <Clock className="h-4 w-4 text-muted-foreground mt-1" />
                      <div>
                        <p className="text-muted-foreground text-xs">{t("duration")}</p>
@@ -307,7 +310,7 @@ export default function InvoiceViewDialog({ isOpen, onClose, invoiceNumber }: In
   </div>
 
   {/* Payment Method */}
-  <div className="flex items-start gap-3 bg-background border border-border rounded-xl p-4 hover:border-gray-600 transition">
+  <div className="flex items-start gap-3 bg-background border border-border rounded-xl p-4 hover:border-border transition">
     <div className="h-4 w-4 text-muted-foreground mt-1">{getPaymentMethodIcon(invoice.method)}</div>
                      <div>
                        <p className="text-muted-foreground text-xs">{t("payment_method")}</p>
@@ -341,7 +344,7 @@ export default function InvoiceViewDialog({ isOpen, onClose, invoiceNumber }: In
                     {invoice.status === "paid" && (
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">{t("paid")}:</span>
-                        <span className="text-green-500/80">{invoice.issueDate}</span>
+                        <span className="text-success">{invoice.issueDate}</span>
                       </div>
                     )}
                   </div>
