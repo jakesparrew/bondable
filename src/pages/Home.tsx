@@ -18,7 +18,6 @@ import { useTranslation } from 'react-i18next';
 import {
   Search,
   ShieldCheck,
-  MessageCircleHeart,
   Stethoscope,
   ArrowRight,
   LogIn,
@@ -29,6 +28,15 @@ import {
 
 import { Button } from '@/components/ui/button';
 import Seo from '@/components/seo/Seo';
+import {
+  BondVignette,
+  CheckinVignette,
+  FinderVignette,
+  ProviderTodayVignette,
+  AdminChainVignette,
+  LeadsVignette,
+} from '@/components/home/FeatureVignettes';
+import FeaturedProviders from '@/components/home/FeaturedProviders';
 import {
   isBypassAvailable,
   setDemoRole,
@@ -145,9 +153,11 @@ const Home = () => {
       </header>
 
       <main className="flex-1">
-        {/* Hero — typography-led, flat canvas, editorial spacing */}
+        {/* Hero — typography-led text + a LIVE replica of the Bond UI, so the
+            first screen already shows the product instead of describing it. */}
         <section className="mx-auto w-full max-w-[1200px] px-4 pb-14 pt-16 sm:px-6 sm:pt-20">
-          <div className="max-w-3xl">
+          <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:gap-14">
+          <div>
             {/* Eyebrow */}
             <span className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
               <ShieldCheck className="h-4 w-4 text-primary" />
@@ -212,11 +222,17 @@ const Home = () => {
             </p>
           </div>
 
-          {/* Duotone photo band placeholder — no real image sourced */}
-          <div
-            aria-hidden="true"
-            className="mt-14 h-40 w-full rounded-hero bg-secondary sm:h-56"
-          />
+          {/* The product, not a promise: a miniature of the real Bond chat. */}
+          <div className="mx-auto w-full max-w-md lg:max-w-none">
+            <BondVignette />
+            <p className="mt-3 text-center text-label text-muted-foreground lg:text-left">
+              {t(
+                'home_hero_vignette_caption',
+                'Zo ziet een gesprek met The Coach eruit — altijd met een echte hulpverlener op de achtergrond.',
+              )}
+            </p>
+          </div>
+          </div>
         </section>
 
         {/* 10-second comprehension strip — how it works in three steps */}
@@ -266,43 +282,85 @@ const Home = () => {
           </div>
         </section>
 
-        {/* Feature grid — border-first cards, no shadow at rest */}
-        <section className="mx-auto w-full max-w-[1200px] px-4 py-6 sm:px-6 sm:py-10">
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            <FeatureCard
-              icon={<MessageCircleHeart className="h-5 w-5" />}
-              title={t('home_feat_coach_title', 'The Coach')}
-              body={t(
-                'home_feat_coach_body',
-                'Een AI-begeleider die er altijd is, onder supervisie van een echte hulpverlener. Verwijst je door wanneer dat nodig is.',
-              )}
-            />
-            <FeatureCard
-              icon={<Search className="h-5 w-5" />}
-              title={t('home_feat_finder_title', 'Hulpverlener-finder')}
-              body={t(
-                'home_feat_finder_body',
-                'Vind coaches en erkende therapeuten op basis van fit: specialisatie, taal en locatie. Neutraal, nooit op betaling.',
-              )}
-            />
-            <FeatureCard
-              icon={<Stethoscope className="h-5 w-5" />}
-              title={t('home_feat_practice_title', 'Praktijktools')}
-              body={t(
-                'home_feat_practice_body',
-                'Voor hulpverleners: cliëntbeheer, sessies, taken, intake en berichten, alles op één plek.',
-              )}
-            />
-            <FeatureCard
-              icon={<ShieldCheck className="h-5 w-5" />}
-              title={t('home_feat_privacy_title', 'Privacy en compliance')}
-              body={t(
-                'home_feat_privacy_body',
-                'Gebouwd rond GDPR en Belgische zorgregels. Jouw gegevens blijven van jou, porteerbaar en transparant.',
-              )}
-            />
+        {/* For clients — real UI, explained, with a CTA per feature */}
+        <section className="mx-auto w-full max-w-[1200px] px-4 py-14 sm:px-6">
+          <span className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            <Users className="h-4 w-4 text-primary" />
+            {t('home_clients_eyebrow', 'Voor jou')}
+          </span>
+          <h2 className="mt-3 max-w-2xl text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
+            {t('home_clients_title', 'Steun die er elke dag is, niet alleen tijdens je sessie')}
+          </h2>
+
+          <div className="mt-10 grid grid-cols-1 gap-10 lg:grid-cols-2 lg:gap-14">
+            {/* Daily check-in */}
+            <div className="flex flex-col">
+              <CheckinVignette />
+              <h3 className="mt-5 text-title font-semibold text-foreground">
+                {t('home_feat_checkin_title', 'Eén minuut per dag, helemaal van jou')}
+              </h3>
+              <p className="mt-1.5 max-w-md text-body-sm leading-relaxed text-muted-foreground">
+                {t(
+                  'home_feat_checkin_body',
+                  'Een korte check-in houdt bij hoe het echt met je gaat. The Coach onthoudt het, je hulpverlener ziet de lijn — alleen als jij dat wil. Geen streaks, geen schuldgevoel.',
+                )}
+              </p>
+              <button
+                type="button"
+                onClick={talkToCoach}
+                className="mt-3 inline-flex items-center gap-1.5 self-start text-sm font-semibold text-primary underline-offset-4 hover:underline"
+              >
+                {t('home_hero_coach_cta', 'Praat met The Coach')}
+                <ArrowRight className="h-4 w-4" />
+              </button>
+            </div>
+
+            {/* Finder */}
+            <div className="flex flex-col">
+              <FinderVignette />
+              <h3 className="mt-5 text-title font-semibold text-foreground">
+                {t('home_feat_finder_title2', 'Vind wie écht bij je past')}
+              </h3>
+              <p className="mt-1.5 max-w-md text-body-sm leading-relaxed text-muted-foreground">
+                {t(
+                  'home_feat_finder_body2',
+                  'Zoek op specialisatie, taal en plaats tussen erkende hulpverleners en geverifieerde coaches. De volgorde is puur op fit — een plaats in de resultaten is bij ons niet te koop.',
+                )}
+              </p>
+              <Link
+                to="/find"
+                className="mt-3 inline-flex items-center gap-1.5 self-start text-sm font-semibold text-primary underline-offset-4 hover:underline"
+              >
+                {t('home_hero_find_cta', 'Vind een hulpverlener')}
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
+          </div>
+
+          {/* Trust strip — quiet, factual */}
+          <div className="mt-12 flex flex-col gap-3 border-t border-border pt-6 sm:flex-row sm:items-center sm:gap-8">
+            <span className="inline-flex items-center gap-2 text-body-sm text-muted-foreground">
+              <ShieldCheck className="h-4 w-4 text-primary" />
+              {t('home_trust_verified', 'Erkenning en visum geverifieerd')}
+            </span>
+            <span className="inline-flex items-center gap-2 text-body-sm text-muted-foreground">
+              <Lock className="h-4 w-4 text-primary" />
+              {t('home_trust_gdpr', 'Jouw gegevens blijven van jou')}
+            </span>
+            <Link
+              to="/how-ranking-works"
+              className="inline-flex items-center gap-2 text-body-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+            >
+              <Search className="h-4 w-4 text-primary" />
+              {t('home_trust_ranking', 'Ranking is nooit te koop — lees hoe het werkt')}
+            </Link>
           </div>
         </section>
+
+        {/* Real providers from the finder — clients see immediately that
+            finding someone is a thing you can do here. Neutral order, never
+            curated, never paid (dichotomieverbod). */}
+        <FeaturedProviders />
 
         {/* For providers */}
         <section id="providers" className="border-t border-border bg-card">
@@ -334,7 +392,7 @@ const Home = () => {
                   </Button>
                 ) : (
                   <Button asChild size="lg">
-                    <Link to="/login">
+                    <Link to="/signup/provider">
                       <Stethoscope className="h-4 w-4" />
                       {t('home_providers_cta', 'Word hulpverlener op Bondable')}
                     </Link>
@@ -342,6 +400,38 @@ const Home = () => {
                 )}
               </div>
             </div>
+
+            {/* The provider workday, shown not told: prep → 90s admin → leads */}
+            <div className="mt-10 grid grid-cols-1 gap-6 md:grid-cols-3">
+              <div>
+                <ProviderTodayVignette />
+                <p className="mt-2.5 text-label text-muted-foreground">
+                  {t('home_prov_vig_today', 'Kom voorbereid in elke sessie — laatste notitie, huiswerk en wat je cliënt wil bespreken.')}
+                </p>
+              </div>
+              <div>
+                <AdminChainVignette />
+                <p className="mt-2.5 text-label text-muted-foreground">
+                  {t('home_prov_vig_chain', 'Notitie, factuur en terugbetalingsattest in één beweging na je sessie.')}
+                </p>
+              </div>
+              <div>
+                <LeadsVignette />
+                <p className="mt-2.5 text-label text-muted-foreground">
+                  {t('home_prov_vig_leads', 'Aanvragen van cliënten die al voorbereid zijn: intake ingevuld, nulmeting klaar.')}
+                </p>
+              </div>
+            </div>
+
+            <p className="mt-8 text-body-sm text-muted-foreground">
+              {t('home_prov_pricing_note', 'Gratis tot 3 actieve cliënten.')}{' '}
+              <Link
+                to="/pricing"
+                className="font-semibold text-primary underline-offset-4 hover:underline"
+              >
+                {t('home_prov_pricing_link', 'Bekijk prijzen')}
+              </Link>
+            </p>
           </div>
         </section>
 
@@ -457,23 +547,5 @@ const Home = () => {
     </div>
   );
 };
-
-/* -------------------------------------------------------------------------- */
-
-interface FeatureCardProps {
-  icon: React.ReactNode;
-  title: string;
-  body: string;
-}
-
-const FeatureCard = ({ icon, title, body }: FeatureCardProps) => (
-  <div className="animate-enter rounded-card border border-border bg-card p-5 transition-all hover:border-primary/20 hover:shadow-raise">
-    <span className="flex h-11 w-11 items-center justify-center rounded-ctl bg-secondary text-primary">
-      {icon}
-    </span>
-    <h3 className="mt-4 text-base font-semibold text-foreground">{title}</h3>
-    <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{body}</p>
-  </div>
-);
 
 export default Home;
