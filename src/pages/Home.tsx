@@ -120,6 +120,14 @@ const Home = () => {
             >
               <a href="#providers">{t('home_nav_providers', 'Voor hulpverleners')}</a>
             </Button>
+            <Button
+              asChild
+              variant="ghost"
+              size="sm"
+              className="hidden text-muted-foreground sm:inline-flex"
+            >
+              <Link to="/pricing">{t('home_nav_pricing', 'Prijzen')}</Link>
+            </Button>
             <Button asChild variant="outline" size="sm">
               <Link to="/login">
                 <LogIn className="h-4 w-4" />
@@ -389,17 +397,55 @@ const Home = () => {
 
       {/* Footer */}
       <footer className="border-t border-border bg-background">
-        <div className="mx-auto flex w-full max-w-[1200px] flex-col items-center justify-between gap-3 px-4 py-8 sm:flex-row sm:px-6">
-          <div className="flex items-center gap-2">
-            <img src="/favicon.ico" alt="" className="h-6 w-6" />
-            <span className="text-sm font-semibold text-primary">Bondable</span>
+        <div className="mx-auto w-full max-w-[1200px] px-4 py-10 sm:px-6">
+          <div className="flex flex-col gap-8 sm:flex-row sm:justify-between">
+            <div className="max-w-xs">
+              <div className="flex items-center gap-2">
+                <img src="/favicon.ico" alt="" className="h-6 w-6" />
+                <span className="text-sm font-semibold text-primary">Bondable</span>
+              </div>
+              <p className="mt-2 text-body-sm text-muted-foreground">
+                {t(
+                  'home_footer_tagline',
+                  'Mentale steun die je verbindt, niet vervangt. Gemaakt in België.',
+                )}
+              </p>
+            </div>
+
+            <nav className="grid grid-cols-2 gap-x-10 gap-y-2 text-body-sm sm:grid-cols-2">
+              <Link to="/find" className="text-muted-foreground hover:text-foreground">
+                {t('home_nav_find', 'Vind hulp')}
+              </Link>
+              <Link to="/pricing" className="text-muted-foreground hover:text-foreground">
+                {t('home_nav_pricing', 'Prijzen')}
+              </Link>
+              <Link
+                to="/how-ranking-works"
+                className="text-muted-foreground hover:text-foreground"
+              >
+                {t('home_footer_ranking', 'Hoe we rangschikken')}
+              </Link>
+              <Link to="/login" className="text-muted-foreground hover:text-foreground">
+                {t('home_nav_login', 'Inloggen')}
+              </Link>
+            </nav>
           </div>
-          <p className="text-xs text-muted-foreground">
-            {t(
-              'home_footer_neutral',
-              'Onafhankelijke matching op basis van fit, nooit op betaling. © Bondable',
-            )}
-          </p>
+
+          {/* Crisis line stays visible on every public page — safety before marketing. */}
+          <div className="mt-8 flex flex-col gap-2 border-t border-border pt-6 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-xs text-muted-foreground">
+              {t(
+                'home_footer_neutral',
+                'Onafhankelijke matching op basis van fit, nooit op betaling. © Bondable',
+              )}
+            </p>
+            <p className="text-xs text-muted-foreground">
+              {t(
+                'home_footer_crisis',
+                'Bondable is geen noodhulp. Bel 112, of de Zelfmoordlijn 1813 (BE) / 113 (NL).',
+              )}
+            </p>
+          </div>
         </div>
       </footer>
     </div>

@@ -1,19 +1,66 @@
-
 <!doctype html>
-<html lang="en">
+<html lang="nl-BE">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Bondable</title>
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-2H6XSHGCDH"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
 
-      gtag('config', 'G-2H6XSHGCDH');
+    <!-- Primary meta -->
+    <title>Bondable — mentale steun die je verbindt, niet vervangt</title>
+    <meta
+      name="description"
+      content="Praat vandaag nog met The Coach, je AI-begeleider onder supervisie van een echte hulpverlener. En vind een coach of erkende therapeut die bij je past — op basis van fit, nooit op betaling."
+    />
+    <link rel="canonical" href="https://bondable.be/" />
+    <meta name="theme-color" content="#0f403c" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Bondable" />
+    <meta property="og:locale" content="nl_BE" />
+    <meta property="og:url" content="https://bondable.be/" />
+    <meta property="og:title" content="Bondable — mentale steun die je verbindt, niet vervangt" />
+    <meta
+      property="og:description"
+      content="Begin vandaag zonder wachtlijst met The Coach, onder supervisie van een echte hulpverlener. Vind daarna een coach of erkende therapeut die bij je past."
+    />
+    <meta property="og:image" content="https://bondable.be/og-image.png" />
+    <meta property="og:image:alt" content="Bondable — gesuperviseerde AI-zorg en een neutrale hulpverlener-finder" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Bondable — mentale steun die je verbindt, niet vervangt" />
+    <meta
+      name="twitter:description"
+      content="Begin vandaag zonder wachtlijst met The Coach, onder supervisie van een echte hulpverlener."
+    />
+    <meta name="twitter:image" content="https://bondable.be/og-image.png" />
+
+    <!-- Organization + service structured data (helps Belgian local search) -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "Bondable",
+        "url": "https://bondable.be/",
+        "description": "Belgisch platform voor mentale steun: een AI-begeleider onder supervisie van een echte hulpverlener, en een neutrale finder voor coaches en erkende therapeuten.",
+        "areaServed": ["BE", "NL"],
+        "knowsLanguage": ["nl", "fr", "en"]
+      }
     </script>
+
+    <!--
+      ANALYTICS — deliberately NOT loaded here.
+      This page previously hard-loaded Google Analytics (G-2H6XSHGCDH, an ID
+      inherited from the earlier codebase) on every visit with no consent step.
+      For an EU health product that is both a GDPR problem (Art. 6/9 + ePrivacy
+      require prior consent for non-essential analytics) and an ownership one
+      (the data went to someone else's property).
+      Analytics now runs through src/services/api/analyticsService.ts, which is
+      consent-aware and OFF by default. Wire a real provider there behind the
+      consent flag when you have your own property.
+    -->
   </head>
   <body>
     <div id="root"></div>
