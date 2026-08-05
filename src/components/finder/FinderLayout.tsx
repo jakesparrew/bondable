@@ -36,7 +36,15 @@ const FinderLayout = ({ children }: FinderLayoutProps) => {
             </Button>
             {/* De wachtlijstradar hoort in de hoofdnavigatie: het is voor veel
                 bezoekers de eerste vraag, nog vóór "wie past bij mij". */}
-            <Button asChild variant="ghost" size="sm" className="text-muted-foreground">
+            {/* Hidden below sm: logo + Vind hulp + Inloggen already fill a
+                375px bar, and a fourth item pushed the nav past the viewport
+                (horizontal scroll on the whole page). Still in the footer. */}
+            <Button
+              asChild
+              variant="ghost"
+              size="sm"
+              className="hidden text-muted-foreground sm:inline-flex"
+            >
               <Link to="/wachttijden">
                 {t('finder_nav_waittimes', 'Wachttijden')}
               </Link>

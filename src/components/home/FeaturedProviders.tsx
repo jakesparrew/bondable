@@ -119,13 +119,15 @@ const FeaturedProviders = () => {
                         </>
                       )}
                     </p>
-                    {/* Skip the badge when it would only repeat the discipline. */}
+                    {/* Skip the badge when it would only repeat the discipline.
+                        max-w-full + truncate so a long label can never spill
+                        past the card edge in a narrow column. */}
                     {badge.kind !== 'plain' && (
                       <div className="mt-1.5">
-                        <Badge variant={badge.variant} className="gap-1 whitespace-nowrap">
+                        <Badge variant={badge.variant} className="max-w-full gap-1">
                           {badge.kind === 'regulated' && <ShieldCheck className="h-3 w-3 shrink-0" />}
                           {badge.kind === 'verified_coach' && <CheckCircle2 className="h-3 w-3 shrink-0" />}
-                          {badge.label}
+                          <span className="truncate">{badge.label}</span>
                         </Badge>
                       </div>
                     )}

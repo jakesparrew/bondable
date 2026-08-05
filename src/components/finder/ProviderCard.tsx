@@ -100,27 +100,6 @@ const ProviderCard = ({ provider, onRequest }: ProviderCardProps) => {
               )}
             </p>
 
-            {/* Trust badge on its OWN row so a long label ("Verificatie in
-                behandeling") can never wrap mid-phrase and knock the cards out
-                of alignment. Skipped for `plain`, where the badge would only
-                repeat the discipline already shown above ("Coach Coach"). */}
-            {badge.kind !== 'plain' && (
-              <div className="mt-2">
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <span>
-                      <Badge variant={badge.variant} className="gap-1 whitespace-nowrap">
-                        {badge.kind === 'regulated' && <ShieldCheck className="h-3.5 w-3.5 shrink-0" />}
-                        {badge.kind === 'verified_coach' && <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />}
-                        {badge.label}
-                      </Badge>
-                    </span>
-                  </TooltipTrigger>
-                  <TooltipContent className="max-w-xs">{badge.tooltip}</TooltipContent>
-                </Tooltip>
-              </div>
-            )}
-
             {/* Rating, when a real review system eventually populates it. */}
             <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
               {provider.rating != null && (
@@ -139,6 +118,32 @@ const ProviderCard = ({ provider, onRequest }: ProviderCardProps) => {
             </div>
           </div>
         </div>
+
+        {/* Trust badge on its own FULL-WIDTH row. Deliberately outside the
+            column next to the avatar: there it only had (card − 64px avatar −
+            gap) to work with, so a long label like "Erkend hulpverlener" spilled
+            past the card edge. Skipped for `plain`, where it would only repeat
+            the discipline shown above ("Coach Coach"). */}
+        {badge.kind !== 'plain' && (
+          <div className="mt-3">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span className="inline-flex max-w-full">
+                  <Badge variant={badge.variant} className="max-w-full gap-1">
+                    {badge.kind === 'regulated' && (
+                      <ShieldCheck className="h-3.5 w-3.5 shrink-0" />
+                    )}
+                    {badge.kind === 'verified_coach' && (
+                      <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />
+                    )}
+                    <span className="truncate">{badge.label}</span>
+                  </Badge>
+                </span>
+              </TooltipTrigger>
+              <TooltipContent className="max-w-xs">{badge.tooltip}</TooltipContent>
+            </Tooltip>
+          </div>
+        )}
 
         {/* Headline */}
         {provider.headline && (
