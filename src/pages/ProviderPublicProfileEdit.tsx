@@ -9,6 +9,12 @@
  * accepting-new-clients, credentials, photo and is_published. Saves via
  * finderService.updateProvider (graceful mock save → toast).
  *
+ * ADDRESS IS OPT-IN. Many providers work from home, so publishing a street is
+ * a deliberate choice: address_visibility defaults to 'city_only' and the
+ * public profile then shows nothing but the city. The self-read here uses
+ * finderService.getOwnProvider so a provider can still see and edit the
+ * address they stored even while it is not published.
+ *
  * REFERRAL-NEUTRAL BY DESIGN (EU P2B + Belgian dichotomieverbod): the Finder
  * ranks PURELY on fit (specialization, language, modality, availability), never
  * on price/payment, and there is no "promoted"/"sponsored" placement. The rate
@@ -30,6 +36,7 @@ import {
   EyeOff,
   ExternalLink,
   Loader2,
+  MapPin,
   Plus,
   Save,
   Sparkles,
@@ -53,6 +60,7 @@ import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   Select,
@@ -64,6 +72,7 @@ import {
 import { useAuthManager } from '@/hooks/api/useAuthManager';
 import {
   finderService,
+  type AddressVisibility,
   type Provider,
   type UpdateProviderPayload,
 } from '@/services/api/finderService';
@@ -82,6 +91,10 @@ interface FormState {
   hourlyRate: string; // kept as string for the input; coerced on save
   city: string;
   country: string;
+  street: string;
+  postalCode: string;
+  addressVisibility: AddressVisibility;
+  reachability: string;
   acceptingNewClients: boolean;
   credentials: string;
   photoUrl: string;
@@ -98,6 +111,11 @@ const emptyForm: FormState = {
   hourlyRate: '',
   city: '',
   country: '',
+  street: '',
+  postalCode: '',
+  // Private by default — never publish a home address by omission.
+  addressVisibility: 'city_only',
+  reachability: '',
   acceptingNewClients: true,
   credentials: '',
   photoUrl: '',
@@ -114,6 +132,10 @@ const fromProvider = (p: Provider): FormState => ({
   hourlyRate: p.hourlyRate != null ? String(p.hourlyRate) : '',
   city: p.city ?? '',
   country: p.country ?? '',
+  street: p.street ?? '',
+  postalCode: p.postalCode ?? '',
+  addressVisibility: p.addressVisibility,
+  reachability: p.reachability ?? '',
   acceptingNewClients: p.acceptingNewClients,
   credentials: p.credentials ?? '',
   photoUrl: p.photoUrl ?? '',
@@ -271,7 +293,9 @@ const ProviderPublicProfileEdit = () => {
     setLoading(true);
     setNotFound(false);
     try {
-      const p = await finderService.getProvider(providerId);
+      // Self-read: unlike getProvider this keeps the street/postcode visible to
+      // its owner even when they publish only their city.
+      const p = await finderService.getOwnProvider(providerId);
       if (p) {
         setProvider(p);
         setForm(fromProvider(p));
@@ -323,6 +347,10 @@ const ProviderPublicProfileEdit = () => {
       hourlyRate: rateNum != null && Number.isFinite(rateNum) ? rateNum : null,
       city: form.city.trim() || null,
       country: form.country.trim() || null,
+      street: form.street.trim() || null,
+      postalCode: form.postalCode.trim() || null,
+      addressVisibility: form.addressVisibility,
+      reachability: form.reachability.trim() || null,
       acceptingNewClients: form.acceptingNewClients,
       credentials: form.credentials.trim() || null,
       photoUrl: form.photoUrl.trim() || null,
@@ -566,6 +594,140 @@ const ProviderPublicProfileEdit = () => {
                   maxLength={2}
                 />
               </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Praktijkadres — opt-in. Default stays 'city_only'. */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <MapPin className="h-4 w-4 text-primary" aria-hidden="true" />
+              {t('finder_profile_address', 'Praktijkadres')}
+            </CardTitle>
+            <CardDescription>
+              {t(
+                'finder_profile_address_desc',
+                'Voor sessies op locatie helpt een adres cliënten beslissen. Je bepaalt zelf of het zichtbaar is — veel hulpverleners werken vanuit huis en delen enkel hun stad.',
+              )}
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-5">
+            <div className="grid gap-4 sm:grid-cols-[2fr,1fr]">
+              <div className="space-y-1.5">
+                <Label htmlFor="street">
+                  {t('finder_profile_street', 'Straat en nummer')}
+                </Label>
+                <Input
+                  id="street"
+                  value={form.street}
+                  onChange={(e) => update('street', e.target.value)}
+                  placeholder={t(
+                    'finder_profile_street_ph',
+                    'bv. Naamsestraat 42',
+                  )}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="postal-code">
+                  {t('finder_profile_postal_code', 'Postcode')}
+                </Label>
+                <Input
+                  id="postal-code"
+                  value={form.postalCode}
+                  onChange={(e) => update('postalCode', e.target.value)}
+                  inputMode="numeric"
+                  maxLength={10}
+                  placeholder="3000"
+                />
+              </div>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              {t(
+                'finder_profile_address_city_hint',
+                'Je stad staat bij Basisgegevens en wordt altijd getoond.',
+              )}
+            </p>
+
+            <Separator />
+
+            {/* The visibility choice itself — plain radios, no dark pattern:
+                'enkel mijn stad' is listed as an equal option and is the
+                default for a new profile. */}
+            <div className="space-y-2">
+              <Label>
+                {t('finder_profile_address_visibility', 'Zichtbaarheid van je adres')}
+              </Label>
+              <RadioGroup
+                value={form.addressVisibility}
+                onValueChange={(v) =>
+                  update('addressVisibility', v as AddressVisibility)
+                }
+                className="gap-0 overflow-hidden rounded-lg border border-border"
+              >
+                <label
+                  htmlFor="addr-full"
+                  className="flex cursor-pointer items-start gap-3 border-b border-border p-3.5 transition-colors hover:bg-muted/40"
+                >
+                  <RadioGroupItem id="addr-full" value="full" className="mt-0.5" />
+                  <span>
+                    <span className="block text-sm font-medium text-foreground">
+                      {t('finder_profile_address_full', 'Toon volledig adres')}
+                    </span>
+                    <span className="block text-xs text-muted-foreground">
+                      {t(
+                        'finder_profile_address_full_hint',
+                        'Straat, postcode en stad staan op je openbaar profiel, met een link naar de kaart.',
+                      )}
+                    </span>
+                  </span>
+                </label>
+                <label
+                  htmlFor="addr-city"
+                  className="flex cursor-pointer items-start gap-3 p-3.5 transition-colors hover:bg-muted/40"
+                >
+                  <RadioGroupItem
+                    id="addr-city"
+                    value="city_only"
+                    className="mt-0.5"
+                  />
+                  <span>
+                    <span className="block text-sm font-medium text-foreground">
+                      {t('finder_profile_address_city_only', 'Toon enkel mijn stad')}
+                    </span>
+                    <span className="block text-xs text-muted-foreground">
+                      {t(
+                        'finder_profile_address_city_only_hint',
+                        'Je straat en postcode blijven bij ons en worden niet meegestuurd naar je profiel. Je deelt ze zelf na een eerste contact.',
+                      )}
+                    </span>
+                  </span>
+                </label>
+              </RadioGroup>
+            </div>
+
+            <Separator />
+
+            <div className="space-y-1.5">
+              <Label htmlFor="reachability">
+                {t('finder_profile_reachability', 'Bereikbaarheid')}
+              </Label>
+              <Textarea
+                id="reachability"
+                rows={2}
+                value={form.reachability}
+                onChange={(e) => update('reachability', e.target.value)}
+                placeholder={t(
+                  'finder_profile_reachability_ph',
+                  'bv. 5 min van Gent-Sint-Pieters, parking in de straat',
+                )}
+              />
+              <p className="text-xs text-muted-foreground">
+                {t(
+                  'finder_profile_reachability_hint',
+                  'Dit tonen we altijd, ook als je enkel je stad deelt.',
+                )}
+              </p>
             </div>
           </CardContent>
         </Card>

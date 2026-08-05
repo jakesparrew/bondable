@@ -15,6 +15,15 @@
  * transparency, never as a selling point. The is_regulated indicator
  * distinguishes a regulated clinician (therapist/psychologist) from a coach.
  *
+ * LOCATION IS OPT-IN AND MAP-FREE. A provider either publishes their full
+ * practice address or only their city (many work from home) — finderService
+ * already strips street/postcode from the payload in the latter case, so this
+ * page renders whatever it is given. There is deliberately NO embedded map:
+ * an iframe would set third-party cookies and leak the visitor's IP on load,
+ * on a page where someone is looking for a psychologist (special-category
+ * context under GDPR/ePrivacy). Instead we link out to OpenStreetMap in a new
+ * tab, which costs the visitor nothing until they choose to click.
+ *
  * Brand tokens only: bg-background/card/muted, text-foreground/muted-foreground,
  * border-border, bg-primary. The mint token is reserved for AI/matching surfaces
  * (not used here); destructive red is reserved for emergencies (not used here).
@@ -40,6 +49,9 @@ import {
   CircleDashed,
   Info,
   GraduationCap,
+  ExternalLink,
+  Lock,
+  Footprints,
 } from 'lucide-react';
 
 import FinderLayout from '@/components/finder/FinderLayout';
@@ -89,6 +101,35 @@ const SectionCard = ({
     </CardHeader>
     <CardContent className="text-sm text-muted-foreground">{children}</CardContent>
   </Card>
+);
+
+/**
+ * Build a search URL for OpenStreetMap from the parts we are allowed to show.
+ * A LINK, never an embed — nothing is requested until the visitor clicks.
+ */
+const osmSearchUrl = (parts: (string | null | undefined)[]): string =>
+  `https://www.openstreetmap.org/search?query=${encodeURIComponent(
+    parts.filter(Boolean).join(', '),
+  )}`;
+
+/**
+ * Decorative stand-in where a map would sit. Pure CSS gradients — no tiles, no
+ * script, no request. aria-hidden: it carries no information.
+ */
+const MapPlaceholder = () => (
+  <div
+    aria-hidden="true"
+    className="relative h-20 overflow-hidden rounded-md border border-border bg-muted/40"
+    style={{
+      backgroundImage:
+        'linear-gradient(to right, hsl(var(--border)) 1px, transparent 1px), linear-gradient(to bottom, hsl(var(--border)) 1px, transparent 1px)',
+      backgroundSize: '18px 18px',
+    }}
+  >
+    <span className="absolute inset-0 flex items-center justify-center">
+      <MapPin className="h-5 w-5 text-primary/60" strokeWidth={1.5} />
+    </span>
+  </div>
 );
 
 /* -------------------------------------------------------------------------- */
@@ -205,6 +246,12 @@ const ProviderProfilePublic = () => {
     ? providerLabel(provider.providerType, t, { capitalize: true })
     : '';
 
+  // The service only ships street/postcode when the provider opted in, so their
+  // mere presence IS the permission — no second UI-level guard to keep in sync.
+  const addressIsPublic =
+    provider?.addressVisibility === 'full' &&
+    Boolean(provider.street || provider.postalCode);
+
   return (
     <FinderLayout>
       {/* Per-provider head. Without this every profile inherits the homepage
@@ -224,7 +271,20 @@ const ProviderProfilePublic = () => {
             jobTitle: providerLabel(provider.providerType, t, { capitalize: true }),
             url: `https://bondable.be/find/${provider.id}`,
             ...(provider.city
-              ? { address: { '@type': 'PostalAddress', addressLocality: provider.city, addressCountry: 'BE' } }
+              ? {
+                  address: {
+                    '@type': 'PostalAddress',
+                    addressLocality: provider.city,
+                    addressCountry: 'BE',
+                    // Street/postcode only when the provider published them.
+                    ...(addressIsPublic && provider.street
+                      ? { streetAddress: provider.street }
+                      : {}),
+                    ...(addressIsPublic && provider.postalCode
+                      ? { postalCode: provider.postalCode }
+                      : {}),
+                  },
+                }
               : {}),
             ...(provider.languages?.length ? { knowsLanguage: provider.languages } : {}),
           }}
@@ -423,6 +483,99 @@ const ProviderProfilePublic = () => {
 
             {/* Sidebar */}
             <div className="space-y-6">
+              {/* Waar — practice location. The full address only ever renders
+                  when the provider chose to publish it; finderService already
+                  withheld street/postcode otherwise, so there is nothing here
+                  to leak. No map embed by design (see file header). */}
+              {(provider.city || addressIsPublic || provider.reachability) && (
+                <Card className="rounded-card border-border shadow-none">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="flex items-center gap-2 text-base font-semibold text-foreground">
+                      <MapPin className="h-4 w-4 text-primary" />
+                      {t('finder_provider_location', 'Waar')}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4 text-sm">
+                    {addressIsPublic ? (
+                      <>
+                        <address className="not-italic leading-relaxed text-foreground">
+                          {provider.street && <div>{provider.street}</div>}
+                          <div>
+                            {[provider.postalCode, provider.city]
+                              .filter(Boolean)
+                              .join(' ')}
+                          </div>
+                        </address>
+                        <MapPlaceholder />
+                      </>
+                    ) : (
+                      <div className="space-y-1.5">
+                        <p className="font-medium text-foreground">
+                          {provider.city ??
+                            t('finder_provider_location_unknown', 'Op afspraak')}
+                        </p>
+                        <p className="flex items-start gap-2 text-xs text-muted-foreground">
+                          <Lock className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+                          <span>
+                            {t(
+                              'finder_provider_address_private',
+                              'Het adres wordt gedeeld na je eerste contact. Veel hulpverleners werken vanuit huis.',
+                            )}
+                          </span>
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Reachability — always safe to show: it says how to get
+                        there, not where someone lives. */}
+                    {provider.reachability && (
+                      <>
+                        <div className="border-t border-border" />
+                        <p className="flex items-start gap-2.5 text-muted-foreground">
+                          <Footprints className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                          <span className="leading-relaxed">
+                            {provider.reachability}
+                          </span>
+                        </p>
+                      </>
+                    )}
+
+                    {/* A LINK, not an embed: nothing is loaded from a third
+                        party until you decide to open it. */}
+                    {addressIsPublic && (
+                      <div className="space-y-1.5">
+                        <Button
+                          asChild
+                          variant="outline"
+                          size="sm"
+                          className="w-full gap-1.5"
+                        >
+                          <a
+                            href={osmSearchUrl([
+                              provider.street,
+                              provider.postalCode,
+                              provider.city,
+                              provider.country,
+                            ])}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            <ExternalLink className="h-3.5 w-3.5" />
+                            {t('finder_provider_show_on_map', 'Toon op kaart')}
+                          </a>
+                        </Button>
+                        <p className="text-center text-xs text-muted-foreground">
+                          {t(
+                            'finder_provider_map_privacy',
+                            'Opent OpenStreetMap in een nieuw tabblad. We laden geen kaart mee op deze pagina, zodat je bezoek privé blijft.',
+                          )}
+                        </p>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
+
               {/* At-a-glance practical info */}
               <Card className="rounded-card border-border shadow-none">
                 <CardHeader className="pb-3">

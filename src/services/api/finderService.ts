@@ -23,6 +23,15 @@ import { recomputeRegulated } from '@/lib/providerTypes';
 
 export type Modality = 'in_person' | 'online' | string;
 
+/**
+ * How much of a provider's practice address may leave this service.
+ * 'city_only' is the safe default: many providers work from home and must never
+ * be forced to publish their street. See toProvider() — when this is not
+ * 'full', street/postalCode are dropped at the mapping boundary, so no caller
+ * (page, dialog, SEO payload, console) can ever see them.
+ */
+export type AddressVisibility = 'full' | 'city_only';
+
 /** A provider as shown in the Finder: provider_profiles joined to its profile. */
 export interface Provider {
   /** = profiles.id = provider_profiles.provider_id */
@@ -46,6 +55,17 @@ export interface Provider {
   hourlyRate: number | null;
   city: string | null;
   country: string | null;
+  /**
+   * Street + house number. ONLY present when addressVisibility === 'full';
+   * null otherwise — stripped in toProvider, never merely hidden in the UI.
+   */
+  street: string | null;
+  /** Postcode. Same rule as `street`: only released on 'full'. */
+  postalCode: string | null;
+  /** Whether this provider publishes their full address or only their city. */
+  addressVisibility: AddressVisibility;
+  /** Free-text reachability note ("5 min van Gent-Sint-Pieters"). Always safe. */
+  reachability: string | null;
   acceptingNewClients: boolean;
   credentials: string | null;
   yearsExperience: number | null;
@@ -131,6 +151,10 @@ export interface UpdateProviderPayload {
   hourlyRate?: number | null;
   city?: string | null;
   country?: string | null;
+  street?: string | null;
+  postalCode?: string | null;
+  addressVisibility?: AddressVisibility;
+  reachability?: string | null;
   acceptingNewClients?: boolean;
   credentials?: string | null;
   yearsExperience?: number | null;
@@ -177,11 +201,28 @@ function fullNameOf(first: unknown, last: unknown): string {
   return name || 'Hulpverlener';
 }
 
+/**
+ * Normalize the stored visibility flag. Anything unrecognised (null, legacy
+ * row, typo, hostile value) falls back to 'city_only' — the private side.
+ */
+function toAddressVisibility(v: unknown): AddressVisibility {
+  return v === 'full' ? 'full' : 'city_only';
+}
+
 /** Merge a provider_profiles row with its profile row into a Provider. */
 function toProvider(pp: Row, profile: Row | null): Provider {
   const providerType = (str(pp, 'provider_type') as ProviderType) ?? null;
   const verificationStatus =
     (str(pp, 'verification_status') as VerificationStatus) ?? null;
+
+  // PRIVACY BY CONSTRUCTION: street/postal_code are dropped HERE, at the
+  // service boundary, whenever the provider has not chosen 'full'. They never
+  // reach a component, a prop, an SEO payload or the devtools — so there is no
+  // UI branch anyone can forget, and no future page can accidentally reveal a
+  // provider's home address by rendering a field it happens to receive.
+  const addressVisibility = toAddressVisibility(pp.address_visibility);
+  const addressIsPublic = addressVisibility === 'full';
+
   return {
     id: String(pp.provider_id ?? ''),
     firstName: profile ? str(profile, 'first_name') : null,
@@ -202,6 +243,10 @@ function toProvider(pp: Row, profile: Row | null): Provider {
     hourlyRate: toNumber(pp.hourly_rate),
     city: str(pp, 'city'),
     country: str(pp, 'country'),
+    street: addressIsPublic ? str(pp, 'street') : null,
+    postalCode: addressIsPublic ? str(pp, 'postal_code') : null,
+    addressVisibility,
+    reachability: str(pp, 'reachability'),
     acceptingNewClients: pp.accepting_new_clients !== false,
     credentials: str(pp, 'credentials'),
     yearsExperience: toNumber(pp.years_experience),
@@ -209,6 +254,23 @@ function toProvider(pp: Row, profile: Row | null): Provider {
     rating: toNumber(pp.rating),
     reviewCount: toNumber(pp.review_count),
     isPublished: pp.is_published !== false,
+  };
+}
+
+/**
+ * Re-attach the provider's OWN street/postal_code to a mapped Provider.
+ *
+ * OWNER-ONLY. toProvider redacts the address for everyone; a provider still has
+ * to be able to see and edit their own, and without this a save from the edit
+ * form would read back an empty street and wipe the stored value. Only ever
+ * call this on a self-read (getOwnProvider / updateProvider) — never on a
+ * listing, a match, or anything rendered to a visitor.
+ */
+function withOwnAddress(provider: Provider, pp: Row): Provider {
+  return {
+    ...provider,
+    street: str(pp, 'street'),
+    postalCode: str(pp, 'postal_code'),
   };
 }
 
@@ -319,6 +381,26 @@ export const finderService = {
     if (!pp) return null;
     const id = typeof pp.provider_id === 'string' ? pp.provider_id : '';
     return toProvider(pp, profilesById.get(id) ?? null);
+  },
+
+  /**
+   * Fetch a provider's OWN row for the self-edit form — identical to
+   * getProvider except the street/postcode are NOT redacted, so a provider who
+   * publishes only their city can still see and edit the address they stored.
+   *
+   * Never use this on a public surface: the caller must already be the
+   * authenticated provider (the edit page passes its own session id).
+   */
+  async getOwnProvider(providerId: string): Promise<Provider | null> {
+    if (!providerId) return null;
+    const [{ data: rows }, profilesById] = await Promise.all([
+      supabase.from('provider_profiles').select('*').eq('provider_id', providerId),
+      loadProfilesById(),
+    ]);
+    const pp = ((rows ?? []) as Row[])[0];
+    if (!pp) return null;
+    const id = typeof pp.provider_id === 'string' ? pp.provider_id : '';
+    return withOwnAddress(toProvider(pp, profilesById.get(id) ?? null), pp);
   },
 
   /**
@@ -482,6 +564,10 @@ export const finderService = {
     set('hourly_rate', payload.hourlyRate);
     set('city', payload.city);
     set('country', payload.country);
+    set('street', payload.street);
+    set('postal_code', payload.postalCode);
+    set('address_visibility', payload.addressVisibility);
+    set('reachability', payload.reachability);
     set('accepting_new_clients', payload.acceptingNewClients);
     set('credentials', payload.credentials);
     set('years_experience', payload.yearsExperience);
@@ -497,9 +583,11 @@ export const finderService = {
     if (error) throw error;
 
     // Merge the echoed/persisted row with the backing profile for name/photo.
+    // This is a self-edit, so the address is returned unredacted — otherwise
+    // the form would read back an empty street and blank it on the next save.
     const profilesById = await loadProfilesById();
     const pp = (data ?? patch) as Row;
-    return toProvider(pp, profilesById.get(providerId) ?? null);
+    return withOwnAddress(toProvider(pp, profilesById.get(providerId) ?? null), pp);
   },
 };
 

@@ -5,13 +5,20 @@
  * preferred modality and date, plus Accept / Decline actions
  * (finderService.respondToRequest).
  *
- * Design: light deep-teal + mint brand TOKENS only (bg-card, text-foreground,
- * border-border, bg-primary). shadcn/ui + lucide-react. New copy via
- * t('key','English default'). Runs on a dev MOCK, so empty / loading / error
- * states are all handled gracefully.
+ * WHAT WAS MISSING: accepting a lead did nothing for the person who wrote it.
+ * Every lead now carries a THREAD (leadThreadService), so this inbox can send a
+ * real answer back — which is the only thing that actually helps the client and
+ * the only thing that stops the 48h clock.
  *
- * REFERRAL-NEUTRAL by design: leads are shown newest-first only — there is no
- * payment-based prioritisation and no "promoted" placement.
+ * The 48h ageing chip is deliberately quiet: it is a nudge for the provider,
+ * never a shaming device, and it never reorders anything (referral-neutral —
+ * leads are newest-first only, no payment-based prioritisation, no "promoted"
+ * placement).
+ *
+ * Design: light deep-teal brand TOKENS only (bg-card, text-foreground,
+ * border-border, bg-primary). MINT IS AI-ONLY and is not used here. shadcn/ui +
+ * lucide-react. New copy via t('key','NL default'). Runs on a dev MOCK, so
+ * empty / loading / error states are all handled gracefully.
  */
 
 import { useCallback, useEffect, useState } from 'react';
@@ -26,6 +33,9 @@ import {
   MapPin,
   Calendar as CalendarIcon,
   Mail,
+  Clock,
+  CornerUpLeft,
+  Send,
 } from 'lucide-react';
 import {
   Card,
@@ -37,11 +47,18 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Textarea } from '@/components/ui/textarea';
 import { useAuthManager } from '@/hooks/api/useAuthManager';
 import {
   finderService,
   type ProviderRequest,
 } from '@/services/api/finderService';
+import {
+  leadThreadService,
+  LEAD_EMAIL_TEMPLATE,
+  LEAD_SLA_MS,
+  type LeadThread,
+} from '@/services/api/leadThreadService';
 
 /* -------------------------------------------------------------------------- */
 /* Helpers                                                                     */
@@ -57,18 +74,51 @@ const initialsOf = (name: string | null): string => {
     .join('');
 };
 
+const HOUR = 60 * 60 * 1000;
+
+/** Hours a lead has been waiting, or null when the date is unusable. */
+const hoursWaiting = (createdAt: string | null): number | null => {
+  if (!createdAt) return null;
+  const ms = Date.now() - new Date(createdAt).getTime();
+  return Number.isFinite(ms) ? Math.max(0, Math.round(ms / HOUR)) : null;
+};
+
 /* -------------------------------------------------------------------------- */
 /* Single lead row                                                             */
 /* -------------------------------------------------------------------------- */
 
 interface LeadCardProps {
   lead: ProviderRequest;
+  /** The two-sided thread for this lead, if one was opened. */
+  thread: LeadThread | null;
   busy: boolean;
   onRespond: (id: string, status: 'accepted' | 'declined') => void;
+  /** Appends a provider message to the thread. Resolves true on success. */
+  onReply: (threadId: string, body: string) => Promise<boolean>;
 }
 
-const LeadCard = ({ lead, busy, onRespond }: LeadCardProps) => {
+const LeadCard = ({ lead, thread, busy, onRespond, onReply }: LeadCardProps) => {
   const { t, i18n } = useTranslation();
+
+  const [replyOpen, setReplyOpen] = useState(false);
+  const [replyText, setReplyText] = useState('');
+  const [replying, setReplying] = useState(false);
+
+  const answered = thread?.messages.some((m) => m.from === 'provider') ?? false;
+  const waited = hoursWaiting(lead.createdAt);
+  const overdue = !answered && waited !== null && waited * HOUR > LEAD_SLA_MS;
+
+  const submitReply = async () => {
+    const body = replyText.trim();
+    if (!thread || !body || replying) return;
+    setReplying(true);
+    const ok = await onReply(thread.id, body);
+    setReplying(false);
+    if (ok) {
+      setReplyText('');
+      setReplyOpen(false);
+    }
+  };
 
   const modalityLabel = (m: string | null): string => {
     if (m === 'online') return t('finder_modality_online', 'Online');
@@ -117,6 +167,20 @@ const LeadCard = ({ lead, busy, onRespond }: LeadCardProps) => {
                   : t('finder_lead_status_declined', 'Afgewezen')}
               </Badge>
             )}
+            {answered && (
+              <Badge variant="success">
+                {t('finder_lead_status_answered', 'Beantwoord')}
+              </Badge>
+            )}
+            {/* Quiet 48h ageing — a nudge, never a ranking signal. */}
+            {!answered && waited !== null && (
+              <Badge variant={overdue ? 'warning' : 'outline'}>
+                <Clock className="mr-1 h-3 w-3" aria-hidden="true" />
+                {overdue
+                  ? t('finder_lead_age_over', 'Meer dan 48 u onbeantwoord')
+                  : t('finder_lead_age', '{{hours}} u onderweg', { hours: waited })}
+              </Badge>
+            )}
           </div>
 
           {/* Meta line: modality + date + email */}
@@ -150,34 +214,129 @@ const LeadCard = ({ lead, busy, onRespond }: LeadCardProps) => {
             </p>
           )}
 
-          {/* Actions (pending only) */}
-          {isPending && (
-            <div className="mt-3 flex items-center gap-2">
+          {/* Everything already said in this thread, so a reply has context. */}
+          {thread && thread.messages.length > 1 && (
+            <ol className="mt-3 space-y-2 border-l border-border pl-3">
+              {thread.messages.slice(1).map((m) => (
+                <li key={m.id}>
+                  <p className="text-xs font-medium text-muted-foreground">
+                    {m.from === 'provider'
+                      ? t('finder_lead_thread_you', 'Jij')
+                      : lead.clientName ??
+                        t('finder_lead_anonymous', 'Nieuwe aanvraag')}
+                  </p>
+                  <p className="whitespace-pre-wrap text-sm leading-relaxed text-foreground/90">
+                    {m.body}
+                  </p>
+                </li>
+              ))}
+            </ol>
+          )}
+
+          {/* Actions */}
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            {isPending && (
+              <>
+                <Button
+                  type="button"
+                  size="sm"
+                  disabled={busy}
+                  onClick={() => onRespond(lead.id, 'accepted')}
+                  className="gap-1.5"
+                >
+                  {busy ? (
+                    <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+                  ) : (
+                    <Check className="h-4 w-4" aria-hidden="true" />
+                  )}
+                  {t('finder_lead_accept', 'Accepteren')}
+                </Button>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  disabled={busy}
+                  onClick={() => onRespond(lead.id, 'declined')}
+                  className="gap-1.5"
+                >
+                  <X className="h-4 w-4" aria-hidden="true" />
+                  {t('finder_lead_decline', 'Afwijzen')}
+                </Button>
+              </>
+            )}
+            {thread && !replyOpen && (
               <Button
                 type="button"
                 size="sm"
-                disabled={busy}
-                onClick={() => onRespond(lead.id, 'accepted')}
+                variant={isPending ? 'ghost' : 'default'}
+                onClick={() => setReplyOpen(true)}
                 className="gap-1.5"
               >
-                {busy ? (
-                  <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
-                ) : (
-                  <Check className="h-4 w-4" aria-hidden="true" />
+                <CornerUpLeft className="h-4 w-4" aria-hidden="true" />
+                {answered
+                  ? t('finder_lead_reply_again', 'Nog iets schrijven')
+                  : t('finder_lead_reply', 'Antwoorden')}
+              </Button>
+            )}
+          </div>
+
+          {/* Reply composer — the thing that actually closes the loop. */}
+          {thread && replyOpen && (
+            <div className="mt-3 rounded-ctl border border-border bg-background p-3">
+              <label
+                htmlFor={`lead-reply-${lead.id}`}
+                className="text-xs font-medium text-muted-foreground"
+              >
+                {t('finder_lead_reply_label', 'Je antwoord')}
+              </label>
+              <Textarea
+                id={`lead-reply-${lead.id}`}
+                value={replyText}
+                onChange={(e) => setReplyText(e.target.value)}
+                rows={3}
+                disabled={replying}
+                placeholder={t(
+                  'finder_lead_reply_ph',
+                  'Bijvoorbeeld: of je plaats hebt, wanneer een eerste gesprek kan, en wat de cliënt mag verwachten.',
                 )}
-                {t('finder_lead_accept', 'Accepteren')}
-              </Button>
-              <Button
-                type="button"
-                size="sm"
-                variant="outline"
-                disabled={busy}
-                onClick={() => onRespond(lead.id, 'declined')}
-                className="gap-1.5"
-              >
-                <X className="h-4 w-4" aria-hidden="true" />
-                {t('finder_lead_decline', 'Afwijzen')}
-              </Button>
+                className="mt-2 resize-none border-border bg-card text-foreground placeholder:text-muted-foreground"
+              />
+              <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
+                <p className="text-xs text-muted-foreground">
+                  {t(
+                    'finder_lead_reply_note',
+                    'Je antwoord verschijnt op de persoonlijke gesprekspagina van de cliënt.',
+                  )}
+                </p>
+                <div className="flex items-center gap-2">
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="ghost"
+                    disabled={replying}
+                    onClick={() => {
+                      setReplyOpen(false);
+                      setReplyText('');
+                    }}
+                  >
+                    {t('finder_lead_reply_cancel', 'Annuleren')}
+                  </Button>
+                  <Button
+                    type="button"
+                    size="sm"
+                    disabled={replying || !replyText.trim()}
+                    onClick={() => void submitReply()}
+                    className="gap-1.5"
+                  >
+                    {replying ? (
+                      <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+                    ) : (
+                      <Send className="h-4 w-4" aria-hidden="true" />
+                    )}
+                    {t('finder_lead_reply_send', 'Antwoord versturen')}
+                  </Button>
+                </div>
+              </div>
             </div>
           )}
         </div>

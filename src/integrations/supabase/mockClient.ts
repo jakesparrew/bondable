@@ -872,6 +872,9 @@ function buildSeed(): Record<string, any[]> {
   // (THERAPIST_ID, regulated) is included alongside the 5 new providers, for a
   // varied directory across specializations / languages / cities / modalities.
   // NB: hourly_rate is shown for transparency only — never a ranking input.
+  // NB: address_visibility decides whether street/postal_code ever leave the
+  // API (finderService strips them on 'city_only'). Two of the six providers
+  // below are 'city_only' so both states are visible in the demo.
   const provider_profiles = [
     {
       provider_id: THERAPIST_ID,
@@ -886,6 +889,10 @@ function buildSeed(): Record<string, any[]> {
       hourly_rate: 75,
       city: 'Leuven',
       country: 'BE',
+      street: 'Naamsestraat 42',
+      postal_code: '3000',
+      address_visibility: 'full',
+      reachability: 'Op 10 minuten wandelen van station Leuven. Betalend parkeren in de Parkstraat.',
       accepting_new_clients: true,
       credentials: 'Master klinische psychologie (KU Leuven), erkend psycholoog',
       years_experience: 12,
@@ -911,6 +918,10 @@ function buildSeed(): Record<string, any[]> {
       hourly_rate: 90,
       city: 'Leuven',
       country: 'BE',
+      street: 'Tiensestraat 128',
+      postal_code: '3000',
+      address_visibility: 'full',
+      reachability: 'Vlak bij bushalte Blauwput. Fietsenstalling voor de deur.',
       accepting_new_clients: true,
       credentials: 'Master klinische psychologie, EFT-gecertificeerd',
       years_experience: 15,
@@ -936,6 +947,10 @@ function buildSeed(): Record<string, any[]> {
       hourly_rate: 80,
       city: 'Gent',
       country: 'BE',
+      street: 'Sint-Pietersnieuwstraat 25',
+      postal_code: '9000',
+      address_visibility: 'full',
+      reachability: '5 minuten van Gent-Sint-Pieters. Tram 1 stopt voor de deur.',
       accepting_new_clients: false,
       credentials: 'Erkend psychotherapeut, EMDR-practitioner',
       years_experience: 10,
@@ -961,6 +976,12 @@ function buildSeed(): Record<string, any[]> {
       hourly_rate: 65,
       city: 'Antwerpen',
       country: 'BE',
+      // Works from home: the street IS stored, but address_visibility keeps it
+      // out of every API response. The finder shows 'Antwerpen' and nothing more.
+      street: 'Lange Leemstraat 187',
+      postal_code: '2018',
+      address_visibility: 'city_only',
+      reachability: 'Sessies gaan online door. Op afspraak kan je ook in Antwerpen langskomen.',
       accepting_new_clients: true,
       credentials: 'Gecertificeerd loopbaan- & stresscoach (geen klinische erkenning)',
       years_experience: 6,
@@ -986,6 +1007,11 @@ function buildSeed(): Record<string, any[]> {
       hourly_rate: 70,
       city: 'Brussel',
       country: 'BE',
+      // Second city_only provider — same privacy path, in-person work.
+      street: 'Louizalaan 231',
+      postal_code: '1050',
+      address_visibility: 'city_only',
+      reachability: 'Vlak bij metro Louiza. Het adres krijg je zodra je afspraak bevestigd is.',
       accepting_new_clients: true,
       credentials: 'ICF-gecertificeerd coach (geen klinische erkenning)',
       years_experience: 8,
@@ -1011,6 +1037,10 @@ function buildSeed(): Record<string, any[]> {
       hourly_rate: 78,
       city: 'Gent',
       country: 'BE',
+      street: 'Vrijdagmarkt 12',
+      postal_code: '9000',
+      address_visibility: 'full',
+      reachability: 'Aan de Vrijdagmarkt. Ondergrondse parking onder het plein.',
       accepting_new_clients: true,
       credentials: 'Master klinische psychologie (UGent), erkend psycholoog',
       years_experience: 9,

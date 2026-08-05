@@ -92,7 +92,14 @@ export type LimitKey = 'activeClients' | 'intakeTemplates';
  */
 export const LIMITS: Record<Tier, Record<LimitKey, number>> = {
   free: {
-    activeClients: 3,
+    // 15, not 3. Three active clients is not a small practice — it is a demo,
+    // and it forces the upgrade decision BEFORE the provider has felt any
+    // value ("I'll have to pay anyway, so why start"). At 15 a starting or
+    // part-time practitioner can run their whole practice for free and
+    // upgrades on GROWTH rather than on frustration. The real paywall sits on
+    // features (invoicing + attesten, outcomes, Bond supervision console,
+    // advanced scheduling), not on the caseload.
+    activeClients: 15,
     intakeTemplates: 1,
   },
   pro: {

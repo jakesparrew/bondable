@@ -598,6 +598,20 @@ export const providerProfiles = pgTable('provider_profiles', {
   hourlyRate: integer('hourly_rate'),
   city: text('city'),
   country: text('country').default('BE'),
+  // --- Practice location (0008_provider_location.sql) ------------------------
+  // street + postal_code are only ever released by the API when
+  // address_visibility = 'full'. Many providers work from home, so the default
+  // is 'city_only' — a row that was never edited can never leak an address.
+  street: text('street'),
+  postalCode: text('postal_code'),
+  // CHECK IN ('full','city_only') — enforced in SQL + at the service boundary.
+  addressVisibility: text('address_visibility').notNull().default('city_only'),
+  // Free text, e.g. '5 min van Gent-Sint-Pieters, parking in de straat'.
+  reachability: text('reachability'),
+  // Reserved for a future distance feature. Nullable and currently UNUSED —
+  // nothing geocodes and no map is embedded (privacy: no third-party call).
+  lat: numeric('lat'),
+  lng: numeric('lng'),
   acceptingNewClients: boolean('accepting_new_clients').notNull().default(true),
   credentials: text('credentials'),
   yearsExperience: integer('years_experience'),

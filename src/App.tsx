@@ -49,6 +49,9 @@ const SignupProvider = lazy(() => import("@/pages/SignupProvider"));
 const Wachttijden = lazy(() => import("./pages/Wachttijden"));
 const WachttijdenStad = lazy(() => import("./pages/WachttijdenStad"));
 const WachtruimtePage = lazy(() => import("./features/wachtruimte/WachtruimtePage"));
+// Tokenised lead conversation — how a provider reaches someone who contacted
+// them without an account (the magic link doubles as their account seed).
+const LeadThread = lazy(() => import("./pages/LeadThread"));
 const Journal = lazy(() => import("./pages/Journal"));
 const Settings = lazy(() => import("./pages/Settings"));
 const Profile = lazy(() => import("./pages/Profile"));
@@ -556,6 +559,9 @@ const App = () => {
                 <Route path="/wachttijden" element={<Wachttijden />} />
                 <Route path="/wachttijden/:stad" element={<WachttijdenStad />} />
                 <Route path="/wachtruimte" element={<WachtruimtePage />} />
+
+                {/* Tokenised, noindex — a lead reads and answers here. */}
+                <Route path="/lead/:token" element={<LeadThread />} />
 
                 <Route path="*" element={<NotFound />} />
               </Routes>

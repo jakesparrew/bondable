@@ -32,7 +32,7 @@ export const UPGRADE_COPY = {
     targetTier: 'pro',
     nl: {
       title: 'Je praktijk groeit',
-      body: 'Je hebt nu 3 actieve cliënten, het maximum in het gratis plan. Met Pro werk je zonder limiet, in dezelfde rustige werkruimte. Je huidige plan blijft gewoon werken.',
+      body: 'Je hebt nu 15 actieve cliënten, het maximum in het gratis plan. Met Pro werk je zonder limiet, in dezelfde rustige werkruimte. Je huidige plan blijft gewoon werken.',
     },
     en: {
       title: 'Your practice is growing',

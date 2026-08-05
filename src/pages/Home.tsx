@@ -424,7 +424,7 @@ const Home = () => {
             </div>
 
             <p className="mt-8 text-body-sm text-muted-foreground">
-              {t('home_prov_pricing_note', 'Gratis tot 3 actieve cliënten.')}{' '}
+              {t('home_prov_pricing_note', 'Gratis tot 15 actieve cliënten.')}{' '}
               <Link
                 to="/pricing"
                 className="font-semibold text-primary underline-offset-4 hover:underline"

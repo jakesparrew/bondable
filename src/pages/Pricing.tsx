@@ -79,7 +79,7 @@ const Pricing = () => {
   const rows: FeatureRow[] = [
     {
       label: t('pricing_row_clients', 'Actieve cliënten begeleiden'),
-      free: { ok: true, note: t('pricing_row_clients_free', 'Tot 3') },
+      free: { ok: true, note: t('pricing_row_clients_free', 'Tot 15') },
       pro: { ok: true, note: t('pricing_row_unlimited', 'Onbeperkt') },
       practice: { ok: true, note: t('pricing_row_unlimited_seat', 'Onbeperkt per zetel') },
     },
@@ -202,7 +202,7 @@ const Pricing = () => {
       <Seo
         path="/pricing"
         title="Prijzen voor hulpverleners"
-        description="Cliënten gebruiken Bondable altijd gratis. Voor hulpverleners: gratis starten met 3 actieve cliënten, Pro aan €39 per maand, of Praktijk aan €29 per zetel. Zichtbaarheid in de finder kun je nooit kopen."
+        description="Cliënten gebruiken Bondable altijd gratis. Voor hulpverleners: gratis starten met 15 actieve cliënten, Pro aan €39 per maand, of Praktijk aan €29 per zetel. Zichtbaarheid in de finder kun je nooit kopen."
       />
       {/* ── Slim top nav (Home-style) ─────────────────────────────────────── */}
       <header className="sticky top-0 z-40 border-b border-border bg-card/80 backdrop-blur supports-[backdrop-filter]:bg-card/60">
@@ -302,7 +302,7 @@ const Pricing = () => {
               name={tierNav('free')}
               price="€0"
               unit={t('pricing_free_unit', 'altijd')}
-              blurb={t('pricing_free_blurb', 'Een volledige praktijk voor wie klein start — tot 3 actieve cliënten.')}
+              blurb={t('pricing_free_blurb', 'Een volledige praktijk voor wie start of deeltijds werkt — tot 15 actieve cliënten.')}
               cta={
                 <Button asChild variant="outline" className="w-full rounded-ctl">
                   <Link to="/signup/provider">{t('pricing_free_cta', 'Gratis beginnen')}</Link>

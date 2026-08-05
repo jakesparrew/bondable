@@ -3,21 +3,27 @@
  *
  * A reassuring, accessible "Aanvraag / Contact" form shared by the directory
  * cards, the public provider profile page, and the match cards. On submit it
- * creates a Finder lead via finderService.createRequest, then shows a success
- * state.
+ *   1. creates the Finder lead (finderService.createRequest),
+ *   2. opens a two-sided lead thread (leadThreadService.createThread) so the
+ *      hulpverlener has somewhere to REPLY and the visitor has somewhere to
+ *      read that reply,
+ *   3. queues the two stub e-mails (provider: new lead / client: confirmation
+ *      with the link) — QUEUES, does not send. See leadThreadService.queueEmail.
  *
- * Two framings of success:
- *   • New visitor (NOT logged in) → lead-gen + "we maken meteen je gratis
- *     Bondable-cliëntaccount aan" so they can connect and start their traject.
- *   • Logged-in client            → skip the account framing, just confirm the
- *     request and point them to their account to follow up.
+ * NO SIGNUP WALL. Someone reaching out on a bad day must not hit a password
+ * form first. Name + e-mail are needed to answer them anyway; that becomes a
+ * link to their thread. A password is offered AFTER sending, optional and
+ * dismissible.
  *
- * Brand: light deep-teal + mint tokens ONLY. Primary deep-teal for CTAs;
- * bg-background/card/muted, text-foreground/muted-foreground, border-border.
- * Mint is reserved for AI surfaces (matching/Bond) — not used here. Destructive
- * red is reserved for emergencies — not used here (only for inline field
- * errors via the destructive token, which is the shadcn convention). All copy
- * via t(key, default); we never edit src/locales/*.json.
+ * HONESTY RULE FOR THIS FILE: e-mail is stubbed in this build, so nothing here
+ * may claim an e-mail arrived or that an account was created. The success state
+ * hands over the actual link and says plainly that no mail goes out yet.
+ *
+ * Brand: light deep-teal tokens only. bg-background/card/muted,
+ * text-foreground/muted-foreground, border-border, rounded-ctl/rounded-card.
+ * MINT IS AI-ONLY (Bond) and is never used on this finder surface. Destructive
+ * red only for inline field errors. All copy via t(key, default); we never edit
+ * src/locales/*.json.
  *
  * Referral-neutral by design: a pure intent-to-contact form. Price is never a
  * reason to pick a provider and there is no "promoted" framing anywhere.
@@ -27,14 +33,20 @@
  */
 
 import { useEffect, useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
+  ArrowRight,
+  Check,
   CheckCircle2,
+  Copy,
+  KeyRound,
+  Link2,
   Loader2,
   Mail,
   MessageSquareHeart,
   ShieldCheck,
-  Sparkles,
+  X as XIcon,
 } from 'lucide-react';
 
 import {
@@ -56,8 +68,13 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useToast } from '@/hooks/ui/use-toast';
-import { useAuth } from '@/hooks/api/useAuthManager';
+import { useAuth, isBypassAvailable } from '@/hooks/api/useAuthManager';
 import { finderService, type Modality, type Provider } from '@/services/api/finderService';
+import {
+  leadThreadService,
+  leadThreadUrl,
+  LEAD_EMAIL_TEMPLATE,
+} from '@/services/api/leadThreadService';
 
 /* -------------------------------------------------------------------------- */
 /* Props                                                                       */
@@ -147,6 +164,11 @@ const RequestProviderDialog = ({
   const [errors, setErrors] = useState<FieldErrors>({});
   const [submitting, setSubmitting] = useState(false);
   const [sent, setSent] = useState(false);
+  /** The magic link to the client's own thread — the thing that replaces mail. */
+  const [threadUrl, setThreadUrl] = useState('');
+  const [copied, setCopied] = useState(false);
+  /** The account offer is post-hoc and dismissible. Never a gate. */
+  const [accountOfferDismissed, setAccountOfferDismissed] = useState(false);
 
   // Reset / seed the form whenever the dialog (re)opens or its inputs change.
   useEffect(() => {
@@ -159,7 +181,31 @@ const RequestProviderDialog = ({
     setErrors({});
     setSubmitting(false);
     setSent(false);
+    setThreadUrl('');
+    setCopied(false);
+    setAccountOfferDismissed(false);
   }, [open, defaultName, defaultEmail, defaultTopic]);
+
+  /** Bond lives behind the client dashboard in demo mode; /wachtruimte otherwise. */
+  const coachHref = isBypassAvailable() ? '/dashboard/client/bond' : '/wachtruimte';
+
+  const copyThreadUrl = async () => {
+    if (!threadUrl) return;
+    try {
+      await navigator.clipboard.writeText(threadUrl);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // Clipboard can be blocked; the link stays visible and selectable.
+      toast({
+        title: t('finder_request_copy_failed', 'Kopiëren lukte niet'),
+        description: t(
+          'finder_request_copy_failed_desc',
+          'Selecteer de link hierboven en kopieer ze zelf.',
+        ),
+      });
+    }
+  };
 
   const validate = (): FieldErrors => {
     const next: FieldErrors = {};
@@ -190,7 +236,7 @@ const RequestProviderDialog = ({
 
     setSubmitting(true);
     try {
-      await finderService.createRequest({
+      const request = await finderService.createRequest({
         providerId: provider.id,
         clientId: user?.id ?? null,
         clientName: name.trim(),
@@ -199,6 +245,43 @@ const RequestProviderDialog = ({
         message: message.trim(),
         preferredModality: modality === 'any' ? undefined : modality,
       });
+
+      // The lead alone is a dead end: without a thread the hulpverlener has
+      // nowhere to answer and the visitor has nowhere to read the answer.
+      const thread = await leadThreadService.createThread({
+        requestId: request.id,
+        providerId: provider.id,
+        providerName: providerName,
+        clientName: name.trim(),
+        clientEmail: email.trim(),
+        topic: topic.trim() || null,
+        message: message.trim(),
+      });
+      const url = leadThreadUrl(thread.token);
+      setThreadUrl(url);
+
+      // STUBS. queueEmail appends to a local outbox and returns — nothing is
+      // sent. The success state below says so out loud.
+      await leadThreadService.queueEmail({
+        to: `provider:${provider.id}`,
+        template: LEAD_EMAIL_TEMPLATE.providerNewLead,
+        vars: {
+          providerName,
+          clientName: name.trim(),
+          topic: topic.trim(),
+          threadId: thread.id,
+        },
+      });
+      await leadThreadService.queueEmail({
+        to: email.trim(),
+        template: LEAD_EMAIL_TEMPLATE.clientConfirmation,
+        vars: {
+          clientName: name.trim(),
+          providerName,
+          threadUrl: url,
+        },
+      });
+
       setSent(true);
       onSubmitted?.();
     } catch (err) {
@@ -221,47 +304,72 @@ const RequestProviderDialog = ({
       <DialogContent className="sm:max-w-lg bg-card border-border max-h-[90vh] overflow-y-auto">
         {sent ? (
           /* ----------------------------- SUCCESS --------------------------- */
-          <div className="text-center py-2">
-            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-primary/10">
-              <CheckCircle2 className="h-7 w-7 text-primary" aria-hidden="true" />
+          /* Honest by construction: it states what happened (a request was
+             filed), what will happen (an answer, usually within 48h), and where
+             it will land (this link). It never claims an e-mail arrived or an
+             account was made, because neither is true in this build. */
+          <div className="py-2">
+            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
+              <CheckCircle2 className="h-6 w-6 text-primary" aria-hidden="true" />
             </div>
 
-            <DialogHeader className="space-y-2">
-              <DialogTitle className="text-center text-foreground">
-                {t('finder_request_success_title', 'Je aanvraag is verstuurd')}
+            <DialogHeader className="space-y-2 text-left">
+              <DialogTitle className="text-foreground">
+                {t('finder_request_success_title', 'Je aanvraag is verstuurd.')}
               </DialogTitle>
-              <DialogDescription className="text-center text-muted-foreground">
-                {isLoggedIn
-                  ? t(
-                      'finder_request_success_desc_client',
-                      'Je aanvraag is verstuurd naar {{provider}}. Je hoort snel iets terug — je kan het verloop volgen in je Bondable-account.',
-                      { provider: providerName },
-                    )
-                  : t(
-                      'finder_request_success_desc_visitor',
-                      'Je aanvraag is verstuurd naar {{provider}}. We maken meteen je gratis Bondable-cliëntaccount aan zodat je kan verbinden en je traject kan starten.',
-                      { provider: providerName },
-                    )}
+              <DialogDescription className="text-muted-foreground">
+                {t(
+                  'finder_request_success_desc',
+                  '{{provider}} antwoordt meestal binnen 48 uur. Het gesprek loopt via Bondable, niet via je mailbox — zo blijft wat je schrijft beschermd en staat alles op één plek.',
+                  { provider: providerName },
+                )}
               </DialogDescription>
             </DialogHeader>
 
-            {/* New-visitor account framing — reassuring, lead-gen forward. */}
-            {!isLoggedIn && (
-              <div className="mt-5 rounded-lg border border-border bg-muted/50 p-4 text-left">
+            {/* The link IS the account, for now. Give it, do not promise it. */}
+            {threadUrl && (
+              <div className="mt-5 rounded-card border border-border bg-muted/40 p-4">
                 <div className="flex items-start gap-3">
-                  <Sparkles className="mt-0.5 h-5 w-5 shrink-0 text-primary" aria-hidden="true" />
-                  <div className="space-y-1">
+                  <Link2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+                  <div className="min-w-0 flex-1">
                     <p className="text-sm font-medium text-foreground">
-                      {t('finder_request_success_account_title', 'Je gratis cliëntaccount')}
-                    </p>
-                    <p className="text-sm text-muted-foreground">
                       {t(
-                        'finder_request_success_account_desc',
-                        'We sturen een uitnodiging naar {{email}}. Activeer je account in één klik om veilig te berichten, sessies te plannen en je traject op te volgen.',
-                        {
-                          email:
-                            email.trim() || t('finder_request_your_email', 'je e-mailadres'),
-                        },
+                        'finder_request_success_link_title',
+                        'Bewaar deze link om het antwoord te lezen',
+                      )}
+                    </p>
+                    <p
+                      className="mt-2 break-all rounded-ctl border border-border bg-background px-3 py-2 text-xs text-muted-foreground"
+                      data-testid="lead-thread-url"
+                    >
+                      {threadUrl}
+                    </p>
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        onClick={() => void copyThreadUrl()}
+                      >
+                        {copied ? (
+                          <Check className="h-4 w-4" aria-hidden="true" />
+                        ) : (
+                          <Copy className="h-4 w-4" aria-hidden="true" />
+                        )}
+                        {copied
+                          ? t('finder_request_success_link_copied', 'Gekopieerd')
+                          : t('finder_request_success_link_copy', 'Link kopiëren')}
+                      </Button>
+                      <Button type="button" size="sm" variant="ghost" asChild>
+                        <a href={threadUrl} target="_blank" rel="noreferrer">
+                          {t('finder_request_success_link_open', 'Gesprek openen')}
+                        </a>
+                      </Button>
+                    </div>
+                    <p className="mt-2 text-xs text-muted-foreground">
+                      {t(
+                        'finder_request_success_link_demo',
+                        'In deze demo vertrekt er nog geen e-mail. Deze link is voorlopig de enige weg terug naar je gesprek.',
                       )}
                     </p>
                   </div>
@@ -269,13 +377,74 @@ const RequestProviderDialog = ({
               </div>
             )}
 
-            <div className="mt-6 flex justify-center">
-              <Button
-                type="button"
-                onClick={() => onOpenChange(false)}
-                className="bg-primary text-primary-foreground hover:bg-primary/90"
-              >
-                {t('finder_request_success_done', 'Klaar')}
+            {/* The highest-value next step is not a form — it is talking today. */}
+            <div className="mt-4 rounded-card border border-border bg-card p-4">
+              <p className="text-sm font-medium text-foreground">
+                {t('finder_request_success_wait_title', 'Liever niet wachten')}
+              </p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                {t(
+                  'finder_request_success_wait_desc',
+                  'Tot je antwoord krijgt, kan je vandaag al terecht bij The Coach. Geen wachtlijst, wanneer het jou past.',
+                )}
+              </p>
+              <Button type="button" className="mt-3 w-full sm:w-auto" asChild>
+                <Link to={coachHref} onClick={() => onOpenChange(false)}>
+                  {t('finder_request_success_wait_cta', 'Praat vandaag met The Coach')}
+                  <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                </Link>
+              </Button>
+            </div>
+
+            {/* Account offer — AFTER sending, optional, dismissible. Never a gate. */}
+            {!isLoggedIn && !accountOfferDismissed && (
+              <div className="relative mt-4 rounded-card border border-dashed border-border bg-card p-4">
+                <button
+                  type="button"
+                  onClick={() => setAccountOfferDismissed(true)}
+                  aria-label={t('finder_request_success_account_dismiss', 'Later')}
+                  className="absolute right-2 top-2 rounded-ctl p-1 text-muted-foreground hover:text-foreground"
+                >
+                  <XIcon className="h-4 w-4" aria-hidden="true" />
+                </button>
+                <div className="flex items-start gap-3 pr-6">
+                  <KeyRound className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+                  <div>
+                    <p className="text-sm font-medium text-foreground">
+                      {t(
+                        'finder_request_success_account_title',
+                        'Wil je je gesprekken bewaren? Kies een wachtwoord',
+                      )}
+                    </p>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      {t(
+                        'finder_request_success_account_desc',
+                        'Dan vind je dit gesprek terug zonder de link, ook op een ander toestel. Het hoeft niet nu.',
+                      )}
+                    </p>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      <Button type="button" size="sm" variant="outline" asChild>
+                        <Link to="/setup-password" onClick={() => onOpenChange(false)}>
+                          {t('finder_request_success_account_cta', 'Wachtwoord kiezen')}
+                        </Link>
+                      </Button>
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => setAccountOfferDismissed(true)}
+                      >
+                        {t('finder_request_success_account_skip', 'Later')}
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <div className="mt-6 flex justify-end">
+              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+                {t('finder_request_success_done', 'Sluiten')}
               </Button>
             </div>
           </div>
@@ -297,11 +466,11 @@ const RequestProviderDialog = ({
                 {isLoggedIn
                   ? t(
                       'finder_request_subtitle_client',
-                      'Stuur een korte aanvraag. We bezorgen ze veilig en je hoort snel iets terug.',
+                      'Stuur een korte aanvraag. Ze komt veilig aan en wordt meestal binnen 48 uur beantwoord.',
                     )
                   : t(
                       'finder_request_subtitle_visitor',
-                      'Stuur een vrijblijvende aanvraag. Geen account nodig om te starten — we helpen je daarna meteen verder.',
+                      'Stuur een vrijblijvende aanvraag. Je hebt geen account nodig — je naam en e-mailadres zijn er alleen om je te kunnen antwoorden.',
                     )}
               </DialogDescription>
             </DialogHeader>
@@ -444,7 +613,7 @@ const RequestProviderDialog = ({
                       )
                     : t(
                         'finder_request_reassure_visitor',
-                        'Vrijblijvend en vertrouwelijk. We maken alleen een gratis cliëntaccount aan om je verder te helpen — geen spam.',
+                        'Vrijblijvend en vertrouwelijk. Na het versturen krijg je een eigen link naar het gesprek. Geen account nodig, geen spam.',
                       )}
                 </p>
               </div>
