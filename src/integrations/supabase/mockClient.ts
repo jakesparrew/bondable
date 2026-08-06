@@ -1132,7 +1132,85 @@ function buildSeed(): Record<string, any[]> {
   };
 }
 
-const SEED = buildSeed();
+/* -------------------------------------------------------------------------- */
+/* Persistence                                                                */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Storage key for the mutated seed. The version suffix is a CACHE BUSTER: bump
+ * it whenever `buildSeed()` changes shape, otherwise returning users keep an
+ * old persisted snapshot and never see the new demo data.
+ */
+const STORE_KEY = 'bondable_mock_db_v1';
+
+/**
+ * The live database. Starts from `buildSeed()`, then gets REPLACED by whatever
+ * was persisted from a previous visit.
+ *
+ * Note this is `let`, not `const`, and that mutations write into it directly.
+ * The mock used to echo insert/update/delete input back to the caller without
+ * ever touching the seed — every "save" in the app reported success and then
+ * vanished on the next refetch. Demo mode is the product surface for everyone
+ * without a backend, so writes have to actually stick.
+ */
+let SEED: Record<string, any[]> = buildSeed();
+
+/** Restore a persisted database, if one exists and is still shape-compatible. */
+function restore(): void {
+  if (typeof localStorage === 'undefined') return;
+  try {
+    const raw = localStorage.getItem(STORE_KEY);
+    if (!raw) return;
+    const parsed = JSON.parse(raw);
+    if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+      // Merge over the fresh seed rather than replacing it: a table added to
+      // buildSeed() since the snapshot was written still shows up.
+      SEED = { ...SEED, ...parsed };
+      // Advance the id counter past anything already persisted, or the next
+      // insert would reuse an id that a restored row is holding.
+      for (const rows of Object.values(SEED)) {
+        if (!Array.isArray(rows)) continue;
+        for (const row of rows) {
+          const m = /^00000000-0000-4000-8000-([0-9a-f]{12})$/.exec(String(row?.id ?? ''));
+          if (m) idCounter = Math.max(idCounter, parseInt(m[1], 16));
+        }
+      }
+    }
+  } catch {
+    // Corrupt or unreadable snapshot — fall back to the pristine seed.
+  }
+}
+
+/**
+ * Persist the database. Throttled to one write per tick so a burst of mutations
+ * serialises once, and silent on failure (private mode, quota) — persistence is
+ * a nicety, never a reason to break a write that already succeeded in memory.
+ */
+let persistQueued = false;
+function persist(): void {
+  if (typeof localStorage === 'undefined' || persistQueued) return;
+  persistQueued = true;
+  queueMicrotask(() => {
+    persistQueued = false;
+    try {
+      localStorage.setItem(STORE_KEY, JSON.stringify(SEED));
+    } catch {
+      // Quota exceeded or storage disabled: keep the in-memory data.
+    }
+  });
+}
+
+restore();
+
+/** Wipe persisted demo data and return to the pristine seed. */
+export function resetMockDatabase(): void {
+  SEED = buildSeed();
+  try {
+    localStorage?.removeItem(STORE_KEY);
+  } catch {
+    /* ignore */
+  }
+}
 
 /* -------------------------------------------------------------------------- */
 /* Chainable, thenable query builder                                          */
@@ -1140,7 +1218,6 @@ const SEED = buildSeed();
 
 class MockQueryBuilder {
   private table: string;
-  private rows: any[];
   private eqFilters: Array<{ column: string; value: any }> = [];
   private inFilters: Array<{ column: string; values: any[] }> = [];
   private isSingle = false;
@@ -1148,47 +1225,40 @@ class MockQueryBuilder {
   private limitCount: number | null = null;
   private rangeBounds: { from: number; to: number } | null = null;
   private orderSpecs: Array<{ column: string; ascending: boolean }> = [];
-  // For insert/update/upsert: data to echo back instead of the seed table.
-  private mutationData: any[] | null = null;
+  /**
+   * A pending write, applied at resolve() time rather than when the verb is
+   * called. It has to be deferred: Supabase chains the filters AFTER the verb
+   * (`.update(vals).eq('id', x)`), so at `update()` time we do not yet know
+   * which rows are targeted.
+   */
+  private mutation: { kind: 'insert' | 'update' | 'upsert' | 'delete'; rows: any[] } | null = null;
   // Raw `select(...)` columns string, used to disambiguate embedded-join aliases
   // (e.g. which fkey a `profiles!...` join targets on relationship rows).
   private selectStr = '';
 
   constructor(table: string) {
     this.table = table;
-    this.rows = Array.isArray(SEED[table]) ? [...SEED[table]] : [];
   }
 
   /* --- mutation methods --- */
 
   insert(rows: any) {
-    const arr = Array.isArray(rows) ? rows : [rows];
-    this.mutationData = arr.map((r) => ({
-      id: r?.id ?? genId(),
-      created_at: r?.created_at ?? NOW_ISO,
-      ...r,
-    }));
+    this.mutation = { kind: 'insert', rows: Array.isArray(rows) ? rows : [rows] };
     return this;
   }
 
   update(vals: any) {
-    // Echo the patched values; in explore mode we don't persist.
-    this.mutationData = [{ id: vals?.id ?? genId(), ...vals }];
+    this.mutation = { kind: 'update', rows: [vals] };
     return this;
   }
 
   upsert(rows: any) {
-    const arr = Array.isArray(rows) ? rows : [rows];
-    this.mutationData = arr.map((r) => ({
-      id: r?.id ?? genId(),
-      created_at: r?.created_at ?? NOW_ISO,
-      ...r,
-    }));
+    this.mutation = { kind: 'upsert', rows: Array.isArray(rows) ? rows : [rows] };
     return this;
   }
 
   delete() {
-    this.mutationData = [];
+    this.mutation = { kind: 'delete', rows: [] };
     return this;
   }
 
@@ -1451,17 +1521,84 @@ class MockQueryBuilder {
     return enriched;
   }
 
-  private resolve(): { data: any; error: null } {
-    // Mutations echo their input rows.
-    if (this.mutationData !== null) {
-      let data: any = this.mutationData;
-      if (this.isSingle || this.isMaybeSingle) {
-        data = data.length > 0 ? data[0] : null;
+  /**
+   * Apply the pending write to the live database and return the affected rows,
+   * mirroring what Supabase hands back from `.insert(...).select()`.
+   */
+  private applyMutation(): any[] {
+    const mutation = this.mutation!;
+    const table: any[] = (SEED[this.table] ??= []);
+
+    switch (mutation.kind) {
+      case 'insert': {
+        const created = mutation.rows.map((r) => ({
+          id: r?.id ?? genId(),
+          created_at: r?.created_at ?? new Date().toISOString(),
+          ...r,
+        }));
+        table.push(...created);
+        return created;
       }
-      return { data, error: null };
+
+      case 'upsert': {
+        const written: any[] = [];
+        for (const r of mutation.rows) {
+          const id = r?.id ?? genId();
+          const existing = table.findIndex((row) => row?.id === id);
+          if (existing >= 0) {
+            Object.assign(table[existing], r, { id });
+            written.push(table[existing]);
+          } else {
+            const row = { id, created_at: r?.created_at ?? new Date().toISOString(), ...r };
+            table.push(row);
+            written.push(row);
+          }
+        }
+        return written;
+      }
+
+      case 'update': {
+        const patch = mutation.rows[0] ?? {};
+        // An unfiltered UPDATE would rewrite the entire table. Real Postgres
+        // allows it; here it is always a bug in the caller, so fall back to the
+        // patch's own id and refuse to touch anything if there is nothing to
+        // target — silently corrupting the demo data is the worse failure.
+        const targets =
+          this.eqFilters.length > 0 || this.inFilters.length > 0
+            ? this.applyFilters(table)
+            : patch?.id != null
+              ? table.filter((row) => row?.id === patch.id)
+              : [];
+        for (const row of targets) Object.assign(row, patch);
+        return targets;
+      }
+
+      case 'delete': {
+        // Same guard as update: never let a filterless delete empty a table.
+        if (this.eqFilters.length === 0 && this.inFilters.length === 0) return [];
+        const doomed = new Set(this.applyFilters(table));
+        const removed = [...doomed];
+        for (let i = table.length - 1; i >= 0; i--) {
+          if (doomed.has(table[i])) table.splice(i, 1);
+        }
+        return removed;
+      }
+    }
+  }
+
+  private resolve(): { data: any; error: null } {
+    if (this.mutation !== null) {
+      const written = this.applyMutation().map((row) => this.attachRelations(row));
+      persist();
+      if (this.isSingle || this.isMaybeSingle) {
+        return { data: written.length > 0 ? written[0] : null, error: null };
+      }
+      return { data: written, error: null };
     }
 
-    let result = this.applyFilters(this.rows);
+    // Read the table LIVE rather than from a constructor snapshot, so a query
+    // built before a write in the same tick still observes that write.
+    let result = this.applyFilters(Array.isArray(SEED[this.table]) ? SEED[this.table] : []);
     result = this.applyOrder(result);
 
     if (this.rangeBounds) {
