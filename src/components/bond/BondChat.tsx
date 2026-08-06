@@ -22,10 +22,12 @@ import MoodRibbon from "./MoodRibbon";
 import {
   bondRespond,
   buildOpening,
+  buildSuggestions,
   DEFAULT_SUGGESTIONS,
   type BondContext,
   type BondMessage,
 } from "./bondEngine";
+import { loadThread, saveThread } from "@/services/bond/conversationStore";
 
 let idCounter = 0;
 const nextId = () => `bond-${Date.now()}-${idCounter++}`;
@@ -156,10 +158,20 @@ const BondChat = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const openedRef = useRef(false);
 
-  // Seed the opening (transparency + continuity) message once context is ready.
+  // Restore the previous thread, or seed the opening (transparency + continuity)
+  // message when there is nothing to restore. Continuity is the point of Bond:
+  // greeting someone as a stranger every reload undoes it.
   useEffect(() => {
     if (openedRef.current) return;
     openedRef.current = true;
+
+    const stored = loadThread();
+    if (stored.length > 0) {
+      setMessages(stored);
+      setSuggestions(buildSuggestions(contextRef.current));
+      return;
+    }
+
     const opening = buildOpening(contextRef.current);
     setMessages([
       {
@@ -172,6 +184,13 @@ const BondChat = () => {
     setSuggestions(opening.suggestions);
     // Intentionally run once on mount; opening copy reads the current context ref.
   }, []);
+
+  // Persist after every change. Skipped until the thread is seeded/restored so
+  // the initial empty state cannot wipe a stored conversation.
+  useEffect(() => {
+    if (!openedRef.current || messages.length === 0) return;
+    saveThread(messages);
+  }, [messages]);
 
   // Auto-scroll to newest message / typing indicator.
   useEffect(() => {
@@ -196,22 +215,54 @@ const BondChat = () => {
     setSuggestions([]);
     setIsTyping(true);
 
-    // Scripted/mockup: bondRespond fakes latency + the scripted reply, and reads
-    // the history for short-term memory so Bond does not repeat itself.
-    void bondRespond(history, contextRef.current).then((reply) => {
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: nextId(),
-          role: "bond",
-          text: reply.text,
-          createdAt: new Date().toISOString(),
-          crisis: reply.crisis,
-        },
-      ]);
-      setSuggestions(reply.suggestions ?? []);
-      setIsTyping(false);
-    });
+    // The reply bubble is created lazily, on the FIRST streamed character. If it
+    // were created up front, a fallback or a crisis answer (neither of which
+    // streams) would briefly render an empty bubble next to the typing dots.
+    const replyId = nextId();
+    let streaming = false;
+
+    const appendDelta = (delta: string) => {
+      if (!streaming) {
+        streaming = true;
+        setIsTyping(false);
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: replyId,
+            role: "bond",
+            text: delta,
+            createdAt: new Date().toISOString(),
+          },
+        ]);
+        return;
+      }
+      setMessages((prev) =>
+        prev.map((m) => (m.id === replyId ? { ...m, text: m.text + delta } : m)),
+      );
+    };
+
+    void bondRespond(history, contextRef.current, { onDelta: appendDelta }).then(
+      (reply) => {
+        setMessages((prev) =>
+          streaming
+            ? // Trust the final text over the accumulated deltas: they should be
+              // identical, and if they ever aren't, the complete answer wins.
+              prev.map((m) => (m.id === replyId ? { ...m, text: reply.text } : m))
+            : [
+                ...prev,
+                {
+                  id: replyId,
+                  role: "bond",
+                  text: reply.text,
+                  createdAt: new Date().toISOString(),
+                  crisis: reply.crisis,
+                },
+              ],
+        );
+        setSuggestions(reply.suggestions ?? []);
+        setIsTyping(false);
+      },
+    );
   };
 
   const handleSuggestion = (text: string) => {

@@ -1,34 +1,27 @@
 /**
- * Bond — scripted response engine with MEMORY (MOCKUP).
+ * Bond — response engine: real model, with a scripted companion behind it.
  * ---------------------------------------------------------------------------
- * There is still NO real LLM here. `bondRespond` matches the client's message
- * against simple intent keywords and returns a warm, brief, non-clinical reply.
+ * `bondRespond` now calls a real LLM through `/api/coach` (server-side key, see
+ * `src/server/coach/handler.ts`) and streams the answer back. The scripted
+ * engine in this file is no longer the product — it is the FALLBACK, and it
+ * still earns its place: when the key is missing, the provider is down, or the
+ * network drops, Bond stays warm and slightly generic instead of showing an
+ * error in the middle of someone's sentence.
  *
- * What changed: Bond no longer starts from zero every time. It receives a
- * BondContext built from REAL data — the last check-in and its themes, an open
- * zorgplan task, days until the next session, the provider's name, the last
- * topic discussed — and it reads the conversation so far so it does not repeat
- * itself. Continuity, not cleverness. A scripted companion that remembers
- * yesterday feels far more alive than a clever one that does not.
+ * The BondContext this file builds is unchanged and now does double duty: it
+ * feeds both the scripted replies and the model's system prompt. It is the
+ * whitelist of everything the model may know — see `src/server/coach/types.ts`.
  *
- * ░░░ SWAP POINT ░░░
- * To wire a real model later, keep this signature and replace the body of
- * `generateScriptedReply` with a network/SDK call, e.g.:
- *
- *   const res = await fetch("/api/bond", {
- *     method: "POST",
- *     body: JSON.stringify({ history, context }),
- *   });
- *   const { text, suggestions } = await res.json();
- *   return { text, suggestions };
- *
- * The crisis check below MUST remain client-side regardless, so distress is
- * caught even if the network/model is unavailable — and memory must NEVER be
- * allowed to soften, delay or skip it. See `bondRespond`.
+ * ░░░ THE ONE RULE ░░░
+ * The crisis check stays client-side and runs BEFORE any network call, so
+ * distress is caught even when the model is unreachable, and it can never be
+ * softened, delayed or missed by a model that read the room wrong. Memory,
+ * context and the model must NEVER be allowed to skip it. See `bondRespond`.
  * ---------------------------------------------------------------------------
  */
 
 import i18n from "@/i18n";
+import { streamCoachReply } from "@/services/api/coachClient";
 
 export type BondRole = "bond" | "user";
 
@@ -802,6 +795,12 @@ const generateScriptedReply = (
 /** Simulated "thinking" latency so the typing indicator feels real. */
 const simulatedDelay = (): number => 600 + Math.floor(Math.random() * 600); // 600–1200ms
 
+export interface BondRespondOptions {
+  /** Streams model text as it arrives. Never called on the scripted path. */
+  onDelta?: (delta: string) => void;
+  signal?: AbortSignal;
+}
+
 /**
  * Generate Bond's next reply.
  *
@@ -809,23 +808,62 @@ const simulatedDelay = (): number => 600 + Math.floor(Math.random() * 600); // 6
  *                latest user turn AND for short-term memory (what Bond already
  *                said, what the previous turn was about).
  * @param context Continuity context built from real data — see BondContext.
+ * @param options Streaming callback + cancellation.
  *
- * NOTE: scripted/mockup. See "SWAP POINT" at the top of this file.
+ * Three layers, in this order and never any other:
+ *
+ *  1. CRISIS — deterministic, client-side, before any network call. Distress is
+ *     caught even when the model is unreachable, and it can never be softened,
+ *     delayed or missed by a model that read the room wrong. This is the whole
+ *     reason the check does not live in the prompt.
+ *  2. MODEL — the real Bond, via `/api/coach` (no key in the browser).
+ *  3. SCRIPTED — the original companion, unchanged, as the fallback. Bond
+ *     staying warm and slightly generic beats Bond showing an error, so a
+ *     missing key or a dead provider degrades instead of failing.
  */
 export const bondRespond = async (
   history: BondMessage[],
   context: BondContext = {},
+  options: BondRespondOptions = {},
 ): Promise<BondReply> => {
   const lastUser = [...history].reverse().find((m) => m.role === "user");
   const lastUserText = lastUser?.text ?? "";
   const memory = buildShortTermMemory(history);
 
-  // Artificial latency to mimic a real model round-trip + typing indicator.
-  // Crisis is exempt: help must never wait behind a cosmetic delay.
-  if (!isCrisisMessage(lastUserText)) {
-    await new Promise((resolve) => setTimeout(resolve, simulatedDelay()));
+  /* --- 1. Crisis: unconditional, offline, ahead of everything else. --- */
+  if (isCrisisMessage(lastUserText)) {
+    return generateScriptedReply(lastUserText, context, memory);
   }
 
+  /* --- 2. The real model. --- */
+  const result = await streamCoachReply({
+    history: history.map((m) => ({
+      role: m.role === "user" ? ("user" as const) : ("bond" as const),
+      text: m.text,
+    })),
+    context,
+    onDelta: options.onDelta,
+    signal: options.signal,
+  });
+
+  if (!result.failure) {
+    return { text: result.text, suggestions: buildSuggestions(context) };
+  }
+
+  /* --- 3. Scripted fallback. --- */
+  if (result.failure === "rate_limited") {
+    return {
+      text: i18n.t(
+        "bond_rate_limited",
+        "Even te snel achter elkaar. Geef me een momentje, dan pak ik het weer op.",
+      ),
+      suggestions: buildSuggestions(context),
+    };
+  }
+
+  // Keep the cosmetic delay ONLY here: without a real round-trip the scripted
+  // reply would otherwise land instantly and give the fallback away.
+  await new Promise((resolve) => setTimeout(resolve, simulatedDelay()));
   return generateScriptedReply(lastUserText, context, memory);
 };
 
