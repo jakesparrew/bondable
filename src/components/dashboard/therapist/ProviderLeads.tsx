@@ -95,9 +95,22 @@ interface LeadCardProps {
   onRespond: (id: string, status: 'accepted' | 'declined') => void;
   /** Appends a provider message to the thread. Resolves true on success. */
   onReply: (threadId: string, body: string) => Promise<boolean>;
+  /**
+   * False for threads whose backing request row is gone (the mock
+   * provider_requests table is in-memory and empties on reload). Answering the
+   * person still works; accept/decline has nothing to write to.
+   */
+  canRespond?: boolean;
 }
 
-const LeadCard = ({ lead, thread, busy, onRespond, onReply }: LeadCardProps) => {
+const LeadCard = ({
+  lead,
+  thread,
+  busy,
+  onRespond,
+  onReply,
+  canRespond = true,
+}: LeadCardProps) => {
   const { t, i18n } = useTranslation();
 
   const [replyOpen, setReplyOpen] = useState(false);
@@ -235,7 +248,7 @@ const LeadCard = ({ lead, thread, busy, onRespond, onReply }: LeadCardProps) => 
 
           {/* Actions */}
           <div className="mt-3 flex flex-wrap items-center gap-2">
-            {isPending && (
+            {isPending && canRespond && (
               <>
                 <Button
                   type="button"
@@ -268,7 +281,7 @@ const LeadCard = ({ lead, thread, busy, onRespond, onReply }: LeadCardProps) => 
               <Button
                 type="button"
                 size="sm"
-                variant={isPending ? 'ghost' : 'default'}
+                variant={isPending && canRespond ? 'ghost' : 'default'}
                 onClick={() => setReplyOpen(true)}
                 className="gap-1.5"
               >
@@ -360,6 +373,8 @@ const ProviderLeads = ({ limit }: ProviderLeadsProps) => {
   const providerId = user?.id ?? '';
 
   const [leads, setLeads] = useState<ProviderRequest[]>([]);
+  /** Threads keyed by the finder request id they belong to. */
+  const [threads, setThreads] = useState<Record<string, LeadThread>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [busyId, setBusyId] = useState<string | null>(null);
@@ -372,8 +387,14 @@ const ProviderLeads = ({ limit }: ProviderLeadsProps) => {
     setLoading(true);
     setError(false);
     try {
-      const data = await finderService.listRequestsForProvider(providerId);
+      const [data, threadList] = await Promise.all([
+        finderService.listRequestsForProvider(providerId),
+        leadThreadService.listForProvider(providerId),
+      ]);
       setLeads(data);
+      setThreads(
+        Object.fromEntries(threadList.map((th) => [th.requestId, th])),
+      );
     } catch {
       setError(true);
     } finally {
@@ -401,18 +422,20 @@ const ProviderLeads = ({ limit }: ProviderLeadsProps) => {
       try {
         await finderService.respondToRequest(id, status);
         if (status === 'accepted') {
+          // HONEST: accepting only marks the lead. Nothing reaches the client
+          // until you write to them, so the toast asks for exactly that.
           toast.success(
-            t('finder_lead_accepted_toast', 'Cliënt verbonden'),
+            t('finder_lead_accepted_toast', 'Aanvraag geaccepteerd'),
             {
               description: lead?.clientName
                 ? t(
                     'finder_lead_accepted_desc_named',
-                    '{{name}} is op de hoogte gebracht. Je kunt nu een eerste afspraak plannen.',
+                    '{{name}} weet dit pas als je antwoordt. Schrijf een kort bericht met wat mogelijk is.',
                     { name: lead.clientName },
                   )
                 : t(
                     'finder_lead_accepted_desc',
-                    'De cliënt is op de hoogte gebracht. Je kunt nu een eerste afspraak plannen.',
+                    'De cliënt weet dit pas als je antwoordt. Schrijf een kort bericht met wat mogelijk is.',
                   ),
             },
           );
@@ -446,7 +469,85 @@ const ProviderLeads = ({ limit }: ProviderLeadsProps) => {
     [leads, t],
   );
 
-  const pending = leads.filter((l) => l.status === 'pending');
+  const handleReply = useCallback(
+    async (threadId: string, body: string): Promise<boolean> => {
+      try {
+        const next = await leadThreadService.addMessage(threadId, 'provider', body);
+        if (!next) return false;
+        setThreads((cur) => ({ ...cur, [next.requestId]: next }));
+        // STUB — queueEmail only appends to the local outbox. The message is
+        // already live on the client's thread page; the mail is the nice-to-have.
+        await leadThreadService.queueEmail({
+          to: next.clientEmail,
+          template: LEAD_EMAIL_TEMPLATE.clientReply,
+          vars: {
+            clientName: next.clientName,
+            providerName: next.providerName,
+            threadId: next.id,
+          },
+        });
+        toast.success(t('finder_lead_reply_sent', 'Je antwoord staat klaar'), {
+          description: t(
+            'finder_lead_reply_sent_desc',
+            '{{name}} leest het op de gesprekspagina. Er vertrekt in deze demo nog geen e-mail.',
+            { name: next.clientName },
+          ),
+        });
+        return true;
+      } catch {
+        toast.error(t('finder_lead_error_toast', 'Er ging iets mis'), {
+          description: t(
+            'finder_lead_reply_error_desc',
+            'Je antwoord kon niet worden toegevoegd. Probeer het opnieuw.',
+          ),
+        });
+        return false;
+      }
+    },
+    [t],
+  );
+
+  /**
+   * Accepted leads whose client is still waiting for a first word. Without this
+   * section an accepted lead would drop out of the inbox unanswered — the exact
+   * dead end this whole path exists to remove.
+   */
+  const awaitingReply = leads.filter(
+    (l) =>
+      l.status === 'accepted' &&
+      threads[l.id] &&
+      !threads[l.id].messages.some((m) => m.from === 'provider'),
+  );
+
+  /**
+   * Threads whose backing request row is gone. The mock provider_requests table
+   * lives in memory and empties on reload, while threads persist — without this
+   * a client who wrote yesterday would silently vanish from the inbox. Rendered
+   * read-only from the thread itself; accept/decline is not offered because
+   * there is no row to write to.
+   */
+  const knownRequestIds = new Set(leads.map((l) => l.id));
+  const orphanThreads = Object.values(threads).filter(
+    (th) => !knownRequestIds.has(th.requestId),
+  );
+  const orphanLeads: ProviderRequest[] = orphanThreads.map((th) => ({
+    id: th.requestId,
+    providerId: th.providerId,
+    clientId: null,
+    clientName: th.clientName,
+    clientEmail: th.clientEmail,
+    topic: th.topic,
+    message: th.messages[0]?.body ?? null,
+    preferredModality: null,
+    status: 'pending',
+    createdAt: th.createdAt,
+    respondedAt: null,
+  }));
+
+  const pending = [...leads.filter((l) => l.status === 'pending'), ...orphanLeads].sort(
+    (a, b) =>
+      new Date(b.createdAt ?? 0).getTime() - new Date(a.createdAt ?? 0).getTime(),
+  );
   const visible = typeof limit === 'number' ? pending.slice(0, limit) : pending;
   const hiddenCount = pending.length - visible.length;
 
@@ -471,7 +572,7 @@ const ProviderLeads = ({ limit }: ProviderLeadsProps) => {
         <CardDescription>
           {t(
             'finder_leads_subtitle',
-            'Aanvragen via de Bondable Finder. Geaccepteerd = cliënt verbonden.',
+            'Aanvragen via de Bondable Finder. Een antwoord binnen 48 uur is wat we cliënten beloven.',
           )}
         </CardDescription>
       </CardHeader>
@@ -520,7 +621,7 @@ const ProviderLeads = ({ limit }: ProviderLeadsProps) => {
         )}
 
         {/* Empty */}
-        {!loading && !error && pending.length === 0 && (
+        {!loading && !error && pending.length === 0 && awaitingReply.length === 0 && (
           <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border bg-muted/30 px-6 py-10 text-center">
             <span className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-secondary text-primary">
               <Inbox className="h-6 w-6" aria-hidden="true" />
@@ -545,8 +646,11 @@ const ProviderLeads = ({ limit }: ProviderLeadsProps) => {
                 <LeadCard
                   key={lead.id}
                   lead={lead}
+                  thread={threads[lead.id] ?? null}
                   busy={busyId === lead.id}
                   onRespond={handleRespond}
+                  onReply={handleReply}
+                  canRespond={knownRequestIds.has(lead.id)}
                 />
               ))}
             </ul>
@@ -560,6 +664,30 @@ const ProviderLeads = ({ limit }: ProviderLeadsProps) => {
               </p>
             )}
           </>
+        )}
+
+        {/* Accepted, but the client has not heard a word yet. */}
+        {!loading && !error && awaitingReply.length > 0 && (
+          <div className={pending.length > 0 ? 'mt-6' : ''}>
+            <p className="mb-2 text-xs font-medium text-muted-foreground">
+              {t(
+                'finder_leads_awaiting_title',
+                'Geaccepteerd, nog geen antwoord geschreven',
+              )}
+            </p>
+            <ul className="space-y-3">
+              {awaitingReply.map((lead) => (
+                <LeadCard
+                  key={lead.id}
+                  lead={lead}
+                  thread={threads[lead.id] ?? null}
+                  busy={busyId === lead.id}
+                  onRespond={handleRespond}
+                  onReply={handleReply}
+                />
+              ))}
+            </ul>
+          </div>
         )}
       </CardContent>
     </Card>
