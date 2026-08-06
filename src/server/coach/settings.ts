@@ -35,9 +35,15 @@ export interface BondSettings {
   modelEnabled: boolean;
 }
 
-/** Last-resort defaults. Deliberately conservative on cost. */
+/**
+ * Last-resort defaults, used when there is neither a settings row nor an env
+ * var — a fresh deploy, or a database that is briefly unreachable.
+ *
+ * Sonnet 5 rather than 4.6: it is the current generation AND cheaper
+ * ($2/$10 per 1M vs $3/$15), so there is no tradeoff to weigh here.
+ */
 const FALLBACK: BondSettings = {
-  model: 'anthropic/claude-sonnet-4.6',
+  model: 'anthropic/claude-sonnet-5',
   maxOutputTokens: 700,
   dailyMessageCap: 60,
   toneInstructions: '',
