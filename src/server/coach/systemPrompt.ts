@@ -134,8 +134,19 @@ Gebruik het om verder te gaan waar het gebleven was, niet om te laten zien wat j
  * per-user context and rolling summary come last where they cost nothing to
  * invalidate.
  */
-export function buildSystemPrompt(context?: CoachContext, summary?: string): string {
+export function buildSystemPrompt(
+  context?: CoachContext,
+  summary?: string,
+  toneInstructions?: string,
+): string {
   const parts = [CORE, CONTEXT_RULES];
+
+  // Operator tone guidance from the admin console. Appended AFTER the core so
+  // it can shape voice and emphasis but cannot argue Bond out of the
+  // boundaries above — those are stated as absolutes and come first.
+  if (toneInstructions && toneInstructions.trim()) {
+    parts.push(`EXTRA AANWIJZINGEN VAN DE BEHEERDER\n${toneInstructions.trim()}`);
+  }
 
   const rendered = renderContext(context);
   if (rendered) {

@@ -17,6 +17,8 @@
  * `streamFromGateway` for `@anthropic-ai/sdk`; nothing else here changes.
  */
 
+import { priceFor } from './catalogue';
+import { loadSettings, type BondSettings } from './settings';
 import { buildSystemPrompt } from './systemPrompt';
 import {
   MAX_HISTORY_TURNS,
@@ -25,6 +27,7 @@ import {
   type CoachRequest,
   type CoachTurn,
 } from './types';
+import { hashUserKey, messagesLast24h, recordUsage } from './usage';
 
 /**
  * OpenAI-compatible chat-completions endpoint. Overridable via
@@ -35,14 +38,12 @@ import {
 const GATEWAY_URL =
   process.env.COACH_GATEWAY_URL || 'https://ai-gateway.vercel.sh/v1/chat/completions';
 
-/**
- * Model slug on the Gateway (`creator/model`). Override with `COACH_MODEL`
- * without touching code — Gateway slugs move faster than releases do.
+/*
+ * Model, output ceiling and daily cap are no longer constants here — they are
+ * operator settings (see `settings.ts`), editable from the admin console and
+ * enforced server-side, because a cost control the browser can set is not a
+ * control.
  */
-const DEFAULT_MODEL = 'anthropic/claude-opus-5';
-
-/** Bond answers in a few sentences. This is a safety ceiling, not a target. */
-const MAX_OUTPUT_TOKENS = 700;
 
 /* -------------------------------------------------------------------------- */
 /* Rate limiting                                                              */
@@ -189,11 +190,13 @@ function jsonError(status: number, code: string, message: string): Response {
  */
 async function streamFromGateway(
   apiKey: string,
-  model: string,
+  settings: BondSettings,
   system: string,
   history: CoachTurn[],
+  userKey: string,
   signal: AbortSignal,
 ): Promise<Response> {
+  const model = settings.model;
   const upstream = await fetch(GATEWAY_URL, {
     method: 'POST',
     signal,
@@ -204,7 +207,10 @@ async function streamFromGateway(
     body: JSON.stringify({
       model,
       stream: true,
-      max_tokens: MAX_OUTPUT_TOKENS,
+      // Ask for token counts on the final frame so spend is recorded from what
+      // was actually billed, rather than estimated from character counts.
+      stream_options: { include_usage: true },
+      max_tokens: settings.maxOutputTokens,
       messages: [
         { role: 'system', content: system },
         ...history.map((turn) => ({
@@ -269,6 +275,9 @@ async function streamFromGateway(
    * close and cancel for us, so a frame that produces no output is simply a
    * frame that produces no output.
    */
+  let inputTokens = 0;
+  let outputTokens = 0;
+
   const parseSse = new TransformStream<Uint8Array, Uint8Array>({
     transform(chunk, controller) {
       buffer += decoder.decode(chunk, { stream: true });
@@ -286,10 +295,39 @@ async function streamFromGateway(
           if (typeof delta === 'string' && delta) {
             controller.enqueue(encoder.encode(delta));
           }
+          // The usage frame arrives last and carries no choices.
+          const usage = parsed?.usage;
+          if (usage) {
+            inputTokens = Number(usage.prompt_tokens) || inputTokens;
+            outputTokens = Number(usage.completion_tokens) || outputTokens;
+          }
         } catch {
           // A malformed frame is not worth killing a live answer over.
         }
       }
+    },
+
+    /**
+     * Record spend once the answer is complete.
+     *
+     * Not awaited: the reader is waiting on this to close the response, and a
+     * slow analytics write must not hold the last token of someone's reply.
+     */
+    flush() {
+      void (async () => {
+        const price = await priceFor(apiKey, model).catch(() => null);
+        const costUsd = price
+          ? inputTokens * price.inputPerToken + outputTokens * price.outputPerToken
+          : 0;
+        await recordUsage({
+          userKey,
+          model,
+          inputTokens,
+          outputTokens,
+          costUsd,
+          ok: true,
+        });
+      })();
     },
   });
 
@@ -340,11 +378,36 @@ export async function handleCoach(request: Request): Promise<Response> {
     return jsonError(400, 'empty_history', 'Geen bericht om op te antwoorden.');
   }
 
-  const system = buildSystemPrompt(sanitizeContext(body.context), str(body.summary, 2000));
-  const model = process.env.COACH_MODEL || DEFAULT_MODEL;
+  const settings = await loadSettings();
+
+  // Operator kill switch. 503 rather than an error page: the client treats it
+  // exactly like a missing key and falls back to the scripted companion, so
+  // turning the model off degrades Bond instead of breaking it.
+  if (!settings.modelEnabled) {
+    return jsonError(503, 'model_disabled', 'Bond draait tijdelijk zonder AI-model.');
+  }
+
+  const userKey = await hashUserKey(ip);
+
+  if (settings.dailyMessageCap > 0) {
+    const used = await messagesLast24h(userKey);
+    if (used >= settings.dailyMessageCap) {
+      return jsonError(
+        429,
+        'daily_cap',
+        'Je hebt je dagelijkse aantal Bond-berichten bereikt.',
+      );
+    }
+  }
+
+  const system = buildSystemPrompt(
+    sanitizeContext(body.context),
+    str(body.summary, 2000),
+    settings.toneInstructions,
+  );
 
   try {
-    return await streamFromGateway(apiKey, model, system, history, request.signal);
+    return await streamFromGateway(apiKey, settings, system, history, userKey, request.signal);
   } catch (error) {
     console.error('[coach] unexpected failure', error);
     return jsonError(502, 'gateway_error', 'De AI-dienst was niet bereikbaar.');

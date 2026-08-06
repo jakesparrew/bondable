@@ -72,6 +72,7 @@ const VerificationQueue = lazy(() => import("./pages/admin/VerificationQueue"));
 const RevenueOps = lazy(() => import("./pages/admin/RevenueOps"));
 const FeatureFlags = lazy(() => import("./pages/admin/FeatureFlags"));
 const GdprQueue = lazy(() => import("./pages/admin/GdprQueue"));
+const BondSettings = lazy(() => import("./pages/admin/BondSettings"));
 const IntakeTemplates = lazy(() => import("@/pages/IntakeTemplates"));
 const IntakeTemplateBuilder = lazy(() => import("@/pages/IntakeTemplateBuilder"));
 const ClientIntake = lazy(() => import("@/pages/ClientIntake"));
@@ -453,6 +454,15 @@ const App = () => {
                     </RouteProtection>
                   }
                 />
+                <Route
+                    path="/dashboard/admin/bond"
+                    element={
+                      <RouteProtection requiredUserType="admin" isAdminRoute={true}>
+                        <BondSettings />
+                      </RouteProtection>
+                    }
+                  />
+
                 <Route
                   path="/dashboard/admin/gdpr"
                   element={

@@ -19,16 +19,18 @@ is aan de codekant al voorbereid.
 | # | Nodig | Waarvoor | Wat er dan aan gaat |
 |---|-------|----------|---------------------|
 | B1 | **Resend API-key + geverifieerd verzenddomein** (bv. `mail.bondable.be`, met SPF/DKIM/DMARC) | Alle e-mail | 27 klaarstaande templates (`src/emails/messageMap.ts`), cliënt-invite, lead-antwoord + magic link, sessieherinneringen, staf/manager-onboarding, trial-mails, weekdigest |
-| B2 | **Neon Postgres** (productie-connectiestring, EU-regio) | Echte database | Drizzle-schema staat klaar (`src/server/db/schema.ts` + `drizzle/*.sql`); data blijft dan bestaan tussen browsers/gebruikers |
+| ~~B2~~ | ~~**Neon Postgres**~~ — **GEDAAN.** DB draait (EU, `eu-central-1`), 23 tabellen gemigreerd, `ai_settings` + `coach_usage` in gebruik door Bond. De rest van de app draait nog op de mock-adapter; die omzetting is het echte resterende werk. |
 | B3 | **Vercel-project** (of bevestiging van het bestaande) | API-laag + deploy | Serverless `/api`-routes i.p.v. de mock-adapter |
 | B4 | **Stripe live keys** (+ btw-instellingen BE) | Abonnementen | Pro €39 / Praktijk €29-per-zetel, 14-daagse trial, facturatie, klantportaal |
-| B5 | **Anthropic API-key** (+ zero-retention/DPA bevestigd) | Bond als echte AI | Vandaag is Bond scripted; hiermee wordt het een echte, gesuperviseerde AI met crisis-prefilter en auditlog |
+| ~~B5~~ | ~~**Anthropic API-key**~~ — **GEDAAN via Vercel AI Gateway.** Bond draait op een echt model (`anthropic/claude-sonnet-4.6`), streaming, key server-side. Resteert: DPA/verwerkersovereenkomst met Vercel + de modelaanbieder, en bevestiging van de verwerkingsregio (art. 9-data). |
 | B6 | **Eigen analytics-property** (Plausible/Matomo EU, of eigen GA) | Cijfers | Er stond een geërfde Google Analytics-ID in `index.html` die data naar de vórige ontwikkelaar stuurde én zonder toestemming laadde — verwijderd. `analyticsService` is consent-aware en staat standaard uit |
+| B8 | **Echte auth voor `/api/coach` en `/api/coach-admin`** | Bond publiek zetten | Vandaag: rate limiting per IP + een gedeeld `COACH_ADMIN_TOKEN`. Dat is géén identiteit — niet per persoon intrekbaar, niet auditbaar, en de chat-endpoint is onbeschermd factureerbaar. Moet een rolcheck op de ingelogde superadmin worden vóór publieke deploy. |
+| B9 | **DPA + verwerkingsregio** voor Vercel AI Gateway en de modelaanbieder | Bond met echte cliëntdata | Art. 9-data loopt nu langs de gateway. Nodig vóór echte cliënten, niet vóór verder bouwen. |
 | B7 | **Juridische review** (advocaat/DPO) | Live gaan met echte cliënten | Zie `docs/plan/09-compliance-gate.md`: consent-teksten, bewaartermijn-matrix (art. 9 + Belgische patiëntendossierregels), DPA's, DPIA |
 
-> **Volgorde-advies:** B2 + B3 eerst (fundament), dan B1 (e-mail maakt het
-> product pas rond), dan B4 (geld), dan B5 (Bond live). B7 blokkeert alleen de
-> échte launch met echte cliënten, niet de bouw.
+> **Volgorde-advies:** B8 eerst (de endpoints staan open), dan B3 + de mock→Neon-omzetting,
+> dan B1 (e-mail maakt het product rond), dan B4 (geld). B7 en B9 blokkeren alleen
+> de échte launch met echte cliënten, niet de bouw.
 
 ---
 

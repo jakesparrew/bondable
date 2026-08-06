@@ -28,14 +28,23 @@ function apiDevServer(mode: string): Plugin {
         if (!(key in process.env)) process.env[key] = value;
       }
 
+      const ROUTES: Record<string, { module: string; fn: string }> = {
+        '/api/coach': { module: '/src/server/coach/handler.ts', fn: 'handleCoach' },
+        '/api/coach-admin': {
+          module: '/src/server/coach/adminHandler.ts',
+          fn: 'handleCoachAdmin',
+        },
+      };
+
       server.middlewares.use(async (req, res, next) => {
         const url = req.url ?? '';
-        if (!url.startsWith('/api/coach')) return next();
+        const path = url.split('?')[0];
+        const route = ROUTES[path];
+        if (!route) return next();
 
         try {
-          const { handleCoach } = await server.ssrLoadModule(
-            '/src/server/coach/handler.ts',
-          );
+          const mod = await server.ssrLoadModule(route.module);
+          const handle = mod[route.fn] as (r: Request) => Promise<Response>;
 
           const chunks: Buffer[] = [];
           for await (const chunk of req) chunks.push(chunk as Buffer);
@@ -46,7 +55,7 @@ function apiDevServer(mode: string): Plugin {
             body: chunks.length > 0 ? Buffer.concat(chunks) : undefined,
           });
 
-          const response: Response = await handleCoach(request);
+          const response: Response = await handle(request);
 
           res.statusCode = response.status;
           response.headers.forEach((value, key) => res.setHeader(key, value));
