@@ -15,10 +15,10 @@ interface BondMessageBubbleProps {
  * replies render the static CrisisResources card inline, beneath the bubble.
  */
 const BondMessageBubble = ({ message }: BondMessageBubbleProps) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const isBond = message.role === "bond";
 
-  const time = new Date(message.createdAt).toLocaleTimeString(undefined, {
+  const time = new Date(message.createdAt).toLocaleTimeString(i18n.language || "nl-BE", {
     hour: "2-digit",
     minute: "2-digit",
   });
@@ -62,7 +62,7 @@ const BondMessageBubble = ({ message }: BondMessageBubbleProps) => {
           )}
         >
           <span className="sr-only">
-            {isBond ? t("bond_sender", "Bond") : t("bond_you", "You")}
+            {isBond ? t("bond_sender", "Bond") : t("bond_you", "Jij")}
             {", "}
           </span>
           {time}

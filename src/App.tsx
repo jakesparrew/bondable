@@ -73,6 +73,7 @@ const RevenueOps = lazy(() => import("./pages/admin/RevenueOps"));
 const FeatureFlags = lazy(() => import("./pages/admin/FeatureFlags"));
 const GdprQueue = lazy(() => import("./pages/admin/GdprQueue"));
 const BondSettings = lazy(() => import("./pages/admin/BondSettings"));
+const Coach = lazy(() => import("./pages/Coach"));
 const IntakeTemplates = lazy(() => import("@/pages/IntakeTemplates"));
 const IntakeTemplateBuilder = lazy(() => import("@/pages/IntakeTemplateBuilder"));
 const ClientIntake = lazy(() => import("@/pages/ClientIntake"));
@@ -189,6 +190,8 @@ const App = () => {
 
                 {/* Login route - no protection needed */}
                 <Route path="/login" element={<Login />} />
+                {/* Public, no account: the anonymous Coach funnel. */}
+                <Route path="/coach" element={<Coach />} />
 
                 {/* Setup Password route - no protection needed */}
                 <Route path="/setup-password" element={<SetupPassword />} />

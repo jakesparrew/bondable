@@ -57,12 +57,23 @@ const Home = () => {
     window.location.assign(path ?? `/dashboard/${role}`);
   };
 
-  /** "The Coach" — drop straight into the supervised AI chat (Bond). */
+  /**
+   * "The Coach" — the hero CTA, and the top of the acquisition funnel.
+   *
+   * This used to send visitors to /login in production: the single most
+   * important button on the page led to a wall, for a product nobody had an
+   * account for. It now opens the public chat, where anyone can talk
+   * immediately and is asked to create an account once the conversation is
+   * worth saving.
+   *
+   * In demo mode it still drops into the full client experience, so the
+   * dashboard, check-ins and care plan stay explorable from the homepage.
+   */
   const talkToCoach = () => {
     if (bypass) {
       enterAs('client', '/dashboard/client/bond');
     } else {
-      navigate('/login');
+      navigate('/coach');
     }
   };
 

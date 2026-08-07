@@ -51,7 +51,7 @@ const BondComposer = ({ onSend, disabled = false }: BondComposerProps) => {
   return (
     <div className="flex items-end gap-2 border-t border-border bg-card px-4 py-3 sm:px-6">
       <label htmlFor="bond-composer" className="sr-only">
-        {t("bond_composer_label", "Message Bond")}
+        {t("bond_composer_label", "Bericht aan Bond")}
       </label>
       <Textarea
         id="bond-composer"
@@ -61,7 +61,7 @@ const BondComposer = ({ onSend, disabled = false }: BondComposerProps) => {
         onKeyDown={handleKeyDown}
         disabled={disabled}
         rows={1}
-        placeholder={t("bond_composer_placeholder", "Message Bond…")}
+        placeholder={t("bond_composer_placeholder", "Schrijf een bericht…")}
         className="max-h-40 min-h-[2.75rem] flex-1 resize-none rounded-2xl border-border bg-background text-sm focus-visible:ring-mint"
       />
       <Button

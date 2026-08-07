@@ -85,6 +85,14 @@ export interface BondReply {
   suggestions?: string[];
   /** True when the reply is a crisis-guardrail response (surface resources). */
   crisis?: boolean;
+  /**
+   * Free turns remaining on this device, when the server reported them.
+   * `null` when there is no cap; absent on scripted and crisis replies, which
+   * never consumed a turn.
+   */
+  turnsLeft?: number | null;
+  /** True when the free allowance is spent — a conversion moment, not an error. */
+  capped?: boolean;
 }
 
 export interface BondOpening {
@@ -120,10 +128,42 @@ const CRISIS_PATTERNS: RegExp[] = [
   /\bbetter\s+off\s+(dead|without\s+me)\b/i,
   /\bhopeless\b/i,
   /\bcan'?t\s+go\s+on\b/i,
-  // Dutch / Flemish signals (Belgium-first)
+  // ── Dutch / Flemish signals (Belgium-first) ──
+  //
+  // This block was dangerously thin. It matched "een eind maken" but not
+  // "er een eind AAN maken" — the single most common Dutch phrasing for
+  // suicidal intent — because the words are not adjacent. A real message
+  // ("ik wil er een eind aan maken") went straight to the model.
+  //
+  // Widened, and deliberately toward false positives: showing a helpline to
+  // someone who did not need it costs a moment of friction; missing someone
+  // who did is the failure this whole guardrail exists to prevent.
   /\bzelfmoord/i,
-  /\bniet\s+meer\s+(leven|verder)\b/i,
-  /\been\s+eind(e)?\s+maken\b/i,
+  /\bzelfdoding/i,
+  /\bniet\s+meer\s+(leven|verder|willen\s+leven)\b/i,
+  // "een eind(e) aan maken", "er een eind aan maken", "een einde maken aan"
+  /\been\s+eind(e)?\s+(aan\s+)?(te\s+)?maken\b/i,
+  /\beind(e)?\s+aan\s+(mijn|m'?n)\s+leven\b/i,
+  /\buit\s+het\s+leven\s+stappen\b/i,
+  /\beruit\s+stappen\b/i,
+  /\bik\s+wil\s+(dood|niet\s+meer)\b/i,
+  /\bliever\s+dood\b/i,
+  /\bmezelf\s+(iets\s+aandoen|pijn\s+doen|snijden|verwonden)\b/i,
+  /\bmijzelf\s+(iets\s+aandoen|pijn\s+doen)\b/i,
+  /\bzelfverwonding\b/i,
+  /\bautomutilatie\b/i,
+  // "ik zie het niet meer zitten" — and every way people actually pad it:
+  // "ik zie het echt niet meer zitten", "ik zie het al een tijd niet meer
+  // zitten". An anchored phrase misses all of those, so allow a few words to
+  // sit in between.
+  /\bzie\s+(?:\w+\s+){0,4}niet\s+meer\s+zitten\b/i,
+  /\bniet\s+meer\s+zien\s+zitten\b/i,
+  /\bhet\s+niet\s+meer\s+aan\s?kan\b/i,
+  /\bbeter\s+af\s+zonder\s+(mij|me)\b/i,
+  /\bgeen\s+(reden|zin)\s+(meer\s+)?om\s+te\s+leven\b/i,
+  /\ber\s+niet\s+meer\s+(zijn|wil\s+zijn)\b/i,
+  /\bvoor\s+de\s+trein\b/i,
+  /\bvan\s+de\s+brug\b/i,
 ];
 
 export const isCrisisMessage = (text: string): boolean =>
@@ -855,7 +895,13 @@ export const bondRespond = async (
   });
 
   if (!result.failure) {
-    return { text: result.text, suggestions: buildSuggestions(context) };
+    // A cap of 0 means unlimited, so report "no limit" rather than a countdown
+    // that would tick down to a wall that does not exist.
+    const turnsLeft =
+      result.turnsCap && result.turnsCap > 0 && result.turnsUsed != null
+        ? Math.max(0, result.turnsCap - result.turnsUsed)
+        : null;
+    return { text: result.text, suggestions: buildSuggestions(context), turnsLeft };
   }
 
   /* --- 3. Quota and verification: NOT errors, so they don't get an error voice. --- */
@@ -866,6 +912,8 @@ export const bondRespond = async (
   // the model runs, not during.
   if (result.failure === "anonymous_cap") {
     return {
+      capped: true,
+      turnsLeft: 0,
       text: i18n.t(
         "bond_anonymous_cap",
         "Ik zou graag verder praten, maar hier stopt het gratis stuk. Maak een account aan, dan bewaar ik dit gesprek en pikken we het op waar we gebleven zijn.",
@@ -911,36 +959,77 @@ export const bondRespond = async (
  * sessions, and explicitly not a crisis service — and then it PICKS UP WHERE
  * YESTERDAY LEFT OFF instead of greeting a stranger.
  */
-export const buildOpening = (context: BondContext): BondOpening => {
+export const buildOpening = (
+  context: BondContext,
+  /**
+   * True on the public page, where the visitor has no account.
+   *
+   * Without this, Bond greets an anonymous stranger with "Ik werk naast je
+   * begeleider en het plan dat jullie samen opbouwen" — a relationship and a
+   * care plan that do not exist. On a mental-health product, opening with a
+   * claim the visitor knows is false is the fastest way to lose them.
+   */
+  anonymous = false,
+): BondOpening => {
   const hi = context.firstName
     ? i18n.t("bond_open_hi_named", "Dag {{name}}.", { name: context.firstName })
     : i18n.t("bond_open_hi", "Dag.");
 
-  const supervised = context.therapistName
+  const supervised = anonymous
     ? i18n.t(
-        "bond_open_supervised_named",
-        "Ik ben Bond, je AI-gezel. Ik werk naast {{provider}} en het plan dat jullie samen opbouwen.",
-        { provider: context.therapistName },
+        "bond_open_anonymous",
+        "Ik ben Bond, de AI-gezel van Bondable. Je kunt hier gewoon beginnen, zonder account. Wil je er later een echte hulpverlener bij, dan help ik je die vinden.",
+      )
+    : context.therapistName
+      ? i18n.t(
+          "bond_open_supervised_named",
+          "Ik ben Bond, je AI-gezel. Ik werk naast {{provider}} en het plan dat jullie samen opbouwen.",
+          { provider: context.therapistName },
+        )
+      : i18n.t(
+          "bond_open_supervised",
+          "Ik ben Bond, je AI-gezel. Ik werk naast je begeleider en het plan dat jullie samen opbouwen.",
+        );
+
+  const disclaimer = anonymous
+    ? // The public page has no in-app crisis button, so point at the numbers
+      // that are actually on screen instead of a control that isn't there.
+      i18n.t(
+        "bond_open_disclaimer_anonymous",
+        "Ik ben een AI, geen therapeut en geen crisisdienst. Ben je in gevaar of denk je aan zelfbeschadiging, bel dan 112 of de Zelfmoordlijn op 1813.",
       )
     : i18n.t(
-        "bond_open_supervised",
-        "Ik ben Bond, je AI-gezel. Ik werk naast je begeleider en het plan dat jullie samen opbouwen.",
+        "bond_open_disclaimer",
+        "Ik ben een AI, geen therapeut en geen crisisdienst. Ben je in gevaar of denk je aan zelfbeschadiging, gebruik dan de knop hierboven of bel 112.",
       );
 
-  const disclaimer = i18n.t(
-    "bond_open_disclaimer",
-    "Ik ben een AI, geen therapeut en geen crisisdienst. Ben je in gevaar of denk je aan zelfbeschadiging, gebruik dan de knop hierboven of bel 112.",
-  );
-
-  const continuity = buildContinuityLine(context);
-  const sessionLine = buildSessionLine(context);
+  // Continuity and session lines read from data an anonymous visitor cannot
+  // have; skip them rather than let them render as empty or invented.
+  const continuity = anonymous ? "" : buildContinuityLine(context);
+  const sessionLine = anonymous ? "" : buildSessionLine(context);
 
   const text = [hi, supervised, disclaimer, continuity, sessionLine]
     .filter(Boolean)
     .join(" ");
 
-  return { text, suggestions: buildSuggestions(context) };
+  return {
+    text,
+    suggestions: anonymous ? ANONYMOUS_SUGGESTIONS : buildSuggestions(context),
+  };
 };
+
+/**
+ * Openers for someone with no account.
+ *
+ * Deliberately excludes anything referencing a care plan or a provider — a
+ * suggestion chip that leads nowhere is a broken promise on the first screen.
+ */
+export const ANONYMOUS_SUGGESTIONS: string[] = [
+  "Ik had een zware dag",
+  "Ik lig 's nachts te piekeren",
+  "Ik weet niet waar ik moet beginnen",
+  "Leer me een ademoefening",
+];
 
 /** Back-compat: the opening as a plain string. */
 export const buildOpeningMessage = (context: BondContext): string =>
