@@ -10,7 +10,7 @@
  * The seam is deliberate: `verifyHuman` is the only thing the handler calls, so
  * swapping in BotID (or hCaptcha) later is one file, not a refactor.
  *
- * NOT CONFIGURED = NOT ENFORCED. Without `TURNSTILE_SECRET_KEY` this returns
+ * NOT CONFIGURED = NOT ENFORCED. Without `TURNSTILE_SECRET` this returns
  * `skipped`, so local development and the demo build keep working. That is the
  * right default for a layer that can lock people out of a mental-health chat,
  * and the admin console shows plainly whether it is active — a security control
@@ -29,14 +29,14 @@ export interface BotCheckResult {
 
 /** True when a bot check is configured and will actually be enforced. */
 export function isBotCheckConfigured(): boolean {
-  return Boolean(process.env.TURNSTILE_SECRET_KEY);
+  return Boolean(process.env.TURNSTILE_SECRET);
 }
 
 export async function verifyHuman(
   token: string | undefined,
   remoteIp: string | undefined,
 ): Promise<BotCheckResult> {
-  const secretKey = process.env.TURNSTILE_SECRET_KEY;
+  const secretKey = process.env.TURNSTILE_SECRET;
   if (!secretKey) return { outcome: 'skipped' };
 
   // Configured but no token: that is a fail, not a skip. Anything else would

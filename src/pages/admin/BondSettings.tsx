@@ -442,7 +442,7 @@ const BondSettings = () => {
           {draft.requireBotCheck && !data.status.botCheckConfigured && (
             <Notice>
               Deze schakelaar staat aan, maar er is geen{" "}
-              <code>TURNSTILE_SECRET_KEY</code> ingesteld — er wordt dus niets
+              <code>TURNSTILE_SECRET</code> ingesteld — er wordt dus niets
               gecontroleerd. Zet de sleutel in <code>.env.local</code> om de
               laag echt aan te zetten.
             </Notice>

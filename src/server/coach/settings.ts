@@ -51,7 +51,7 @@ export interface BondSettings {
   /**
    * Require a passed bot check for anonymous visitors.
    *
-   * Only has an effect when TURNSTILE_SECRET_KEY is configured — a switch that
+   * Only has an effect when TURNSTILE_SECRET is configured — a switch that
    * silently does nothing would be worse than no switch, so the admin console
    * reports whether the check is actually wired.
    */

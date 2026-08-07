@@ -20,7 +20,25 @@ interface TurnstileApi {
     container: HTMLElement,
     options: {
       sitekey: string;
-      size?: 'invisible' | 'normal' | 'flexible';
+      /**
+       * Attribution label, surfaced in Cloudflare's Turnstile analytics. The
+       * JS-render equivalent of the `data-action` attribute on a `cf-turnstile`
+       * div — this integration renders explicitly, so there is no div to put an
+       * attribute on. Removing it does not break verification; only the
+       * analytics segmentation is lost.
+       */
+      action?: string;
+      /**
+       * `execute` = do not run on render; wait for `turnstile.execute()`.
+       * Lets us fetch a fresh token per message instead of one per page load.
+       */
+      execution?: 'render' | 'execute';
+      /**
+       * `execute` = stay out of sight until executing. There is no
+       * `size: 'invisible'` — that is not a Turnstile option, and passing it
+       * silently gets you a visible default-size widget.
+       */
+      appearance?: 'always' | 'execute' | 'interaction-only';
       callback?: (token: string) => void;
       'error-callback'?: () => void;
     },
@@ -114,7 +132,14 @@ export async function getTurnstileToken(): Promise<string | undefined> {
 
     if (!container) {
       container = document.createElement('div');
-      container.style.display = 'none';
+      // NOT `display: none`. With a Managed widget Turnstile may decide it
+      // needs a moment of interaction, and a hidden container would leave the
+      // visitor silently stuck with no way to continue. Parked bottom-right so
+      // it costs nothing when nothing is shown, and is reachable when it is.
+      container.style.position = 'fixed';
+      container.style.right = '1rem';
+      container.style.bottom = '1rem';
+      container.style.zIndex = '9999';
       document.body.appendChild(container);
     }
 
@@ -132,7 +157,9 @@ export async function getTurnstileToken(): Promise<string | undefined> {
       if (widgetId === null) {
         widgetId = api.render(container!, {
           sitekey: key,
-          size: 'invisible',
+          action: 'turnstile-spin-v2',
+          execution: 'execute',
+          appearance: 'execute',
           callback: (token) => settle(token),
           'error-callback': () => settle(undefined),
         });
