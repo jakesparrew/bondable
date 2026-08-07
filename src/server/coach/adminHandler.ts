@@ -6,17 +6,20 @@
  * POST → change the settings.
  *
  * ⚠️ AUTHORISATION. This endpoint decides which model runs and how many
- * messages people get — that is direct control over spend, so it is gated on a
- * shared secret (`COACH_ADMIN_TOKEN`) rather than left open. That is a
- * stopgap, honestly: a shared token is not identity, it cannot be revoked per
- * person and it cannot be audited. When real auth lands this must become a
- * role check on the signed-in superadmin (backlog B8).
+ * messages people get — direct control over spend, so writes are gated.
+ *
+ * A signed-in Bondable admin (`profiles.role = 'admin'`) is now the primary
+ * proof. The shared `COACH_ADMIN_TOKEN` remains as a fallback only because the
+ * console itself has not been moved onto the login yet; it is one secret for
+ * everyone, revocable only by rotating it for everyone, and it goes away as
+ * soon as the console signs in (backlog B8).
  *
  * With no token configured the endpoint is READ-ONLY. Refusing to write is the
  * safe default; refusing to read would leave the console blank in local dev
  * for no security benefit, since none of what it returns is a secret.
  */
 
+import { isAdmin } from '../auth/profile';
 import { isBotCheckConfigured } from './botCheck';
 import { fetchCatalogue } from './catalogue';
 import { hasDatabase } from './db';
@@ -42,7 +45,24 @@ function tokenMatches(provided: string, expected: string): boolean {
   return diff === 0;
 }
 
-function authorized(request: Request): boolean {
+/**
+ * May this caller change Bond's settings?
+ *
+ * Two accepted proofs, in order of preference:
+ *
+ *  1. A signed-in Bondable admin (`profiles.role = 'admin'`). This is real
+ *     identity: revocable per person, auditable, and tied to the same account
+ *     that owns the clinical data.
+ *  2. The shared `COACH_ADMIN_TOKEN`. A stopgap from before auth existed —
+ *     one secret for everyone, revocable only by rotating it for everyone.
+ *
+ * The token path stays for now because the admin console still sends it and
+ * the operator may not have a profile yet; it is a fallback, not an equal.
+ * Once the console signs in, delete it (backlog B8).
+ */
+async function authorized(request: Request): Promise<boolean> {
+  if (await isAdmin(request)) return true;
+
   const expected = process.env.COACH_ADMIN_TOKEN;
   if (!expected) return false;
   const header = request.headers.get('x-admin-token') ?? '';
@@ -83,7 +103,7 @@ export async function handleCoachAdmin(request: Request): Promise<Response> {
   }
 
   if (request.method === 'POST') {
-    if (!authorized(request)) {
+    if (!(await authorized(request))) {
       return json(401, {
         error: 'unauthorized',
         message: process.env.COACH_ADMIN_TOKEN

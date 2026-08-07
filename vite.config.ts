@@ -29,10 +29,10 @@ function apiDevServer(mode: string): Plugin {
       }
 
       /**
-       * `prefix: true` matches everything under the path. Better Auth serves
-       * many sub-routes (`/api/auth/sign-in/email`, `/api/auth/get-session`,
-       * `/api/auth/verify-email`, …) behind one handler, so listing them
-       * individually would go stale the moment the library adds one.
+       * `prefix: true` matches everything under the path, for handlers that
+       * serve a whole subtree. Nothing needs it today — auth is hosted by Neon
+       * on its own origin, not under `/api` — but it stays because the next
+       * multi-route handler will, and re-deriving it is worse than keeping it.
        */
       const ROUTES: Array<{
         path: string;
@@ -45,12 +45,6 @@ function apiDevServer(mode: string): Plugin {
           path: '/api/coach-admin',
           module: '/src/server/coach/adminHandler.ts',
           fn: 'handleCoachAdmin',
-        },
-        {
-          path: '/api/auth',
-          prefix: true,
-          module: '/src/server/auth/handler.ts',
-          fn: 'handleAuth',
         },
       ];
 
