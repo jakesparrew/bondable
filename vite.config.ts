@@ -28,18 +28,40 @@ function apiDevServer(mode: string): Plugin {
         if (!(key in process.env)) process.env[key] = value;
       }
 
-      const ROUTES: Record<string, { module: string; fn: string }> = {
-        '/api/coach': { module: '/src/server/coach/handler.ts', fn: 'handleCoach' },
-        '/api/coach-admin': {
+      /**
+       * `prefix: true` matches everything under the path. Better Auth serves
+       * many sub-routes (`/api/auth/sign-in/email`, `/api/auth/get-session`,
+       * `/api/auth/verify-email`, …) behind one handler, so listing them
+       * individually would go stale the moment the library adds one.
+       */
+      const ROUTES: Array<{
+        path: string;
+        prefix?: boolean;
+        module: string;
+        fn: string;
+      }> = [
+        { path: '/api/coach', module: '/src/server/coach/handler.ts', fn: 'handleCoach' },
+        {
+          path: '/api/coach-admin',
           module: '/src/server/coach/adminHandler.ts',
           fn: 'handleCoachAdmin',
         },
-      };
+        {
+          path: '/api/auth',
+          prefix: true,
+          module: '/src/server/auth/handler.ts',
+          fn: 'handleAuth',
+        },
+      ];
 
       server.middlewares.use(async (req, res, next) => {
         const url = req.url ?? '';
         const path = url.split('?')[0];
-        const route = ROUTES[path];
+        const route = ROUTES.find((r) =>
+          // The `/` guard keeps `/api/coach-admin` from being swallowed by a
+          // hypothetical `/api/coach` prefix rule.
+          r.prefix ? path === r.path || path.startsWith(`${r.path}/`) : path === r.path,
+        );
         if (!route) return next();
 
         try {
