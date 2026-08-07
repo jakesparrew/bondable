@@ -34,6 +34,11 @@ export type CoachFailure =
    * treat it as a conversion point rather than a failure to apologise for.
    */
   | 'anonymous_cap'
+  /**
+   * The per-account daily allowance is spent. Distinct from `anonymous_cap`
+   * because the remedy differs: there is no account to create — only tomorrow.
+   */
+  | 'daily_cap'
   /** Bot check rejected the request. */
   | 'bot_check_failed'
   /** Network dropped, or the provider errored. */
@@ -56,6 +61,12 @@ export interface CoachOptions {
   summary?: string;
   /** Turnstile token, when a bot check is configured. */
   botToken?: string;
+  /**
+   * JWT for the signed-in caller (see authClient.getApiToken). The session
+   * cookie lives on the auth origin and never reaches our API, so identity
+   * travels in this header or not at all.
+   */
+  authToken?: string;
   /** Called with each chunk of text as it streams in. */
   onDelta?: (delta: string) => void;
   signal?: AbortSignal;
@@ -65,7 +76,7 @@ export interface CoachOptions {
 const REQUEST_TIMEOUT_MS = 30_000;
 
 export async function streamCoachReply(options: CoachOptions): Promise<CoachResult> {
-  const { history, context, summary, botToken, onDelta, signal } = options;
+  const { history, context, summary, botToken, authToken, onDelta, signal } = options;
 
   const timeout = new AbortController();
   const timer = window.setTimeout(() => timeout.abort(), REQUEST_TIMEOUT_MS);
@@ -76,7 +87,10 @@ export async function streamCoachReply(options: CoachOptions): Promise<CoachResu
   try {
     const response = await fetch('/api/coach', {
       method: 'POST',
-      headers: { 'content-type': 'application/json' },
+      headers: {
+        'content-type': 'application/json',
+        ...(authToken ? { authorization: `Bearer ${authToken}` } : {}),
+      },
       body: JSON.stringify({ history, context, summary, botToken }),
       // Send and accept the signed device-budget cookie. Without this the
       // allowance silently resets on every request in cross-origin setups.
@@ -92,12 +106,18 @@ export async function streamCoachReply(options: CoachOptions): Promise<CoachResu
       const body = await response.json().catch(() => null);
 
       if (response.status === 429) {
-        // Distinguish "slow down" from "your free turns are spent" — they call
-        // for completely different UI, and conflating them turns a conversion
+        // Three different 429s, three different UIs: "slow down" (burst),
+        // "create an account" (conversion moment), and "you are done for
+        // today" (account allowance). Conflating them turns a conversion
         // moment into an error message.
         return {
           text: '',
-          failure: body?.error === 'anonymous_cap' ? 'anonymous_cap' : 'rate_limited',
+          failure:
+            body?.error === 'anonymous_cap'
+              ? 'anonymous_cap'
+              : body?.error === 'daily_cap'
+                ? 'daily_cap'
+                : 'rate_limited',
         };
       }
       if (response.status === 403 && body?.error === 'bot_check_failed') {

@@ -839,6 +839,12 @@ const simulatedDelay = (): number => 600 + Math.floor(Math.random() * 600); // 6
 export interface BondRespondOptions {
   /** Streams model text as it arrives. Never called on the scripted path. */
   onDelta?: (delta: string) => void;
+  /**
+   * JWT for a signed-in caller (authClient.getApiToken). When present the
+   * Turnstile round-trip is skipped entirely: the server does not bot-check
+   * authenticated requests, so fetching a token would only add latency.
+   */
+  authToken?: string;
   signal?: AbortSignal;
 }
 
@@ -880,11 +886,13 @@ export const bondRespond = async (
 
   // Fetched per message: Turnstile tokens are single-use and short-lived, so
   // one token per conversation would be rejected from the second turn on.
-  // Resolves to undefined when no bot check is configured.
-  const botToken = await getTurnstileToken();
+  // Resolves to undefined when no bot check is configured. Signed-in callers
+  // skip the round-trip entirely — the server does not bot-check them.
+  const botToken = options.authToken ? undefined : await getTurnstileToken();
 
   const result = await streamCoachReply({
     botToken,
+    authToken: options.authToken,
     history: history.map((m) => ({
       role: m.role === "user" ? ("user" as const) : ("bond" as const),
       text: m.text,
@@ -922,6 +930,18 @@ export const bondRespond = async (
         i18n.t("bond_cap_create_account", "Account aanmaken"),
         i18n.t("bond_cap_find_provider", "Zoek een hulpverlener"),
       ],
+    };
+  }
+
+  // The account's daily allowance. No account to create here — the honest
+  // message is "tomorrow", said warmly and without a workaround to hunt for.
+  if (result.failure === "daily_cap") {
+    return {
+      text: i18n.t(
+        "bond_daily_cap",
+        "We hebben vandaag al veel gedeeld — hier stopt het voor nu, morgen kunnen we verder. Zit je ondertussen ergens mee dat niet kan wachten, bel dan je hulpverlener of kijk bij de hulplijnen onderaan.",
+      ),
+      suggestions: [],
     };
   }
 

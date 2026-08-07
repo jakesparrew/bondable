@@ -1,75 +1,223 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { ArrowRight, Phone, ShieldCheck } from "lucide-react";
+import { ArrowRight, LogOut, Phone, ShieldCheck, Trash2 } from "lucide-react";
 import Seo from "@/components/seo/Seo";
 import { Button } from "@/components/ui/button";
 import BondMessageBubble from "@/components/bond/BondMessageBubble";
 import BondTypingIndicator from "@/components/bond/BondTypingIndicator";
 import BondSuggestionChips from "@/components/bond/BondSuggestionChips";
 import BondComposer from "@/components/bond/BondComposer";
+import CoachAuthPanel from "@/components/coach/CoachAuthPanel";
 import {
   bondRespond,
   buildOpening,
   type BondMessage,
 } from "@/components/bond/bondEngine";
+import { clearApiToken, getApiToken, signOut, useSession } from "@/lib/authClient";
+import {
+  deleteServerThread,
+  loadServerThread,
+  saveServerThread,
+} from "@/services/api/coachThreadClient";
 
 /**
- * Coach — /coach, the PUBLIC entry point. No account, no dashboard shell.
+ * Coach — /coach, the PUBLIC entry point. No dashboard shell; no account
+ * required to start talking.
  *
- * This is the page the four protection layers were built for (see
- * `src/server/coach/*`): anyone can talk, the server meters it, and the free
- * allowance running out is a conversion moment rather than an error.
+ * Two visitor states, two storage rules:
  *
- * Deliberately NOT reusing `BondChat`: that component is wired to
- * `useAuthManager`, `useOptimizedTasks`, `useCheckins` and friends, which would
- * fire authenticated data fetches for a visitor who has no account and no data.
- * It reuses the presentational pieces and the engine instead — same Bond, no
- * phantom requests.
+ *   ANONYMOUS — the conversation lives in this component's memory and nowhere
+ *   else. Storing an anonymous mental-health conversation on a shared device
+ *   is a privacy problem, not a feature — and its disappearance on reload is
+ *   exactly what makes "save this" worth an account at the cap.
  *
- * Context is deliberately EMPTY. An anonymous visitor has no check-ins, no care
- * plan and no provider, so Bond gets nothing about them and says nothing it
- * cannot know.
+ *   SIGNED IN — the conversation is saved server-side after every completed
+ *   reply (the promise Bond makes at the cap), restored on mount, erasable
+ *   with one button. The anonymous protections that meter strangers (bot
+ *   check, device budget) no longer apply; the account's daily cap does.
  *
- * Nothing is persisted here. `BondChat` stores its thread for logged-in
- * continuity; this page holds the conversation in memory only, because storing
- * an anonymous mental-health conversation on a shared device is a privacy
- * problem, not a feature. That is also exactly what makes "save this" worth
- * offering at the cap.
+ * The bridge between the two is the ADOPTION flow: at the cap the visitor
+ * signs up inline (no navigation — navigating would discard the very
+ * conversation Bond just promised to keep), and the in-memory thread is
+ * PUT to the server. The Google path must navigate away for OAuth, so the
+ * thread is stashed in sessionStorage first and adopted when the redirect
+ * lands back here.
+ *
+ * Deliberately NOT reusing `BondChat`: that component is wired to the
+ * dashboard's data hooks, which would fire authenticated fetches for data an
+ * anonymous visitor does not have. Same presentational pieces, same engine.
  */
 
 let idCounter = 0;
 const nextId = () => `coach-${Date.now()}-${idCounter++}`;
 
+/**
+ * Where the thread waits out the Google redirect. sessionStorage, not
+ * localStorage: it must not survive the tab, only the round-trip to the
+ * OAuth screen and back.
+ */
+const STASH_KEY = "bnd_coach_pending_thread";
+
+const stashThread = (messages: BondMessage[]): void => {
+  try {
+    sessionStorage.setItem(STASH_KEY, JSON.stringify(messages));
+  } catch {
+    /* quota/private mode: the Google path then starts fresh — survivable */
+  }
+};
+
+const readStash = (): BondMessage[] | null => {
+  try {
+    const raw = sessionStorage.getItem(STASH_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) && parsed.length > 0 ? (parsed as BondMessage[]) : null;
+  } catch {
+    return null;
+  }
+};
+
+const clearStash = (): void => {
+  try {
+    sessionStorage.removeItem(STASH_KEY);
+  } catch {
+    /* ignore */
+  }
+};
+
+/** Merge stored + adopted messages without duplicating a re-adopted stash. */
+const mergeThreads = (server: BondMessage[], local: BondMessage[]): BondMessage[] => {
+  const seen = new Set(server.map((m) => m.id));
+  return [...server, ...local.filter((m) => !seen.has(m.id))].slice(-200);
+};
+
 const Coach = () => {
   const { t } = useTranslation();
+  const session = useSession();
+  const signedIn = Boolean(session.data?.user);
+  const firstName =
+    session.data?.user?.name?.trim().split(/\s+/)[0] ??
+    session.data?.user?.email?.split("@")[0] ??
+    "";
 
   const [messages, setMessages] = useState<BondMessage[]>([]);
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [isTyping, setIsTyping] = useState(false);
-  /** Set once the free allowance runs out; drives the sign-up panel. */
+  /** Set once the free allowance runs out; drives the inline sign-up panel. */
   const [capped, setCapped] = useState(false);
   const [turnsLeft, setTurnsLeft] = useState<number | null>(null);
 
   const scrollRef = useRef<HTMLDivElement>(null);
-  const openedRef = useRef(false);
+  const seededRef = useRef(false);
+  /** Mirrors `messages` for save calls made outside React's render cycle. */
+  const messagesRef = useRef<BondMessage[]>([]);
+  messagesRef.current = messages;
 
-  // Opening turn. States up front that Bond is an AI (EU AI Act Art. 50) —
-  // before the first question, not buried in a footer.
+  /**
+   * Seed the thread once the session state has settled. Order of preference:
+   * stash (an adoption in progress — the freshest conversation), then the
+   * server thread (a returning user), then the opening turn. The opening
+   * states up front that Bond is an AI (EU AI Act Art. 50) — before the
+   * first question, not buried in a footer.
+   */
   useEffect(() => {
-    if (openedRef.current) return;
-    openedRef.current = true;
-    const opening = buildOpening({}, true);
-    setMessages([
-      {
-        id: nextId(),
-        role: "bond",
-        text: opening.text,
-        createdAt: new Date().toISOString(),
-      },
-    ]);
-    setSuggestions(opening.suggestions);
-  }, []);
+    if (session.isPending || seededRef.current) return;
+    seededRef.current = true;
+
+    const seed = async () => {
+      const stash = readStash();
+
+      if (signedIn) {
+        const token = await getApiToken();
+
+        // Make sure the login is attached to a Bondable person. Idempotent,
+        // and required for the Google path, which never passes through the
+        // email form's profile step.
+        if (token) {
+          void fetch("/api/profile", {
+            method: "POST",
+            headers: {
+              "content-type": "application/json",
+              authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ role: "client" }),
+          }).catch(() => {});
+        }
+
+        const server = token ? await loadServerThread(token) : null;
+
+        if (stash) {
+          // Adoption: the moment Bond's "dan bewaar ik dit gesprek" comes true.
+          const merged = mergeThreads(server ?? [], stash);
+          const confirmed: BondMessage[] = [
+            ...merged,
+            {
+              id: nextId(),
+              role: "bond",
+              text: t(
+                "coach_thread_adopted",
+                "Gelukt — je gesprek is bewaard. We kunnen gewoon verder waar we waren.",
+              ),
+              createdAt: new Date().toISOString(),
+            },
+          ];
+          setMessages(confirmed);
+          clearStash();
+          if (token) void saveServerThread(token, confirmed);
+          return;
+        }
+
+        if (server && server.length > 0) {
+          setMessages(server);
+          return;
+        }
+
+        // Signed in, nothing stored yet: greet by name, honestly — no
+        // "zonder account" line (they have one), no invented care plan.
+        setMessages([
+          {
+            id: nextId(),
+            role: "bond",
+            text: [
+              firstName
+                ? t("coach_open_signed_hi", "Dag {{name}}.", { name: firstName })
+                : t("coach_open_signed_hi_anon", "Dag."),
+              t(
+                "coach_open_signed_body",
+                "Fijn dat je er bent. Ik ben Bond, de AI-gezel van Bondable — geen therapeut en geen crisisdienst. Wat je hier vertelt wordt bewaard, zodat we altijd kunnen verdergaan waar we waren. Waar wil je het over hebben?",
+              ),
+            ].join(" "),
+            createdAt: new Date().toISOString(),
+          },
+        ]);
+        return;
+      }
+
+      // Anonymous. A leftover stash means an aborted sign-in attempt: restore
+      // the conversation (losing it would punish the abort) and show the cap
+      // panel again — the allowance that triggered it is still spent.
+      if (stash) {
+        setMessages(stash);
+        setCapped(true);
+        return;
+      }
+
+      const opening = buildOpening({}, true);
+      setMessages([
+        {
+          id: nextId(),
+          role: "bond",
+          text: opening.text,
+          createdAt: new Date().toISOString(),
+        },
+      ]);
+      setSuggestions(opening.suggestions);
+    };
+
+    void seed();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [session.isPending, signedIn]);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({
@@ -119,20 +267,24 @@ const Coach = () => {
       );
     };
 
-    void bondRespond(history, {}, { onDelta: appendDelta }).then((reply) => {
+    void (async () => {
+      // Token first: it decides both the request identity and whether the
+      // engine spends a Turnstile round-trip.
+      const authToken = signedIn ? await getApiToken() : undefined;
+      const reply = await bondRespond(history, {}, { onDelta: appendDelta, authToken });
+
+      const replyMessage: BondMessage = {
+        id: replyId,
+        role: "bond",
+        text: reply.text,
+        createdAt: new Date().toISOString(),
+        crisis: reply.crisis,
+      };
+
       setMessages((prev) =>
         streaming
           ? prev.map((m) => (m.id === replyId ? { ...m, text: reply.text } : m))
-          : [
-              ...prev,
-              {
-                id: replyId,
-                role: "bond",
-                text: reply.text,
-                createdAt: new Date().toISOString(),
-                crisis: reply.crisis,
-              },
-            ],
+          : [...prev, replyMessage],
       );
       setSuggestions(reply.suggestions ?? []);
       setIsTyping(false);
@@ -141,7 +293,77 @@ const Coach = () => {
       // break the moment anyone edits a translation string.
       if (reply.capped) setCapped(true);
       if (reply.turnsLeft !== undefined) setTurnsLeft(reply.turnsLeft);
-    });
+
+      // Keep the promise: a signed-in thread survives reload and device.
+      // `history` already ends on the user turn, so this is the exact thread.
+      if (authToken) {
+        void saveServerThread(authToken, [...history, replyMessage]);
+      }
+    })();
+  };
+
+  /** Inline auth completed (email path) — adopt the conversation and resume. */
+  const adoptAfterAuth = async () => {
+    const token = await getApiToken();
+    const local = messagesRef.current;
+
+    const confirmed: BondMessage[] = [
+      ...local,
+      {
+        id: nextId(),
+        role: "bond",
+        text: t(
+          "coach_thread_adopted",
+          "Gelukt — je gesprek is bewaard. We kunnen gewoon verder waar we waren.",
+        ),
+        createdAt: new Date().toISOString(),
+      },
+    ];
+
+    if (token) {
+      const server = await loadServerThread(token);
+      const merged = server && server.length > 0 ? mergeThreads(server, confirmed) : confirmed;
+      setMessages(merged);
+      void saveServerThread(token, merged);
+    } else {
+      setMessages(confirmed);
+    }
+
+    clearStash();
+    setCapped(false);
+    setTurnsLeft(null);
+  };
+
+  /** The erase button. Server first, then local — the order the promise implies. */
+  const eraseConversation = async () => {
+    if (!window.confirm(t("coach_erase_confirm", "Dit gesprek definitief wissen?"))) return;
+    const token = await getApiToken();
+    if (token) await deleteServerThread(token);
+    seededRef.current = false;
+    setMessages([]);
+    setSuggestions([]);
+    setCapped(false);
+    // Re-seed as a fresh signed-in thread.
+    seededRef.current = true;
+    setMessages([
+      {
+        id: nextId(),
+        role: "bond",
+        text: t(
+          "coach_erased",
+          "Gewist. We beginnen met een schone lei — waar wil je het over hebben?",
+        ),
+        createdAt: new Date().toISOString(),
+      },
+    ]);
+  };
+
+  const handleSignOut = async () => {
+    await signOut();
+    clearApiToken();
+    // Full reload: every piece of signed-in state on this page derives from
+    // the session, and a hard boundary beats chasing each one down.
+    window.location.assign("/coach");
   };
 
   return (
@@ -157,12 +379,39 @@ const Coach = () => {
           <Link to="/" className="font-display text-lg font-semibold">
             Bondable
           </Link>
-          <Button asChild variant="ghost" size="sm">
-            <Link to="/find">
-              {t("coach_find_provider", "Vind een hulpverlener")}
-              <ArrowRight className="ml-1 h-4 w-4" />
-            </Link>
-          </Button>
+          <div className="flex items-center gap-1">
+            {signedIn && (
+              <>
+                <span className="mr-1 hidden text-sm text-muted-foreground sm:inline">
+                  {firstName
+                    ? t("coach_signed_in_as", "Ingelogd als {{name}}", { name: firstName })
+                    : t("coach_signed_in", "Ingelogd")}
+                </span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={eraseConversation}
+                  title={t("coach_erase", "Gesprek wissen")}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleSignOut}
+                  title={t("coach_sign_out", "Uitloggen")}
+                >
+                  <LogOut className="h-4 w-4" />
+                </Button>
+              </>
+            )}
+            <Button asChild variant="ghost" size="sm">
+              <Link to="/find">
+                {t("coach_find_provider", "Vind een hulpverlener")}
+                <ArrowRight className="ml-1 h-4 w-4" />
+              </Link>
+            </Button>
+          </div>
         </div>
       </header>
 
@@ -189,31 +438,14 @@ const Coach = () => {
           {isTyping && <BondTypingIndicator />}
         </div>
 
-        {/* Cap reached: the whole point of the anonymous funnel. Offer the two
-            things that actually help — keep the conversation, or find a real
-            person — instead of a wall. */}
+        {/* Cap reached: the conversion moment the anonymous funnel exists for.
+            The form is INLINE — navigating away would discard the very
+            conversation Bond just promised to save. */}
         {capped ? (
-          <div className="mt-4 space-y-3 rounded-card border border-border bg-card p-4">
-            <h2 className="font-display text-lg font-semibold">
-              {t("coach_cap_title", "Hier stopt het gratis stuk")}
-            </h2>
-            <p className="text-sm text-muted-foreground">
-              {t(
-                "coach_cap_body",
-                "Maak een account aan, dan bewaren we dit gesprek en pikt The Coach het op waar jullie gebleven zijn. Liever meteen een mens? Zoek dan een hulpverlener die bij je past.",
-              )}
-            </p>
-            <div className="flex flex-wrap gap-2">
-              <Button asChild>
-                <Link to="/login">{t("coach_cap_signup", "Account aanmaken")}</Link>
-              </Button>
-              <Button asChild variant="outline">
-                <Link to="/find">
-                  {t("coach_cap_find", "Vind een hulpverlener")}
-                </Link>
-              </Button>
-            </div>
-          </div>
+          <CoachAuthPanel
+            onAuthenticated={adoptAfterAuth}
+            onBeforeRedirect={() => stashThread(messagesRef.current)}
+          />
         ) : (
           <div className="mt-3 space-y-3">
             {suggestions.length > 0 && (
@@ -224,7 +456,7 @@ const Coach = () => {
               />
             )}
             <BondComposer onSend={handleSend} disabled={isTyping} />
-            {turnsLeft !== null && turnsLeft <= 3 && (
+            {!signedIn && turnsLeft !== null && turnsLeft <= 3 && (
               <p className="text-center text-sm text-muted-foreground">
                 {t("coach_turns_left", "Nog {{count}} berichten zonder account.", {
                   count: turnsLeft,
