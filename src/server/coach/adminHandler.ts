@@ -17,9 +17,12 @@
  * for no security benefit, since none of what it returns is a secret.
  */
 
+import { isBotCheckConfigured } from './botCheck';
 import { fetchCatalogue } from './catalogue';
 import { hasDatabase } from './db';
+import { isDeviceBudgetSecure } from './deviceBudget';
 import { loadSettings, saveSettings } from './settings';
+import { spentToday } from './spendGuard';
 import { usageSummary } from './usage';
 
 function json(status: number, body: unknown): Response {
@@ -69,6 +72,12 @@ export async function handleCoachAdmin(request: Request): Promise<Response> {
         writable: Boolean(process.env.COACH_ADMIN_TOKEN),
         gatewayUrl:
           process.env.COACH_GATEWAY_URL || 'https://ai-gateway.vercel.sh/v1/chat/completions',
+        // Whether each protection layer is genuinely wired. A control that is
+        // switched on in settings but has no secret behind it does nothing,
+        // and the console must say so rather than imply protection.
+        botCheckConfigured: isBotCheckConfigured(),
+        deviceBudgetSecure: isDeviceBudgetSecure(),
+        spentTodayUsd: await spentToday(),
       },
     });
   }

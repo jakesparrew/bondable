@@ -33,6 +33,29 @@ export interface BondSettings {
   toneInstructions: string;
   /** Turn the model off and serve the scripted companion (kill switch). */
   modelEnabled: boolean;
+
+  /**
+   * Hard ceiling on total spend per day, in USD. 0 = no ceiling.
+   *
+   * This is the only setting that bounds the worst case. Everything else makes
+   * abuse harder; this makes it finite.
+   */
+  dailySpendCapUsd: number;
+
+  /** Turns an anonymous visitor gets per device per 24h. 0 = unlimited. */
+  anonymousTurnCap: number;
+
+  /** Requests per IP per minute, shared across all serverless instances. */
+  ipRequestsPerMinute: number;
+
+  /**
+   * Require a passed bot check for anonymous visitors.
+   *
+   * Only has an effect when TURNSTILE_SECRET_KEY is configured — a switch that
+   * silently does nothing would be worse than no switch, so the admin console
+   * reports whether the check is actually wired.
+   */
+  requireBotCheck: boolean;
 }
 
 /**
@@ -48,6 +71,14 @@ const FALLBACK: BondSettings = {
   dailyMessageCap: 60,
   toneInstructions: '',
   modelEnabled: true,
+  // $5/day ≈ 1000 replies at measured cost. Low enough that a runaway loop is
+  // an annoyance rather than an incident, high enough not to trip on real use.
+  dailySpendCapUsd: 5,
+  // Eight turns is enough for a conversation to become worth saving, which is
+  // where the "create an account" prompt belongs.
+  anonymousTurnCap: 8,
+  ipRequestsPerMinute: 20,
+  requireBotCheck: true,
 };
 
 const SETTING_NAME = 'bond';
@@ -58,12 +89,22 @@ let cache: { value: BondSettings; at: number } | null = null;
 function fromEnv(): BondSettings {
   const cap = Number(process.env.COACH_DAILY_MESSAGE_CAP);
   const max = Number(process.env.COACH_MAX_OUTPUT_TOKENS);
+  const spend = Number(process.env.COACH_DAILY_SPEND_CAP_USD);
+  const anon = Number(process.env.COACH_ANONYMOUS_TURN_CAP);
+  const rpm = Number(process.env.COACH_IP_REQUESTS_PER_MINUTE);
   return {
     model: process.env.COACH_MODEL || FALLBACK.model,
     maxOutputTokens: Number.isFinite(max) && max > 0 ? max : FALLBACK.maxOutputTokens,
     dailyMessageCap: Number.isFinite(cap) && cap >= 0 ? cap : FALLBACK.dailyMessageCap,
     toneInstructions: FALLBACK.toneInstructions,
     modelEnabled: FALLBACK.modelEnabled,
+    dailySpendCapUsd:
+      Number.isFinite(spend) && spend >= 0 ? spend : FALLBACK.dailySpendCapUsd,
+    anonymousTurnCap:
+      Number.isFinite(anon) && anon >= 0 ? anon : FALLBACK.anonymousTurnCap,
+    ipRequestsPerMinute:
+      Number.isFinite(rpm) && rpm > 0 ? rpm : FALLBACK.ipRequestsPerMinute,
+    requireBotCheck: FALLBACK.requireBotCheck,
   };
 }
 
@@ -85,7 +126,21 @@ export function normalize(raw: unknown, base: BondSettings): BondSettings {
     toneInstructions:
       typeof v.toneInstructions === 'string' ? v.toneInstructions.slice(0, 2000) : base.toneInstructions,
     modelEnabled: typeof v.modelEnabled === 'boolean' ? v.modelEnabled : base.modelEnabled,
+    dailySpendCapUsd: clamp(v.dailySpendCapUsd, base.dailySpendCapUsd, 0, 10_000),
+    anonymousTurnCap: clamp(v.anonymousTurnCap, base.anonymousTurnCap, 0, 1000),
+    // Never let this reach 0 through the API: a 0/minute limit would lock out
+    // every visitor, and "I typed a zero" should not be able to take the
+    // product offline. The kill switch is the intentional way to stop Bond.
+    ipRequestsPerMinute: clamp(v.ipRequestsPerMinute, base.ipRequestsPerMinute, 1, 1000),
+    requireBotCheck:
+      typeof v.requireBotCheck === 'boolean' ? v.requireBotCheck : base.requireBotCheck,
   };
+}
+
+/** Coerce an unknown into a bounded number, falling back when it is not one. */
+function clamp(value: unknown, fallback: number, min: number, max: number): number {
+  if (typeof value !== 'number' || !Number.isFinite(value)) return fallback;
+  return Math.max(min, Math.min(max, value));
 }
 
 /** The effective settings for this request. */

@@ -47,6 +47,10 @@ interface Settings {
   dailyMessageCap: number;
   toneInstructions: string;
   modelEnabled: boolean;
+  dailySpendCapUsd: number;
+  anonymousTurnCap: number;
+  ipRequestsPerMinute: number;
+  requireBotCheck: boolean;
 }
 
 interface UsageWindow {
@@ -71,6 +75,9 @@ interface AdminPayload {
     hasDatabase: boolean;
     writable: boolean;
     gatewayUrl: string;
+    botCheckConfigured: boolean;
+    deviceBudgetSecure: boolean;
+    spentTodayUsd: number;
   };
 }
 
@@ -338,6 +345,117 @@ const BondSettings = () => {
             een die het account niet mag gebruiken, dan valt Bond terug op de
             scripted metgezel en verschijnt dat in de serverlogs.
           </Notice>
+        </section>
+
+        {/* Protection — the four layers, with the guarantee first. */}
+        <section className="space-y-4 rounded-card border border-border bg-card p-4">
+          <div>
+            <h2 className="text-sm font-semibold">Bescherming</h2>
+            <p className="text-sm text-muted-foreground">
+              Vier lagen. De onderste drie maken misbruik moeilijk; het
+              dagplafond maakt de schade eindig.
+            </p>
+          </div>
+
+          {/* Layer 4 — the only guarantee, so it goes first and gets the
+              live "spent today" figure next to it. */}
+          <div>
+            <Label htmlFor="spendcap">Dagplafond totale kosten (USD)</Label>
+            <Input
+              id="spendcap"
+              type="number"
+              min={0}
+              step="0.5"
+              value={draft.dailySpendCapUsd}
+              onChange={(e) =>
+                setDraft({ ...draft, dailySpendCapUsd: Number(e.target.value) })
+              }
+            />
+            <p className="mt-1 text-sm text-muted-foreground">
+              Vandaag verbruikt: <strong>{usd(data.status.spentTodayUsd)}</strong>
+              {draft.dailySpendCapUsd > 0
+                ? ` van ${usd(draft.dailySpendCapUsd)}.`
+                : " — geen plafond ingesteld."}{" "}
+              Boven het plafond gaat het model uit en antwoordt Bond scripted;
+              bezoekers merken geen storing. 0 = geen plafond.
+            </p>
+            {draft.dailySpendCapUsd === 0 && (
+              <Notice>
+                Zonder plafond is er geen bovengrens aan wat één dag kan kosten.
+                De andere lagen maken misbruik moeilijker, maar begrenzen de
+                schade niet.
+              </Notice>
+            )}
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <Label htmlFor="anoncap">Gratis beurten per apparaat (24u)</Label>
+              <Input
+                id="anoncap"
+                type="number"
+                min={0}
+                value={draft.anonymousTurnCap}
+                onChange={(e) =>
+                  setDraft({ ...draft, anonymousTurnCap: Number(e.target.value) })
+                }
+              />
+              <p className="mt-1 text-sm text-muted-foreground">
+                Daarna vraagt Bond om een account. Bewaard in een ondertekende
+                cookie: niet te vervalsen, wel te wissen. 0 = onbeperkt.
+              </p>
+            </div>
+
+            <div>
+              <Label htmlFor="rpm">Verzoeken per IP per minuut</Label>
+              <Input
+                id="rpm"
+                type="number"
+                min={1}
+                value={draft.ipRequestsPerMinute}
+                onChange={(e) =>
+                  setDraft({ ...draft, ipRequestsPerMinute: Number(e.target.value) })
+                }
+              />
+              <p className="mt-1 text-sm text-muted-foreground">
+                Gedeeld over alle servers, dus dit vangt ook iemand die telkens
+                zijn cookies wist.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <Label>Botcontrole verplicht</Label>
+              <p className="text-sm text-muted-foreground">
+                Onzichtbare Turnstile-check voor anonieme bezoekers.
+              </p>
+            </div>
+            <Switch
+              checked={draft.requireBotCheck}
+              onCheckedChange={(v) => setDraft({ ...draft, requireBotCheck: v })}
+            />
+          </div>
+
+          {/* A control that is on but has no secret behind it does nothing.
+              Say so, rather than letting the switch imply protection. */}
+          {draft.requireBotCheck && !data.status.botCheckConfigured && (
+            <Notice>
+              Deze schakelaar staat aan, maar er is geen{" "}
+              <code>TURNSTILE_SECRET_KEY</code> ingesteld — er wordt dus niets
+              gecontroleerd. Zet de sleutel in <code>.env.local</code> om de
+              laag echt aan te zetten.
+            </Notice>
+          )}
+
+          {!data.status.deviceBudgetSecure && (
+            <Notice>
+              <code>COACH_COOKIE_SECRET</code> ontbreekt; het apparaatbudget
+              wordt met een ontwikkelsleutel ondertekend. Zet er een eigen
+              geheim voor je live gaat, anders is de handtekening te
+              reproduceren.
+            </Notice>
+          )}
         </section>
 
         {/* Limits */}

@@ -17,8 +17,12 @@
  * `streamFromGateway` for `@anthropic-ai/sdk`; nothing else here changes.
  */
 
+import { verifyHuman } from './botCheck';
 import { priceFor } from './catalogue';
+import { budgetCookie, readBudget } from './deviceBudget';
 import { loadSettings, type BondSettings } from './settings';
+import { checkSpend, invalidateSpendCache } from './spendGuard';
+import { consume } from './throttle';
 import { buildSystemPrompt } from './systemPrompt';
 import {
   MAX_HISTORY_TURNS,
@@ -49,33 +53,14 @@ const GATEWAY_URL =
 /* Rate limiting                                                              */
 /* -------------------------------------------------------------------------- */
 
-/**
- * In-memory sliding window, keyed by client IP.
+/*
+ * The in-memory `Map` limiter that used to live here has been removed.
  *
- * Honest about its limits: serverless instances don't share memory, so this
- * caps a single instance rather than the whole deployment. It stops a stuck
- * retry loop and casual abuse — it is NOT a substitute for authentication.
- * Before this endpoint is public, it needs a real identity check (backlog B8).
+ * It counted per serverless instance, and Vercel runs many in parallel — each
+ * starting empty — so concurrent requests simply spread across them and every
+ * one got a fresh allowance. It read like protection and was not. Rate limiting
+ * now lives in `throttle.ts`, shared through the database.
  */
-const WINDOW_MS = 60_000;
-const MAX_REQUESTS_PER_WINDOW = 20;
-const hits = new Map<string, number[]>();
-
-function rateLimited(ip: string): boolean {
-  const now = Date.now();
-  const recent = (hits.get(ip) ?? []).filter((t) => now - t < WINDOW_MS);
-  recent.push(now);
-  hits.set(ip, recent);
-
-  // Opportunistic sweep so the map cannot grow without bound on a warm instance.
-  if (hits.size > 5000) {
-    for (const [key, times] of hits) {
-      if (times.every((t) => now - t >= WINDOW_MS)) hits.delete(key);
-    }
-  }
-
-  return recent.length > MAX_REQUESTS_PER_WINDOW;
-}
 
 function clientIp(request: Request): string {
   const forwarded = request.headers.get('x-forwarded-for');
@@ -327,6 +312,10 @@ async function streamFromGateway(
           costUsd,
           ok: true,
         });
+        // The spend ceiling reads a cached sum; drop it so the next request
+        // (and the admin console) sees this reply's cost immediately. Without
+        // this, a burst inside the cache window could overshoot the ceiling.
+        invalidateSpendCache();
       })();
     },
   });
@@ -362,9 +351,6 @@ export async function handleCoach(request: Request): Promise<Response> {
   }
 
   const ip = clientIp(request);
-  if (rateLimited(ip)) {
-    return jsonError(429, 'rate_limited', 'Te veel berichten na elkaar. Even wachten.');
-  }
 
   let body: CoachRequest;
   try {
@@ -387,8 +373,68 @@ export async function handleCoach(request: Request): Promise<Response> {
     return jsonError(503, 'model_disabled', 'Bond draait tijdelijk zonder AI-model.');
   }
 
-  const userKey = await hashUserKey(ip);
+  /* ── Protection layers ────────────────────────────────────────────────────
+   *
+   * Ordered cheapest-and-hardest first, so an attacker burns the least of our
+   * resources before being turned away, and so a tripped ceiling never costs a
+   * database round-trip it did not need.
+   *
+   *   4. global spend ceiling — the only guarantee; bounds the worst case
+   *   1. bot check            — filters scripted traffic at the door
+   *   3. shared IP throttle   — one database round-trip, catches bursts
+   *   2. device budget        — the polite fence for ordinary visitors
+   *
+   * Layers 1–3 fail OPEN when their dependency is unreachable; layer 4 is what
+   * makes that safe. See each module for the reasoning.
+   */
 
+  // ── 4. Global daily spend ceiling ──
+  const spend = await checkSpend(settings.dailySpendCapUsd);
+  if (spend.exceeded) {
+    console.warn(`[coach] daily spend ceiling hit: $${spend.spent.toFixed(4)} / $${spend.cap}`);
+    // Same code as the kill switch: the visitor gets the scripted companion,
+    // not an error. They are not the ones who did anything wrong.
+    return jsonError(503, 'model_disabled', 'Bond draait tijdelijk zonder AI-model.');
+  }
+
+  // ── 1. Bot check ──
+  if (settings.requireBotCheck) {
+    const check = await verifyHuman(str(body.botToken, 4000), ip);
+    if (check.outcome === 'failed') {
+      console.warn(`[coach] bot check failed: ${check.codes?.join(',') ?? 'unknown'}`);
+      return jsonError(403, 'bot_check_failed', 'Verificatie mislukt. Herlaad de pagina.');
+    }
+  }
+
+  // ── 3. Shared IP throttle ──
+  const ipKey = await hashUserKey(ip);
+  const burst = await consume({
+    scope: 'ip',
+    key: ipKey,
+    windowSeconds: 60,
+    max: settings.ipRequestsPerMinute,
+  });
+  if (!burst.allowed) {
+    return jsonError(429, 'rate_limited', 'Te veel berichten na elkaar. Even wachten.');
+  }
+
+  // ── 2. Signed device budget ──
+  const budget = await readBudget(request);
+  const anonymousCapped =
+    settings.anonymousTurnCap > 0 && budget.used >= settings.anonymousTurnCap;
+  if (anonymousCapped) {
+    // 402-ish in spirit but 429 in code: this is a quota, and the client turns
+    // it into the "save your conversation" prompt rather than an error.
+    return jsonError(
+      429,
+      'anonymous_cap',
+      'Je hebt het gratis aantal berichten bereikt. Maak een account om verder te praten.',
+    );
+  }
+
+  // Per-person daily message cap (independent of spend; an operator control
+  // over volume rather than cost).
+  const userKey = budget.deviceId ? await hashUserKey(budget.deviceId) : ipKey;
   if (settings.dailyMessageCap > 0) {
     const used = await messagesLast24h(userKey);
     if (used >= settings.dailyMessageCap) {
@@ -407,7 +453,30 @@ export async function handleCoach(request: Request): Promise<Response> {
   );
 
   try {
-    return await streamFromGateway(apiKey, settings, system, history, userKey, request.signal);
+    const response = await streamFromGateway(
+      apiKey,
+      settings,
+      system,
+      history,
+      userKey,
+      request.signal,
+    );
+
+    // Spend the turn only on a response we are actually going to stream — a
+    // gateway error should not cost the visitor part of their allowance.
+    if (response.ok) {
+      const headers = new Headers(response.headers);
+      headers.append(
+        'set-cookie',
+        await budgetCookie({ ...budget, used: budget.used + 1 }, request),
+      );
+      // Let the client show "3 of 8 messages left" without a second request.
+      headers.set('x-coach-turns-used', String(budget.used + 1));
+      headers.set('x-coach-turns-cap', String(settings.anonymousTurnCap));
+      return new Response(response.body, { status: response.status, headers });
+    }
+
+    return response;
   } catch (error) {
     console.error('[coach] unexpected failure', error);
     return jsonError(502, 'gateway_error', 'De AI-dienst was niet bereikbaar.');

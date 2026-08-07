@@ -65,6 +65,16 @@ export interface CoachRequest {
    * conversation on every turn.
    */
   summary?: string;
+
+  /**
+   * Turnstile token proving a human is present.
+   *
+   * Absent in development and in the demo build, where no bot check is
+   * configured. When one IS configured, an absent token is treated as a
+   * failure rather than a skip — otherwise omitting the field would be a way
+   * to opt out of the check.
+   */
+  botToken?: string;
 }
 
 /** How many turns of raw history the server will forward to the model. */

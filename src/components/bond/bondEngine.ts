@@ -22,6 +22,7 @@
 
 import i18n from "@/i18n";
 import { streamCoachReply } from "@/services/api/coachClient";
+import { getTurnstileToken } from "@/services/api/turnstileClient";
 
 export type BondRole = "bond" | "user";
 
@@ -836,7 +837,14 @@ export const bondRespond = async (
   }
 
   /* --- 2. The real model. --- */
+
+  // Fetched per message: Turnstile tokens are single-use and short-lived, so
+  // one token per conversation would be rejected from the second turn on.
+  // Resolves to undefined when no bot check is configured.
+  const botToken = await getTurnstileToken();
+
   const result = await streamCoachReply({
+    botToken,
     history: history.map((m) => ({
       role: m.role === "user" ? ("user" as const) : ("bond" as const),
       text: m.text,
@@ -850,7 +858,35 @@ export const bondRespond = async (
     return { text: result.text, suggestions: buildSuggestions(context) };
   }
 
-  /* --- 3. Scripted fallback. --- */
+  /* --- 3. Quota and verification: NOT errors, so they don't get an error voice. --- */
+
+  // The free allowance is spent. This is the conversion moment the whole
+  // anonymous flow is built around, so Bond says it as an invitation rather
+  // than a refusal — and never mid-thought, because the cap is checked before
+  // the model runs, not during.
+  if (result.failure === "anonymous_cap") {
+    return {
+      text: i18n.t(
+        "bond_anonymous_cap",
+        "Ik zou graag verder praten, maar hier stopt het gratis stuk. Maak een account aan, dan bewaar ik dit gesprek en pikken we het op waar we gebleven zijn.",
+      ),
+      suggestions: [
+        i18n.t("bond_cap_create_account", "Account aanmaken"),
+        i18n.t("bond_cap_find_provider", "Zoek een hulpverlener"),
+      ],
+    };
+  }
+
+  if (result.failure === "bot_check_failed") {
+    return {
+      text: i18n.t(
+        "bond_bot_check_failed",
+        "Ik kon niet bevestigen dat je een mens bent. Herlaad de pagina even, dan proberen we opnieuw.",
+      ),
+      suggestions: [],
+    };
+  }
+
   if (result.failure === "rate_limited") {
     return {
       text: i18n.t(
@@ -860,6 +896,8 @@ export const bondRespond = async (
       suggestions: buildSuggestions(context),
     };
   }
+
+  /* --- 4. Scripted fallback for genuine failures. --- */
 
   // Keep the cosmetic delay ONLY here: without a real round-trip the scripted
   // reply would otherwise land instantly and give the fallback away.
