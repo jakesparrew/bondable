@@ -17,11 +17,13 @@
  * `streamFromGateway` for `@anthropic-ai/sdk`; nothing else here changes.
  */
 
+import { getServerSession } from '../auth/session';
 import { verifyHuman } from './botCheck';
 import { priceFor } from './catalogue';
 import { budgetCookie, readBudget } from './deviceBudget';
 import { loadSettings, type BondSettings } from './settings';
 import { checkSpend, invalidateSpendCache } from './spendGuard';
+import { loadSummary } from './threads';
 import { consume } from './throttle';
 import { buildSystemPrompt } from './systemPrompt';
 import {
@@ -373,6 +375,18 @@ export async function handleCoach(request: Request): Promise<Response> {
     return jsonError(503, 'model_disabled', 'Bond draait tijdelijk zonder AI-model.');
   }
 
+  /**
+   * Signed-in callers get real identity (a verified JWT — see
+   * src/server/auth/session.ts) and with it a different protection profile:
+   * the bot check and the anonymous device budget exist to meter STRANGERS,
+   * and an authenticated account is already a higher bar than either. What
+   * stays for everyone: the global spend ceiling (it bounds the bill, not the
+   * person), the per-IP burst throttle (a hijacked account is still a bot),
+   * and the daily message cap — keyed on the account instead of the device,
+   * so clearing cookies no longer resets a signed-in user's allowance.
+   */
+  const session = await getServerSession(request);
+
   /* ── Protection layers ────────────────────────────────────────────────────
    *
    * Ordered cheapest-and-hardest first, so an attacker burns the least of our
@@ -397,8 +411,8 @@ export async function handleCoach(request: Request): Promise<Response> {
     return jsonError(503, 'model_disabled', 'Bond draait tijdelijk zonder AI-model.');
   }
 
-  // ── 1. Bot check ──
-  if (settings.requireBotCheck) {
+  // ── 1. Bot check (anonymous only — see the signed-in note above) ──
+  if (settings.requireBotCheck && !session) {
     const check = await verifyHuman(str(body.botToken, 4000), ip);
     if (check.outcome === 'failed') {
       console.warn(`[coach] bot check failed: ${check.codes?.join(',') ?? 'unknown'}`);
@@ -418,23 +432,30 @@ export async function handleCoach(request: Request): Promise<Response> {
     return jsonError(429, 'rate_limited', 'Te veel berichten na elkaar. Even wachten.');
   }
 
-  // ── 2. Signed device budget ──
-  const budget = await readBudget(request);
-  const anonymousCapped =
-    settings.anonymousTurnCap > 0 && budget.used >= settings.anonymousTurnCap;
-  if (anonymousCapped) {
-    // 402-ish in spirit but 429 in code: this is a quota, and the client turns
-    // it into the "save your conversation" prompt rather than an error.
-    return jsonError(
-      429,
-      'anonymous_cap',
-      'Je hebt het gratis aantal berichten bereikt. Maak een account om verder te praten.',
-    );
+  // ── 2. Signed device budget (anonymous only) ──
+  const budget = session ? null : await readBudget(request);
+  if (budget) {
+    const anonymousCapped =
+      settings.anonymousTurnCap > 0 && budget.used >= settings.anonymousTurnCap;
+    if (anonymousCapped) {
+      // 402-ish in spirit but 429 in code: this is a quota, and the client
+      // turns it into the "save your conversation" prompt rather than an error.
+      return jsonError(
+        429,
+        'anonymous_cap',
+        'Je hebt het gratis aantal berichten bereikt. Maak een account om verder te praten.',
+      );
+    }
   }
 
   // Per-person daily message cap (independent of spend; an operator control
-  // over volume rather than cost).
-  const userKey = budget.deviceId ? await hashUserKey(budget.deviceId) : ipKey;
+  // over volume rather than cost). Signed in → keyed on the ACCOUNT, so the
+  // allowance follows the person across devices and survives cookie clears.
+  const userKey = session
+    ? await hashUserKey(`auth:${session.user.id}`)
+    : budget?.deviceId
+      ? await hashUserKey(budget.deviceId)
+      : ipKey;
   if (settings.dailyMessageCap > 0) {
     const used = await messagesLast24h(userKey);
     if (used >= settings.dailyMessageCap) {
@@ -446,9 +467,17 @@ export async function handleCoach(request: Request): Promise<Response> {
     }
   }
 
+  // Long-term continuity. Signed in → the summary the SERVER built and stored
+  // (threads.ts); a client-supplied one is ignored, because the stored one is
+  // the only one whose provenance we know. Anonymous → the client may send a
+  // short recap of its own local history.
+  const summary = session
+    ? ((await loadSummary(session.user.id)) ?? undefined)
+    : str(body.summary, 2000);
+
   const system = buildSystemPrompt(
     sanitizeContext(body.context),
-    str(body.summary, 2000),
+    summary,
     settings.toneInstructions,
   );
 
@@ -464,7 +493,10 @@ export async function handleCoach(request: Request): Promise<Response> {
 
     // Spend the turn only on a response we are actually going to stream — a
     // gateway error should not cost the visitor part of their allowance.
-    if (response.ok) {
+    // Signed-in callers carry no device budget: their allowance is the daily
+    // cap on the account, so there is no cookie to advance and no countdown
+    // to report.
+    if (response.ok && budget) {
       const headers = new Headers(response.headers);
       headers.append(
         'set-cookie',

@@ -46,6 +46,16 @@ function apiDevServer(mode: string): Plugin {
           module: '/src/server/coach/adminHandler.ts',
           fn: 'handleCoachAdmin',
         },
+        {
+          path: '/api/coach-thread',
+          module: '/src/server/coach/threadHandler.ts',
+          fn: 'handleCoachThread',
+        },
+        {
+          path: '/api/profile',
+          module: '/src/server/auth/profileHandler.ts',
+          fn: 'handleProfile',
+        },
       ];
 
       server.middlewares.use(async (req, res, next) => {

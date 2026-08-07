@@ -87,9 +87,10 @@ export async function handleCoachAdmin(request: Request): Promise<Response> {
       status: {
         hasApiKey: Boolean(apiKey),
         hasDatabase: hasDatabase(),
-        // Whether writes are possible at all, so the UI can disable the form
-        // rather than let someone type a change that will be rejected.
-        writable: Boolean(process.env.COACH_ADMIN_TOKEN),
+        // Whether THIS caller can write, so the UI can disable the form rather
+        // than let someone type a change that will be rejected. A signed-in
+        // admin can always write; the shared token is the legacy path.
+        writable: (await isAdmin(request)) || Boolean(process.env.COACH_ADMIN_TOKEN),
         gatewayUrl:
           process.env.COACH_GATEWAY_URL || 'https://ai-gateway.vercel.sh/v1/chat/completions',
         // Whether each protection layer is genuinely wired. A control that is
