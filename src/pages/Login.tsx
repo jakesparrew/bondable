@@ -4,13 +4,30 @@ import console from "@/lib/production-console";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { PasswordStrengthInput } from "@/components/ui/password-strength-input";
-import { supabase } from "@/integrations/supabase/client";
+import { getApiToken, signIn, signUp } from "@/lib/authClient";
 import { useToast } from "@/hooks/ui/use-toast";
 import { useAuthManager, isBypassAvailable, setDemoRole } from "@/hooks/api/useAuthManager";
 import { RoleSelectionDialog } from "@/components/ui/role-selection-dialog";
 import { useTranslation } from "react-i18next";
+
+/**
+ * Login — real authentication against Neon Auth.
+ *
+ * This page used to call `supabase.auth.*`: a mock that accepted any
+ * password in dev, and in production a Supabase project whose domain no
+ * longer resolves. Sign-in, registration and Google now run against the
+ * real auth server; the profile (and with it the role) is created through
+ * /api/profile, where the role is capped server-side at client/therapist.
+ *
+ * Supports `?redirect=/coach`-style return paths: only same-origin absolute
+ * paths are honoured, so the parameter can never send someone off-site.
+ */
+
+/** Only paths like "/coach" — never protocol-relative or absolute URLs. */
+const safeRedirect = (value: string | null): string | null =>
+  value && value.startsWith("/") && !value.startsWith("//") ? value : null;
 
 const Login = () => {
   const [email, setEmail] = useOptimizedState("");
@@ -24,7 +41,9 @@ const Login = () => {
   const [isRedirecting, setIsRedirecting] = useOptimizedState(false);
   const [hasProcessedAuth, setHasProcessedAuth] = useOptimizedState(false);
   const navigate = useNavigate();
-  const { user, session, loading, error } = useAuthManager();
+  const [searchParams] = useSearchParams();
+  const redirectTo = safeRedirect(searchParams.get("redirect"));
+  const { user, session, loading, error, role, roleLoading, refreshProfile } = useAuthManager();
   const { toast } = useToast();
   const { t } = useTranslation();
 
@@ -38,9 +57,14 @@ const Login = () => {
     }
   }, [user, loading]);
 
-  // Handle authenticated users with role-based redirect
+  /**
+   * Authenticated → route by role. The provider resolves the profile (and so
+   * the role) for us; no profile yet means a fresh account whose role is
+   * still unknown — email registrations create theirs immediately below, so
+   * in practice the dialog only appears for first-time Google sign-ins.
+   */
   useOptimizedEffect(() => {
-    if (loading || isRedirecting || hasProcessedAuth) {
+    if (loading || roleLoading || isRedirecting || hasProcessedAuth) {
       return;
     }
 
@@ -51,151 +75,56 @@ const Login = () => {
     }
 
     if (user && session) {
-      console.log('✅ User authenticated, processing redirect...');
       setHasProcessedAuth(true);
-      handleAuthenticatedUser();
-    }
-  }, [user, session, loading, error, isRedirecting, hasProcessedAuth]);
-
-  const handleAuthenticatedUser = async () => {
-    if (!user || !session || isRedirecting) return;
-
-    setIsRedirecting(true);
-    
-    try {
-      console.log('🔍 Processing authenticated user:', user.id, 'email:', user.email);
-      const providers = session.user.app_metadata?.providers || [];
-      const isGoogleUser = providers.includes('google');
-      
-      console.log('🔍 User providers:', providers);
-      console.log('🔍 Is Google user:', isGoogleUser);
-      
-      if (isGoogleUser) {
-        await handleGoogleUser();
+      if (role) {
+        setIsRedirecting(true);
+        directRedirect(role);
       } else {
-        await handleRegularUser();
+        setShowRoleDialog(true);
       }
-    } catch (error) {
-      console.error("❌ Error handling authenticated user:", error);
-      showNotification("error", t("could_not_determine_user_role"));
-      setIsRedirecting(false);
     }
-  };
+  }, [user, session, loading, error, role, roleLoading, isRedirecting, hasProcessedAuth]);
 
-  const handleGoogleUser = async () => {
-    if (!user) return;
-
-    try {
-      console.log("🔍 Checking Google user profile...");
-      
-      const { data: profile, error: profileError } = await supabase
-        .from("profiles")
-        .select("role")
-        .eq("id", user.id)
-        .maybeSingle();
-
-      if (profileError) {
-        console.warn("⚠️ Profile fetch error:", profileError);
-      }
-
-      if (profile?.role) {
-        console.log('✅ Found existing Google user profile:', profile.role);
-        directRedirect(profile.role);
-        return;
-      }
-
-      // New Google user - show role selection
-      console.log("🆕 New Google user - showing role selection");
-      setShowRoleDialog(true);
-      setIsRedirecting(false);
-      
-    } catch (error) {
-      console.warn("⚠️ Error handling Google user, showing role selection:", error);
-      setShowRoleDialog(true);
-      setIsRedirecting(false);
-    }
-  };
-
-  const handleRegularUser = async () => {
-    if (!user) return;
-
-    try {
-      console.log("🔍 Fetching regular user profile...");
-      
-      const { data: profile, error: profileError } = await supabase
-        .from("profiles")
-        .select("role")
-        .eq("id", user.id)
-        .single();
-
-      if (profileError) {
-        console.error("❌ Profile fetch error:", profileError);
-        showNotification("error", t("could_not_determine_user_role"));
-        setIsRedirecting(false);
-        return;
-      }
-
-      if (profile?.role) {
-        console.log('✅ Found regular user profile:', profile.role);
-        directRedirect(profile.role);
-      } else {
-        console.error("❌ No role found for user");
-        showNotification("error", t("could_not_determine_user_role"));
-        setIsRedirecting(false);
-      }
-    } catch (error) {
-      console.error("❌ Error handling regular user:", error);
-      showNotification("error", t("authentication_error"));
-      setIsRedirecting(false);
-    }
-  };
-
-  const directRedirect = (role: string) => {
-    console.log("🚀 Direct redirect to:", role);
-    const targetPath = `/dashboard/${role}`;
-    console.log("🚀 Navigating to:", targetPath);
+  const directRedirect = (userRole: string) => {
+    // A requested return path (e.g. /coach after the cap) outranks the role
+    // dashboard — the visitor was in the middle of something.
+    const targetPath = redirectTo ?? `/dashboard/${userRole}`;
     navigate(targetPath, { replace: true });
   };
 
-  const handleRoleSelection = async (role: "therapist" | "client") => {
-    if (!user) return;
-
+  /**
+   * First-time Google users: no profile exists yet, so ask which side of the
+   * platform they are on and create it. Role capping happens server-side.
+   */
+  const handleRoleSelection = async (chosenRole: "therapist" | "client") => {
     try {
-      console.log("🆕 Creating new Google user profile with role:", role);
-
-      const fullName =
-        `${user.user_metadata?.first_name || ''} ${user.user_metadata?.last_name || ''}`.trim() ||
-        user.user_metadata?.name ||
-        user.email?.split("@")[0] ||
-        "User";
-
-      const { error } = await supabase.from("profiles").insert({
-        id: user.id,
-        first_name: fullName.split(' ')[0] || '',
-        last_name: fullName.split(' ').slice(1).join(' ') || '',
-        email: user.email,
-        role: role,
-        avatar_url: user.user_metadata?.avatar_url || user.user_metadata?.picture,
-      });
-
-      if (error) {
-        console.error("❌ Error creating Google user profile:", error);
-        showNotification("error", "Failed to create profile");
+      const token = await getApiToken();
+      if (!token) {
+        showNotification("error", t("authentication_error"));
         return;
       }
-
-      console.log("✅ Google user profile created successfully");
+      const response = await fetch("/api/profile", {
+        method: "POST",
+        headers: { "content-type": "application/json", authorization: `Bearer ${token}` },
+        body: JSON.stringify({ role: chosenRole }),
+      });
+      if (!response.ok) {
+        showNotification("error", t("could_not_determine_user_role"));
+        return;
+      }
+      await refreshProfile();
       setShowRoleDialog(false);
-      directRedirect(role);
-
-    } catch (error) {
-      console.error("❌ Error in handleRoleSelection:", error);
-      showNotification("error", "Failed to create profile");
+      setIsRedirecting(true);
+      directRedirect(chosenRole);
+    } catch (err) {
+      console.error("❌ Error in handleRoleSelection:", err);
+      showNotification("error", t("could_not_determine_user_role"));
     }
   };
 
   const isPasswordValid = () => {
-    const requirements = [/.{8,}/, /[0-9]/, /[a-z]/, /[A-Z]/];
+    // Length mirrors the server's minimum (10); the complexity checks are ours.
+    const requirements = [/.{10,}/, /[0-9]/, /[a-z]/, /[A-Z]/];
     return requirements.every((regex) => regex.test(password));
   };
 
@@ -225,25 +154,21 @@ const Login = () => {
   const handleGoogleSignIn = async () => {
     try {
       setIsLoading(true);
-      console.log("🚀 Starting Google sign-in...");
-
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: "google",
-        options: {
-          redirectTo: `${window.location.origin}/`,
-        },
-      });
+      // Come back to THIS page (with any return path preserved): the
+      // role/profile logic above runs on return and finishes the journey.
+      const callbackURL = `${window.location.origin}/login${
+        redirectTo ? `?redirect=${encodeURIComponent(redirectTo)}` : ""
+      }`;
+      const { error } = await signIn.social({ provider: "google", callbackURL });
 
       if (error) {
         console.error("❌ Google sign-in error:", error);
-        showNotification("error", `Google sign-in failed: ${error.message}`);
+        showNotification("error", t("failed_to_initiate_google_signin"));
         return;
       }
-
-      console.log("✅ Google sign-in initiated");
-      showNotification("success", t("redirecting_to_google"));
-    } catch (error) {
-      console.error("❌ Google sign-in error:", error);
+      // The browser navigates to Google here; nothing further runs on success.
+    } catch (err) {
+      console.error("❌ Google sign-in error:", err);
       showNotification("error", t("failed_to_initiate_google_signin"));
     } finally {
       setIsLoading(false);
@@ -264,91 +189,67 @@ const Login = () => {
 
     try {
       if (isRegister) {
-        console.log("🚀 Starting registration...");
-
         if (!email || !password || !firstName || !lastName || !selectedRole) {
           throw new Error(t("missing_required_registration_data"));
         }
 
-        const fullName = `${firstName.trim()} ${lastName.trim()}`;
-
-        const { data, error } = await supabase.auth.signUp({
+        const { error } = await signUp.email({
           email: email.trim(),
-          password: password,
-          options: {
-            emailRedirectTo: `${window.location.origin}/`,
-            data: {
-              first_name: firstName.trim(),
-              last_name: lastName.trim(),
-              role: selectedRole,
-            },
-          },
+          password,
+          name: `${firstName.trim()} ${lastName.trim()}`,
         });
 
         if (error) {
           console.error("❌ Registration error:", error);
-          if (error.message.includes("User already registered")) {
-            showNotification(
-              "error",
-              t("user_already_registered")
-            );
-          } else if (error.message.includes("Invalid email")) {
+          if (error.code === "USER_ALREADY_EXISTS") {
+            showNotification("error", t("user_already_registered"));
+          } else if (error.code === "INVALID_EMAIL") {
             showNotification("error", t("please_enter_valid_email"));
-          } else if (error.message.includes("Password")) {
-            showNotification(
-              "error",
-              t("password_requirements")
-            );
+          } else if (error.code === "PASSWORD_TOO_SHORT") {
+            showNotification("error", t("password_requirements"));
           } else {
-            showNotification("error", `${t("registration_failed")}: ${error.message}`);
+            showNotification("error", `${t("registration_failed")}: ${error.message ?? ""}`);
           }
           return;
         }
 
-        if (data.user) {
-          console.log("✅ Registration successful:", data.user.id);
-          showNotification(
-            "success",
-            t("registration_successful_check_email")
-          );
-
-          // Clear form
-          setEmail("");
-          setPassword("");
-          setFirstName("");
-          setLastName("");
-          setSelectedRole(null);
+        // The account exists; now make it a PERSON with the chosen role. The
+        // server caps the role at client/therapist, so a tampered request
+        // cannot mint an admin. The redirect effect fires once the provider
+        // sees the fresh session + profile.
+        const token = await getApiToken();
+        if (token) {
+          await fetch("/api/profile", {
+            method: "POST",
+            headers: { "content-type": "application/json", authorization: `Bearer ${token}` },
+            body: JSON.stringify({
+              role: selectedRole,
+              firstName: firstName.trim(),
+              lastName: lastName.trim(),
+            }),
+          }).catch(() => {
+            /* provider retries via refreshProfile on next load */
+          });
+          await refreshProfile();
         }
+        showNotification("success", t("login_successful"));
       } else {
-        console.log("🚀 Starting login...");
-
-        const { data, error } = await supabase.auth.signInWithPassword({
+        const { error } = await signIn.email({
           email: email.trim(),
-          password: password,
+          password,
         });
 
         if (error) {
           console.error("❌ Login error:", error);
-          if (error.message.includes("Invalid login credentials")) {
-            showNotification(
-              "error",
-              t("invalid_email_or_password")
-            );
-          } else if (error.message.includes("Email not confirmed")) {
-            showNotification(
-              "warning",
-              t("email_not_confirmed")
-            );
+          if (error.code === "INVALID_EMAIL_OR_PASSWORD") {
+            showNotification("error", t("invalid_email_or_password"));
           } else {
-            showNotification("error", `${t("login_failed")}: ${error.message}`);
+            showNotification("error", `${t("login_failed")}: ${error.message ?? ""}`);
           }
           return;
         }
 
-        if (data.user) {
-          console.log("✅ Login successful:", data.user.id);
-          showNotification("success", t("login_successful"));
-        }
+        showNotification("success", t("login_successful"));
       }
     } catch (error) {
       console.error("❌ Authentication error:", error);

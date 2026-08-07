@@ -1,11 +1,36 @@
-import { createContext, useContext, ReactNode, useState, useEffect, useRef, useCallback } from 'react';
-import console from "@/lib/production-console";
-import { User, Session } from '@supabase/supabase-js';
-import { supabase } from '@/integrations/supabase/client';
-import { useParams } from 'react-router-dom';
-import { avatarCache, profileCache } from '@/services/cache';
+import { createContext, useContext, ReactNode, useState, useEffect, useCallback } from 'react';
+import type { User, Session } from '@supabase/supabase-js';
+import {
+  clearApiToken,
+  getApiToken,
+  signOut as neonSignOut,
+  useSession as useNeonSession,
+} from '@/lib/authClient';
 
 export type UserRole = 'client' | 'therapist' | 'admin' | null;
+
+/**
+ * useAuthManager — the single answer to "who is using the app right now?"
+ *
+ * Three providers, chosen once at mount:
+ *
+ *   1. Demo role chosen (dev/demo builds) → the seeded mock user, so the
+ *      dashboards stay explorable with seeded data. Unchanged.
+ *   2. Everything else → RealAuthProvider on NEON AUTH. This replaced a
+ *      Supabase-based provider whose project no longer even resolves in DNS —
+ *      there was no real login anywhere in the app.
+ *
+ * The interface still speaks Supabase's `User`/`Session` TYPES because ~37
+ * call sites consume that shape; the objects are constructed compatibly. The
+ * types are compile-time only — no Supabase code runs here.
+ *
+ * One identity rule worth stating: `user.id` is the PROFILE id
+ * (`profiles.id`), not the auth user id. Every data query in the app keys on
+ * profiles.id; the auth id is a credential detail that stays inside the
+ * provider. Until the profile has loaded (or when none exists yet), user.id
+ * falls back to the auth id and `role` stays null — protected routes treat
+ * that as "not authorised yet", which is the safe reading.
+ */
 
 interface AuthState {
   user: User | null;
@@ -20,7 +45,7 @@ interface AuthState {
 interface UseAuthManagerReturn extends AuthState {
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
-  getCurrentUserType: () => "therapist" | "client" | "admin" | null;
+  getCurrentUserType: () => 'therapist' | 'client' | 'admin' | null;
 }
 
 const AuthManagerContext = createContext<UseAuthManagerReturn | null>(null);
@@ -37,19 +62,10 @@ interface AuthManagerProviderProps {
   children: ReactNode;
 }
 
-/**
- * DEMO / DEV login bypass — now RUNTIME-SWITCHABLE.
- *
- * The bypass is *available* under `vite` dev (import.meta.env.DEV) OR in any
- * build with VITE_DEMO_MODE=true (a shareable demo deploy). Which role (if any)
- * is *active* is chosen at runtime from the homepage: the picked role is stored
- * in localStorage so it survives reloads, and the env var VITE_DEV_BYPASS_AUTH
- * is used only as an initial fallback. Pick a role -> we render the matching
- * dashboard with seeded mock data; pick nothing -> the public homepage shows.
- *
- * This whole mechanism is stripped from a real production build (DEV false and
- * VITE_DEMO_MODE unset), where normal authentication runs instead.
- */
+/* -------------------------------------------------------------------------- */
+/* Demo / dev bypass — runtime-switchable, unchanged behaviour                 */
+/* -------------------------------------------------------------------------- */
+
 const DEMO_ROLE_STORAGE_KEY = 'bondable_demo_role';
 
 /** True when the demo bypass is available at all (dev or demo build). */
@@ -141,521 +157,150 @@ const DevBypassAuthProvider = ({ children, role }: { children: ReactNode; role: 
   return <AuthManagerContext.Provider value={value}>{children}</AuthManagerContext.Provider>;
 };
 
-/**
- * Demo/dev "logged out" state. When the bypass is AVAILABLE (dev or demo build)
- * but NO role has been chosen on the homepage, present an explicit signed-out
- * context. Otherwise the in-memory mock backend's default session would quietly
- * authenticate the visitor (as a therapist) and protected routes would render
- * for a beat before redirecting — the "dashboard flash" before the homepage.
- * With this, the public homepage is the clean landing and dashboards redirect
- * straight there until the visitor picks a role.
- */
-const DemoLoggedOutProvider = ({ children }: { children: ReactNode }) => {
-  const value: UseAuthManagerReturn = {
-    user: null, session: null, loading: false, initialized: true,
-    role: null, roleLoading: false, error: null,
-    signOut: async () => {
-      clearDemoRole();
+/* -------------------------------------------------------------------------- */
+/* Real authentication — Neon Auth                                            */
+/* -------------------------------------------------------------------------- */
+
+interface ApiProfile {
+  id: string;
+  email: string | null;
+  role: Exclude<UserRole, null>;
+  firstName: string | null;
+  lastName: string | null;
+}
+
+const RealAuthProvider = ({ children }: { children: ReactNode }) => {
+  const neonSession = useNeonSession();
+  const authUser = neonSession.data?.user ?? null;
+
+  const [profile, setProfile] = useState<ApiProfile | null>(null);
+  const [profileLoading, setProfileLoading] = useState(false);
+  // Bumping this re-runs the profile fetch — that is all refreshProfile is.
+  const [profileVersion, setProfileVersion] = useState(0);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    if (!authUser?.id) {
+      setProfile(null);
+      setProfileLoading(false);
+      return;
+    }
+
+    setProfileLoading(true);
+    void (async () => {
+      try {
+        const token = await getApiToken();
+        if (!token) {
+          if (!cancelled) setProfile(null);
+          return;
+        }
+        const response = await fetch('/api/profile', {
+          headers: { authorization: `Bearer ${token}` },
+        });
+        const body = response.ok
+          ? ((await response.json()) as { profile: ApiProfile | null })
+          : { profile: null };
+        if (!cancelled) setProfile(body.profile);
+      } catch {
+        if (!cancelled) setProfile(null);
+      } finally {
+        if (!cancelled) setProfileLoading(false);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [authUser?.id, profileVersion]);
+
+  const refreshProfile = useCallback(async () => {
+    setProfileVersion((v) => v + 1);
+  }, []);
+
+  const handleSignOut = useCallback(async () => {
+    try {
+      await neonSignOut();
+    } finally {
+      clearApiToken();
+      // Full navigation: every consumer derives from this provider, and a hard
+      // boundary beats chasing each piece of state down individually.
       if (typeof window !== 'undefined') window.location.assign('/');
-    },
-    refreshProfile: async () => {},
-    getCurrentUserType: () => null,
+    }
+  }, []);
+
+  // Compatibility shape for the ~37 call sites that expect Supabase's User.
+  const user: User | null = authUser
+    ? ({
+        // The app's identity is the PROFILE id — see the module comment.
+        id: profile?.id ?? authUser.id,
+        email: authUser.email ?? undefined,
+        user_metadata: {
+          first_name: profile?.firstName ?? authUser.name?.split(' ')[0] ?? '',
+          last_name:
+            profile?.lastName ?? authUser.name?.split(' ').slice(1).join(' ') ?? '',
+          full_name: authUser.name ?? '',
+        },
+        app_metadata: { provider: 'neon-auth', providers: ['neon-auth'] },
+        aud: 'authenticated',
+        created_at:
+          typeof authUser.createdAt === 'string'
+            ? authUser.createdAt
+            : new Date().toISOString(),
+      } as unknown as User)
+    : null;
+
+  const session: Session | null = user
+    ? ({
+        // No secrets here on purpose: real credentials are the httpOnly cookie
+        // on the auth origin plus short-lived JWTs from getApiToken().
+        access_token: 'neon-auth',
+        refresh_token: 'neon-auth',
+        token_type: 'bearer',
+        expires_in: 900,
+        expires_at: Math.floor(Date.now() / 1000) + 900,
+        user,
+      } as unknown as Session)
+    : null;
+
+  const value: UseAuthManagerReturn = {
+    user,
+    session,
+    loading: neonSession.isPending,
+    initialized: !neonSession.isPending,
+    role: profile?.role ?? null,
+    roleLoading: profileLoading,
+    error: null,
+    signOut: handleSignOut,
+    refreshProfile,
+    getCurrentUserType: () => profile?.role ?? null,
   };
+
   return <AuthManagerContext.Provider value={value}>{children}</AuthManagerContext.Provider>;
 };
 
+/* -------------------------------------------------------------------------- */
+/* Provider selection                                                          */
+/* -------------------------------------------------------------------------- */
+
 export const AuthManagerProvider = ({ children }: AuthManagerProviderProps) => {
+  // Constant at module load, so the same branch is taken for the lifetime of
+  // the mount — no conditional-hook hazards.
   if (DEV_BYPASS_ROLE) {
     return <DevBypassAuthProvider role={DEV_BYPASS_ROLE}>{children}</DevBypassAuthProvider>;
   }
 
-  // Bypass available but no role chosen → treat as signed out (see above).
-  if (isBypassAvailable()) {
-    return <DemoLoggedOutProvider>{children}</DemoLoggedOutProvider>;
-  }
-
-  const [authState, setAuthState] = useState<AuthState>({
-    user: null,
-    session: null,
-    loading: true,
-    initialized: false,
-    role: null,
-    roleLoading: true,
-    error: null,
-  });
-
-  // Prevent duplicate listener setup and track session stability
-  const initializationRef = useRef(false);
-  const sessionStableRef = useRef(false);
-  const reconnectAttemptRef = useRef(0);
-  const maxReconnectAttempts = 3;
-  const authStateDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  // Enhanced session persistence with stability checks
-  const persistSession = useCallback((session: Session | null) => {
-    try {
-      if (session) {
-        localStorage.setItem('supabase_session_backup', JSON.stringify({
-          session: session,
-          timestamp: Date.now(),
-          user_id: session.user.id
-        }));
-        sessionStableRef.current = true;
-        reconnectAttemptRef.current = 0;
-      } else {
-        localStorage.removeItem('supabase_session_backup');
-        sessionStableRef.current = false;
-      }
-    } catch (error) {
-      console.warn('Failed to persist session:', error);
-    }
-  }, []);
-
-  // Session recovery mechanism
-  const attemptSessionRecovery = useCallback(async () => {
-    if (reconnectAttemptRef.current >= maxReconnectAttempts) {
-      console.log('Max reconnection attempts reached');
-      return null;
-    }
-
-    try {
-      reconnectAttemptRef.current++;
-      console.log(`🔄 Attempting session recovery (${reconnectAttemptRef.current}/${maxReconnectAttempts})`);
-
-      const { data: { session: currentSession }, error: sessionError } = await supabase.auth.getSession();
-      
-      if (!sessionError && currentSession) {
-        console.log('✅ Current session recovered');
-        return currentSession;
-      }
-
-      const { data: { session: refreshedSession }, error: refreshError } = await supabase.auth.refreshSession();
-      
-      if (!refreshError && refreshedSession) {
-        console.log('✅ Session refreshed successfully');
-        return refreshedSession;
-      }
-
-      const backup = localStorage.getItem('supabase_session_backup');
-      if (backup) {
-        const { session: backupSession, timestamp } = JSON.parse(backup);
-        const age = Date.now() - timestamp;
-        
-        if (age < 3600000 && backupSession) {
-          console.log('🔄 Attempting to restore from backup session');
-          
-          const { error: setError } = await supabase.auth.setSession({
-            access_token: backupSession.access_token,
-            refresh_token: backupSession.refresh_token
-          });
-          
-          if (!setError) {
-            console.log('✅ Session restored from backup');
-            return backupSession;
-          }
-        }
-      }
-
-      console.warn('❌ All session recovery attempts failed');
-      return null;
-    } catch (error) {
-      console.error('❌ Session recovery error:', error);
-      return null;
-    }
-  }, []);
-
-  // Fetch user role
-  const fetchUserRole = useCallback(async (user: User | null): Promise<UserRole> => {
-    if (!user) return null;
-
-    try {
-      console.log('🔍 useAuthManager: Fetching user role for:', user.email);
-      
-      const { data: profile, error } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', user.id)
-        .maybeSingle();
-
-      console.log('🔍 useAuthManager: Profile query result:', { profile, error });
-
-      if (error) {
-        console.error('❌ Error fetching user role:', error);
-        return null;
-      }
-
-      const userRole = profile?.role as UserRole;
-      console.log('✅ User role fetched:', userRole);
-      return userRole;
-    } catch (error) {
-      console.error('❌ User role fetch failed:', error);
-      return null;
-    }
-  }, []);
-
-  // Ensure profile exists
-  const ensureProfileExists = useCallback(
-    async (
-      userId: string,
-      email: string,
-      fullName: string,
-      role: 'client' | 'therapist' = 'client'
-    ) => {
-      const { data: existing, error: checkErr } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('id', userId)
-        .maybeSingle();
-
-      if (checkErr) {
-        console.error('❌ Error checking profile:', checkErr);
-        return null;
-      }
-      if (existing) {
-        console.log('✅ Profile already exists:', existing.id);
-        return existing;
-      }
-
-      console.log('🆕 Creating new profile for user:', userId);
-      const { data: newProfile, error: insertErr } = await supabase
-        .from('profiles')
-        .insert({ 
-          id: userId, 
-          email, 
-          first_name: fullName.split(' ')[0] || '', 
-          last_name: fullName.split(' ').slice(1).join(' ') || '', 
-          role 
-        })
-        .select()
-        .single();
-
-      if (insertErr) {
-        console.error('❌ Error creating profile:', insertErr);
-        return null;
-      }
-      console.log('✅ Profile created successfully:', newProfile.id);
-      return newProfile;
-    },
-    []
-  );
-
-  // Send new user notification
-  const sendNewUserNotification = useCallback(async (user: User) => {
-    console.log('🔔 Sending admin notification for new user:', user.id);
-    try {
-      const { error } = await supabase.functions.invoke('send-admin-notification', {
-        body: {
-          notification_type: 'new_user_registration',
-          subject: 'New User Registration',
-          message: `A new user has registered on the platform.`,
-          user_data: {
-            user_id: user.id,
-            email: user.email,
-            first_name: user.user_metadata?.first_name || 
-              user.user_metadata?.full_name?.split(' ')[0] ||
-              user.user_metadata?.name || 'User',
-            last_name: user.user_metadata?.last_name || 
-              user.user_metadata?.full_name?.split(' ').slice(1).join(' ') ||
-              'New User',
-            registration_date: new Date().toISOString(),
-            provider: user.app_metadata?.providers?.[0] || 'email',
-          },
-          email_addresses: [],
-        },
-      });
-      if (error) {
-        console.error('❌ Failed to send admin notification:', error);
-      } else {
-        console.log('✅ Admin notification sent successfully');
-      }
-    } catch (err) {
-      console.error('❌ Error sending admin notification:', err);
-    }
-  }, []);
-
-  // Enhanced auth state change handler
-  const handleAuthStateChange = useCallback(async (_event: string, session: Session | null) => {
-    if (authStateDebounceRef.current) {
-      clearTimeout(authStateDebounceRef.current);
-    }
-
-    authStateDebounceRef.current = setTimeout(async () => {
-      console.log('🔄 Auth state change:', _event, session?.user?.id ?? 'No user');
-      
-      if (_event === 'TOKEN_REFRESHED' && session?.user?.id === authState.user?.id) {
-        console.log('⏭️ Skipping token refresh - same user');
-        return;
-      }
-      
-      if (!session && sessionStableRef.current && _event !== 'SIGNED_OUT') {
-        console.log('⚠️ Unexpected session loss detected, attempting recovery');
-        
-        const recoveredSession = await attemptSessionRecovery();
-        if (recoveredSession) {
-          session = recoveredSession;
-          console.log('✅ Session recovered successfully');
-        } else {
-          console.log('❌ Session recovery failed');
-          setAuthState(prev => ({ ...prev, error: 'Session expired. Please log in again.' }));
-        }
-      }
-      
-      // Fetch role if we have a user
-      let role: UserRole = null;
-      let roleLoading = false;
-      
-      if (session?.user) {
-        roleLoading = true;
-        setAuthState(prev => ({ ...prev, roleLoading: true }));
-        role = await fetchUserRole(session.user);
-        roleLoading = false;
-      }
-      
-      // Update state
-      setAuthState(prev => ({
-        ...prev,
-        session,
-        user: session?.user ?? null,
-        loading: false,
-        initialized: true,
-        role,
-        roleLoading,
-        error: session ? null : prev.error,
-      }));
-      
-      persistSession(session);
-    }, 50);
-  }, [attemptSessionRecovery, persistSession, authState.user?.id, fetchUserRole]);
-
-  // Initialize auth on mount
-  useEffect(() => {
-    let subscription: { unsubscribe: () => void } | null = null;
-
-    const initializeAuth = async () => {
-      if (initializationRef.current) return;
-      initializationRef.current = true;
-
-      console.log('🚀 Initializing enhanced auth manager...');
-      
-      const { data: { subscription: authSubscription } } = supabase.auth.onAuthStateChange(handleAuthStateChange);
-      subscription = authSubscription;
-
-      try {
-        const { data, error } = await supabase.auth.getSession();
-        
-        if (error) {
-          console.error('❌ Initial session error:', error);
-          
-          const recoveredSession = await attemptSessionRecovery();
-          if (recoveredSession) {
-            const role = await fetchUserRole(recoveredSession.user);
-            setAuthState({
-              session: recoveredSession,
-              user: recoveredSession.user,
-              loading: false,
-              initialized: true,
-              role,
-              roleLoading: false,
-              error: null,
-            });
-            persistSession(recoveredSession);
-          } else {
-            setAuthState(prev => ({ 
-              ...prev, 
-              user: null, 
-              session: null, 
-              loading: false, 
-              initialized: true,
-              role: null,
-              roleLoading: false,
-              error: 'Failed to load session' 
-            }));
-          }
-        } else {
-          console.log('✅ Initial session loaded:', data.session?.user?.id ?? 'No user');
-          const role = data.session?.user ? await fetchUserRole(data.session.user) : null;
-          setAuthState({
-            session: data.session,
-            user: data.session?.user ?? null,
-            loading: false,
-            initialized: true,
-            role,
-            roleLoading: false,
-            error: null,
-          });
-          persistSession(data.session);
-        }
-      } catch (err) {
-        console.error('❌ Session initialization failed:', err);
-        setAuthState(prev => ({ 
-          ...prev, 
-          user: null, 
-          session: null, 
-          loading: false, 
-          initialized: true,
-          role: null,
-          roleLoading: false,
-          error: 'Failed to initialize authentication' 
-        }));
-      }
-    };
-
-    initializeAuth();
-
-    return () => {
-      if (subscription && initializationRef.current) {
-        console.log('🧹 Cleaning up enhanced auth manager subscription');
-        subscription.unsubscribe();
-        initializationRef.current = false;
-      }
-    };
-  }, []);
-
-  // Handle new user profile creation and notifications
-  useEffect(() => {
-    const user = authState.user;
-    if (!user) return;
-
-    (async () => {
-      const { data: existingProfile } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('id', user.id)
-        .maybeSingle();
-
-      const isNewUser = !existingProfile;
-      if (isNewUser) {
-        console.log('👤 New user detected, sending admin notification…');
-        sendNewUserNotification(user);
-      }
-
-      const providers = user.app_metadata?.providers || [];
-      const fullName =
-        `${user.user_metadata?.first_name || ''} ${user.user_metadata?.last_name || ''}`.trim() ||
-        user.user_metadata?.name ||
-        user.email?.split('@')[0] ||
-        'User';
-
-      // For non-Google users, ensure profile exists immediately.
-      // For Google users, defer profile creation to the role selection flow.
-      if (!providers.includes('google')) {
-        await ensureProfileExists(user.id, user.email ?? '', fullName);
-      }
-      // If Google user, sync avatar_url from Google metadata when missing
-      if (providers.includes('google')) {
-        const googleAvatar = (user.user_metadata as any)?.avatar_url || (user.user_metadata as any)?.picture;
-        if (googleAvatar) {
-          const { data: prof, error: profErr } = await supabase
-            .from('profiles')
-            .select('avatar_url')
-            .eq('id', user.id)
-            .maybeSingle();
-          if (profErr) {
-            console.warn('Profile fetch error while syncing Google avatar:', profErr);
-          }
-          if (!prof?.avatar_url) {
-            const { error: upErr } = await supabase
-              .from('profiles')
-              .update({ avatar_url: googleAvatar })
-              .eq('id', user.id);
-            if (upErr) {
-              console.warn('Failed to update avatar_url from Google:', upErr);
-            } else {
-              // Warm caches for instant UI
-              avatarCache.set(`avatar:${user.id}`, googleAvatar, 15 * 60 * 1000);
-              profileCache.delete(`profile:${user.id}`);
-            }
-          }
-        }
-      }
-    })();
-  }, [authState.user, ensureProfileExists, sendNewUserNotification]);
-
-  // Refresh profile
-  const refreshProfile = useCallback(async () => {
-    const u = authState.session?.user;
-    if (!u) return;
-    const fullName =
-      `${u.user_metadata?.first_name || ''} ${u.user_metadata?.last_name || ''}`.trim() ||
-      u.user_metadata?.name ||
-      u.email?.split('@')[0] ||
-      'User';
-    try {
-      await ensureProfileExists(u.id, u.email ?? '', fullName);
-      // Refresh role after profile update
-      const newRole = await fetchUserRole(u);
-      setAuthState(prev => ({ ...prev, role: newRole }));
-    } catch {
-      setAuthState(prev => ({ ...prev, error: 'Failed to refresh profile' }));
-    }
-  }, [authState.session, ensureProfileExists, fetchUserRole]);
-
-  // Sign out
-  const signOut = useCallback(async () => {
-    try {
-      console.log('🚪 Starting sign out process...');
-      
-      sessionStableRef.current = false;
-      reconnectAttemptRef.current = 0;
-      localStorage.removeItem('supabase_session_backup');
-      
-      setAuthState({
-        user: null, 
-        session: null, 
-        loading: false, 
-        initialized: true,
-        role: null,
-        roleLoading: false,
-        error: null,
-      });
-      
-      if (authStateDebounceRef.current) {
-        clearTimeout(authStateDebounceRef.current);
-        authStateDebounceRef.current = null;
-      }
-      
-      await supabase.auth.signOut();
-      console.log('✅ Successfully signed out');
-    } catch (e) {
-      console.error('❌ Sign out error:', e);
-      setAuthState({
-        user: null, 
-        session: null, 
-        loading: false, 
-        initialized: true,
-        role: null,
-        roleLoading: false,
-        error: null,
-      });
-    }
-  }, []);
-
-  // Get current user type (for URL-based routing)
-  const getCurrentUserType = useCallback((): "therapist" | "client" | "admin" | null => {
-    // For admin users, always return admin regardless of URL
-    if (authState.role === 'admin') {
-      return 'admin';
-    }
-    
-    // For regular users, return their role
-    return authState.role;
-  }, [authState.role]);
-
-  const value: UseAuthManagerReturn = {
-    ...authState,
-    signOut,
-    refreshProfile,
-    getCurrentUserType,
-  };
-
-  return (
-    <AuthManagerContext.Provider value={value}>
-      {children}
-    </AuthManagerContext.Provider>
-  );
+  // No demo role chosen → real auth, in dev too. A visitor who signed up on
+  // /coach is genuinely signed in here; a visitor who did not is genuinely
+  // signed out — which also kills the old "dashboard flash" the previous
+  // demo-logged-out shim existed to suppress.
+  return <RealAuthProvider>{children}</RealAuthProvider>;
 };
 
-// Legacy compatibility hooks
+/* -------------------------------------------------------------------------- */
+/* Legacy compatibility hooks                                                  */
+/* -------------------------------------------------------------------------- */
+
 export const useAuth = () => {
   const authManager = useAuthManager();
   return {
@@ -677,7 +322,7 @@ export const useUserRole = () => {
   };
 };
 
-export const useCurrentUserType = (): "therapist" | "client" | "admin" | null => {
+export const useCurrentUserType = (): 'therapist' | 'client' | 'admin' | null => {
   const authManager = useAuthManager();
   return authManager.getCurrentUserType();
 };

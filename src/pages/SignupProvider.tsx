@@ -27,6 +27,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ArrowRight, LogIn, Search, ShieldCheck } from 'lucide-react';
 import { toast } from 'sonner';
+import { getApiToken, signUp } from '@/lib/authClient';
 
 import Seo from '@/components/seo/Seo';
 import { Badge } from '@/components/ui/badge';
@@ -57,7 +58,7 @@ type FieldKey =
   | 'city';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-const MIN_PASSWORD = 8;
+const MIN_PASSWORD = 10; // mirrors the server's minimum
 
 const SignupProvider = () => {
   const { t } = useTranslation();
@@ -98,7 +99,7 @@ const SignupProvider = () => {
     if (password.length < MIN_PASSWORD) {
       next.password = t(
         'signup_err_password',
-        'Kies een wachtwoord van minstens 8 tekens.',
+        'Kies een wachtwoord van minstens 10 tekens.',
       );
     }
     if (!providerType) {
@@ -110,7 +111,7 @@ const SignupProvider = () => {
     return next;
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     markStarted();
 
@@ -124,6 +125,47 @@ const SignupProvider = () => {
 
     setSubmitting(true);
     try {
+      // 1. The REAL account, on Neon Auth. The mock below used to be the whole
+      //    story; now it only carries the demo product state (finder profile,
+      //    trial, founding number) while the credentials are genuine.
+      const { error: authError } = await signUp.email({
+        email: email.trim(),
+        password,
+        name: `${firstName.trim()} ${lastName.trim()}`,
+      });
+
+      if (authError) {
+        setSubmitting(false);
+        if (authError.code === 'USER_ALREADY_EXISTS') {
+          setErrors({ email: t('signup_err_email_taken', 'Er bestaat al een account met dit e-mailadres. Log in.') });
+        } else {
+          toast.error(
+            t('signup_toast_error', 'Er ging iets mis bij het aanmaken van je account. Probeer het opnieuw.'),
+          );
+        }
+        return;
+      }
+
+      // 2. Attach the person, as a therapist. The server caps roles at
+      //    client/therapist, so this endpoint can never mint an admin.
+      const token = await getApiToken();
+      if (token) {
+        await fetch('/api/profile', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json', authorization: `Bearer ${token}` },
+          body: JSON.stringify({
+            role: 'therapist',
+            firstName: firstName.trim(),
+            lastName: lastName.trim(),
+          }),
+        }).catch(() => {
+          /* re-attempted on next load by the auth provider; not fatal here */
+        });
+      }
+
+      // 3. Demo product state (finder profile, trial, founding number) — the
+      //    data layer is still the mock; this keeps the rest of the journey
+      //    working until it moves to Neon.
       createProviderAccount({
         firstName,
         lastName,
@@ -340,7 +382,7 @@ const SignupProvider = () => {
             <Field
               id="password"
               label={t('signup_field_password', 'Wachtwoord')}
-              hint={t('signup_hint_password', 'Minstens 8 tekens.')}
+              hint={t('signup_hint_password', 'Minstens 10 tekens.')}
               error={errors.password}
             >
               <Input
