@@ -28,9 +28,44 @@ is aan de codekant al voorbereid.
 | B9 | **DPA + verwerkingsregio** voor Vercel AI Gateway en de modelaanbieder | Bond met echte cliëntdata | Art. 9-data loopt nu langs de gateway. Nodig vóór echte cliënten, niet vóór verder bouwen. |
 | B7 | **Juridische review** (advocaat/DPO) | Live gaan met echte cliënten | Zie `docs/plan/09-compliance-gate.md`: consent-teksten, bewaartermijn-matrix (art. 9 + Belgische patiëntendossierregels), DPA's, DPIA |
 
-> **Volgorde-advies:** B8 eerst (de endpoints staan open), dan B3 + de mock→Neon-omzetting,
-> dan B1 (e-mail maakt het product rond), dan B4 (geld). B7 en B9 blokkeren alleen
-> de échte launch met echte cliënten, niet de bouw.
+> **Volgorde-advies:** B8 is gedaan. Nu B3 + de mock→Neon-omzetting (§3, het
+> grootste blok en het enige dat een werkende productiebuild in de weg staat),
+> dan B1 (e-mail maakt het product rond), dan B4 (geld). B7 en B9 blokkeren
+> alleen de échte launch met echte cliënten, niet de bouw.
+
+---
+
+## 1b. Kleine dashboard-taken voor de eigenaar (elk < 5 minuten)
+
+Geen code nodig; elk item blokkeert wel iets concreets.
+
+| # | Wat | Waar | Wat het deblokkeert |
+|---|-----|------|---------------------|
+| C1 | **Roteer drie credentials** — het Neon-DB-wachtwoord, de Vercel AI Gateway-key en het Turnstile-secret | Neon-, Vercel- en Cloudflare-dashboard | Ze zijn tijdens het bouwen in een chattranscript geplakt. Ze wérken; ze horen alleen niet in een log te staan. Doe dit vóór productie. |
+| C2 | **Trusted origins invullen** (`http://localhost:3002` + je echte domein) | Neon-console → Auth | Wachtwoord-reset. Nu leeg, dus `request-password-reset` geeft 403. Dit is het enige dat tussen jou en een werkende reset staat — de Neon-mailprovider is al geconfigureerd. |
+| C3 | **`localhost` bij de Turnstile-hostnames** | Cloudflare → Turnstile → widget | De botcheck lokaal kunnen testen. In productie werkt hij sowieso op je eigen domein; zonder dit kun je hem alleen niet op je eigen machine proberen. |
+| C4 | **Krediet op AI Gateway** (of bevestigen dat het Pro-team de key bezit) | Vercel → AI | Toegang tot Opus-modellen. Nu free tier: `sonnet-5` mag, `opus-5`/`opus-4.8`/`haiku-4.5` niet. Sonnet 5 is bewust de keuze (beter én goedkoper dan 4.6), dus dit is comfort, geen blokkade. |
+| C5 | **E-mailverificatie aanzetten** zodra C2 rond is | `emailAndPassword.requireEmailVerification` | Staat bewust op `false`: aanzetten vóór mail werkt, sluit elke nieuwe registratie buiten. |
+
+---
+
+## 1c. Wat nog niet in een echte browser is bevestigd
+
+Alles hieronder is server-side getest (curl, type-check, database), maar de
+browserverificatie is bewust overgeslagen — de preview deed de omgeving
+crashen. De vangnetten eromheen zijn wél getest: faalt een van deze, dan krijgt
+de bezoeker een nette Nederlandse melding, geen stilte.
+
+- [ ] **Turnstile-widget mint echt een token** op localhost (hangt aan C3).
+- [ ] **Google-redirect-UX** end-to-end: `/coach` → Google → terug → thread
+      geadopteerd. De serverkant van die keten is getest; de redirect zelf niet.
+- [ ] **Cross-origin sessiecookie** in een browser die third-party cookies
+      blokkeert. Neon Auth zet `SameSite=None; Secure; Partitioned` (CHIPS), wat
+      juist is — maar een browser zonder CHIPS-ondersteuning houdt de sessie niet
+      vast. Waard om in Safari te proberen.
+
+Dit is in tien minuten zelf te doen: open `/coach`, praat tot de cap, maak een
+account, herlaad.
 
 ---
 
@@ -56,6 +91,50 @@ Deze zijn expliciet gemarkeerd in de code. Ze moeten waar worden zodra B1/B2 er 
 ---
 
 ## 3. Bekende gaten / opgeruimd maar niet af
+
+### 3a. De datalaag: van de Supabase-shim naar Neon — het grootste blok
+
+> **Dit is wat een werkende productiebuild vandaag tegenhoudt.** `supabase` is
+> geen Supabase meer maar een compatibiliteitsshim: in dev en demo krijg je de
+> in-memory mock, in een productiebuild een client die naar
+> `cvoilvhdqczdhpijutyt.supabase.co` wijst — een domein dat **niet meer
+> resolvet**. In dev merk je daar niets van; een productiebuild is stuk.
+>
+> Er valt niets te *migreren* (dat Supabase-project bestaat niet, er staat geen
+> data in). Het is een herbouw van de datalaag. De gemeten omvang — 72 bestanden
+> importeren de shim, 71 gebruiken hem:
+
+| Onderdeel | Aanroepen | Neon-equivalent |
+|---|---|---|
+| `from()` — data | **231**, 15 tabellen | ja, via API-routes |
+| `functions.invoke` — edge functions | **16** | nee, worden API-routes |
+| `storage` — bestanden | **15** | **nee** — Vercel Blob of S3 |
+| realtime (`channel`/`removeChannel`) | **27** | **nee** — SSE of polling |
+| `rpc()` | 8, 3 functies | moeten geschreven worden (bestaan niet in Neon) |
+| `auth.*` | 36 | **gedaan** — Neon Auth (B8) |
+
+- [ ] **Datalaag (231 calls).** De browser kan niet rechtstreeks met Neon praten
+      — `DATABASE_URL` in de frontend is je volledige databasewachtwoord publiek.
+      Elke call moet via een server-route met per-tabel toegangsregels. Dat kan
+      nu veilig: `getServerProfile()` levert de identiteit en rol.
+      **Kortere weg dan 231 herschrijvingen:** de mock implementeert die hele
+      chainable interface al (`from().select().eq().single()`), dus één bestand
+      (`integrations/supabase/client.ts`) kan naar een echte laag wijzen en de
+      71 bestanden veranderen nauwelijks.
+- [ ] **16 edge functions** → API-routes (dezelfde dev-middleware bedient ze al).
+- [ ] **15 storage-aanroepen** → Vercel Blob of S3. Neon slaat geen bestanden op.
+- [ ] **27 realtime-aanroepen** → SSE of polling. Neon heeft geen realtime.
+- [ ] **3 RPC-functies** (`get_unread_message_counts`, `mark_messages_as_read`,
+      `mark_conversation_messages_read`) bestaan niet in Neon — schrijven als
+      SQL-functie of vervangen door gewone queries.
+- [ ] **`COACH_ADMIN_TOKEN`-fallback verwijderen** zodra de admin-console zelf
+      inlogt. De rolcheck (`profiles.role = 'admin'`) werkt al; het gedeelde
+      token blijft er alleen omdat de console het nog meestuurt. Eén gedeeld
+      geheim is geen identiteit: niet per persoon intrekbaar, niet auditbaar.
+- [ ] **`profiles` heeft nog geen `avatar_url`-sync** voor Google-accounts. De
+      oude Supabase-code deed dat; bij de omzetting is het niet meegekomen.
+
+### 3b. Overige gaten
 
 - [ ] **Prerendering / SSR voor SEO** — `<Seo>` zet titel + canonical per route,
       maar een crawler die geen JS uitvoert ziet enkel `index.html`. Voor
