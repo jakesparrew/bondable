@@ -423,8 +423,16 @@ const RequestProviderDialog = ({
                       )}
                     </p>
                     <div className="mt-3 flex flex-wrap gap-2">
+                      {/* Real registration (Neon Auth), register tab up front,
+                          and back to THIS thread afterwards — /setup-password
+                          was a mock that stored nothing. */}
                       <Button type="button" size="sm" variant="outline" asChild>
-                        <Link to="/setup-password" onClick={() => onOpenChange(false)}>
+                        <Link
+                          to={`/login?mode=register&redirect=${encodeURIComponent(
+                            threadUrl ? new URL(threadUrl).pathname : '/find',
+                          )}`}
+                          onClick={() => onOpenChange(false)}
+                        >
                           {t('finder_request_success_account_cta', 'Wachtwoord kiezen')}
                         </Link>
                       </Button>

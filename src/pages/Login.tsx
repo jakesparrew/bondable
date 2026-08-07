@@ -35,7 +35,13 @@ const Login = () => {
   const [firstName, setFirstName] = useOptimizedState("");
   const [lastName, setLastName] = useOptimizedState("");
   const [selectedRole, setSelectedRole] = useOptimizedState<"therapist" | "client" | null>(null);
-  const [isRegister, setIsRegister] = useOptimizedState(false);
+  // ?mode=register opens on the register tab — used by the post-lead nudge,
+  // where "no account yet" is the known state. Read directly from location so
+  // it works before the router hooks below have run.
+  const [isRegister, setIsRegister] = useOptimizedState(
+    typeof window !== "undefined" &&
+      new URLSearchParams(window.location.search).get("mode") === "register",
+  );
   const [isLoading, setIsLoading] = useOptimizedState(false);
   const [showRoleDialog, setShowRoleDialog] = useOptimizedState(false);
   const [isRedirecting, setIsRedirecting] = useOptimizedState(false);

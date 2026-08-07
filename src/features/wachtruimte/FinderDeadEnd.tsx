@@ -78,7 +78,10 @@ const FinderDeadEnd = ({
       setDemoRole('client');
       window.location.assign('/dashboard/client/bond');
     } else {
-      navigate('/login');
+      // The public chat, not a login wall: /coach talks first and asks for an
+      // account once the conversation is worth saving — same fix as the
+      // homepage hero CTA.
+      navigate('/coach');
     }
   };
 

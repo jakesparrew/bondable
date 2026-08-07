@@ -113,7 +113,9 @@ const WachtruimtePanel = ({
       setDemoRole('client');
       window.location.assign(path);
     } else {
-      navigate('/login');
+      // Preserve the destination through the login: the visitor picked a
+      // specific place to go, and losing that on the auth wall loses them.
+      navigate(`/login?redirect=${encodeURIComponent(path)}`);
     }
   };
 
