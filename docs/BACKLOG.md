@@ -179,6 +179,62 @@ Deze zijn expliciet gemarkeerd in de code. Ze moeten waar worden zodra B1/B2 er 
 - [ ] **Data-export voor de hulpverlener** (cliënten CSV, ondertekende notities,
       factuurboek) — vertrouwen én AVG.
 
+### B10 — Stripe Connect: hulpverleners hun eigen cliënten laten aanrekenen
+
+**Beslissing: niet nu. Eerst gewone abonnementen (B4), Connect pas per markt
+zodra daar volume is.** De redenering, zodat ze niet opnieuw gevoerd hoeft te
+worden:
+
+**Technisch geen probleem.** Stripe Connect Express, destination charges met
+`application_fee_amount` voor de commissie, Stripe Billing of SEPA-domiciliëring
+voor het terugkerende deel. Estland is een ondersteund platformland, België een
+ondersteund land voor connected accounts.
+
+**Wat het commercieel oplevert.** Een therapeut met 20 sessies/week à €70 draait
+~€6.000/maand. 3% = €180 tegenover €39 abonnement — vier à vijf keer het huidige
+model. Wél de vraag of ze het accepteren: België is een overschrijvingsland, en
+een overschrijving is gratis.
+
+**Waarom het botst met de ranking-belofte.** Bij een percentage per sessie
+verdien je meer naarmate bepáálde hulpverleners meer cliënten krijgen. Dan heb
+je een financieel belang in de match, en "volgorde op fit, nooit op betaling" is
+niet meer te bewíjzen. Uitweg: **uniform tarief voor iedereen, gepubliceerd.**
+Wat het definitief breekt is een gestaffelde commissie (Pro betaalt minder %) —
+dan koppel je geld aan positie.
+
+**De BTW is niet uniform, en dat is contra-intuïtief.** Sinds 1-1-2022 is de
+toets het *doel*, niet het beroep: psychotherapie met therapeutisch doel door een
+erkend klinisch psycholoog/orthopedagoog is vrijgesteld; **coaching,
+persoonlijke ontwikkeling en expertiseverslagen niet** (21%). Het platform laat
+beide toe, dus het bestand is gemengd — en gemengde praktijken hebben pro rata
+aftrek.
+
+Gevolg: een **coach** (btw-plichtig, kan aftrekken) betaalt netto 3%. Een
+**erkende therapeut** (vrijgesteld, kan níet aftrekken) betaalt 3,63% én moet
+een btw-identificatienummer aanvragen (formulier 604A) plus een bijzondere
+btw-aangifte indienen voor de verlegde btw op onze Estse factuur. We vragen dus
+het meest van precies de groep die ons vertrouwensanker is.
+
+Praktisch: factureer de commissie **maandelijks gebundeld**, niet per
+transactie — anders staan er honderden regels in hun boekhouding.
+
+**Het doorslaggevende argument tegen "nu".** Alles hierboven is het *Belgische*
+plaatje. Elk land heeft eigen regels over welke zorg vrijgesteld is en hoe een
+zorgverlener mag factureren. Een commissie op zorgbetalingen laat je
+regelgevingslast meegroeien met je landkaart; een abonnement is in de hele EU
+één B2B-dienst met verlegging. Eén regel, overal.
+
+**Openstaande vragen voor de boekhouder** (bepalen of de structuur doet wat
+verwacht wordt, los van dit product):
+- Werkelijke plaats van leiding van de Estse vennootschap terwijl de bestuurder
+  in België woont — bij Belgische residentie is de winst hier belastbaar en valt
+  Estlands uitstel op ingehouden winst weg.
+- Verlegging + IC-opgave voor de eenmanszaak die naar de Estse vennootschap
+  factureert.
+- At-arm's-length-hoogte van die interne vergoeding.
+- Ontbreekt nog volledig in de code: getuigschrift voor verstrekte hulp,
+  btw-behandeling per prestatie, mutualiteit-terugbetaling.
+
 ---
 
 ## 5. Afgesproken beslissingen (niet heropenen zonder reden)
